@@ -28,6 +28,14 @@ RegisterCommand('toggle_radio', () => {
     ToggleRadio();
 }, false);
 
+RegisterCommand('set_rid', (source, args) => {
+    if (args.length > 0) {
+        setRid(args[0]);
+    } else {
+        console.log('Usage: /set_rid <RID>');
+    }
+}, false);
+
 onNet('open_radio', () => {
     ToggleRadio();
 });
@@ -54,6 +62,7 @@ function ToggleRadio() {
 function OpenRadio() {
     console.debug('Open radio command received');
     SendNuiMessage(JSON.stringify({ type: 'openRadio' }));
+    SendNuiMessage(JSON.stringify({ type: 'setRid', rid: GetResourceKvpString('myRid') }));
     SetNuiFocus(false, false);
     isRadioOpen = true;
 }
@@ -101,3 +110,9 @@ function handlePTTUp() {
 setTick(async () => {
     await Wait(0);
 });
+
+function setRid(newRid) {
+    myRid = newRid;
+    SetResourceKvp('myRid', myRid);
+    SendNuiMessage(JSON.stringify({ type: 'setRid', rid: GetResourceKvpString('myRid') }));
+}

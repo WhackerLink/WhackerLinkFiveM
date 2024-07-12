@@ -2,11 +2,13 @@ const pcmPlayer = new PCMPlayer({ encoding: '16bitInt', channels: 1, sampleRate:
 const EXPECTED_PCM_LENGTH = 1600;
 const CHUNK_SIZE = 320;
 
+const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 let socket;
 let currentChannel;
 let audioBuffer = [];
 
-let myRid = "123498";
+let myRid = "1234";
 let currentTg = "2001";
 
 window.addEventListener('message', async function (event) {
@@ -28,6 +30,8 @@ window.addEventListener('message', async function (event) {
         document.getElementById('startup-message').style.display = 'block';
     } else if (event.data.type === 'hideStartupMessage') {
         document.getElementById('startup-message').style.display = 'none';
+    } else if (event.data.type === 'setRid') {
+        myRid = event.data.rid;
     }
 });
 
@@ -49,7 +53,6 @@ function SendRegistrationRequest() {
 }
 
 function SendDeRegistrationRequest() {
-    console.debug("Sending u de reg")
     if (!socketOpen) { return; }
 
     const request = {
@@ -60,9 +63,6 @@ function SendDeRegistrationRequest() {
     }
 
     socket.send(JSON.stringify(request));
-
-    console.debug("sent u de reg")
-
 }
 
 function SendGroupVoiceRequest() {
@@ -124,14 +124,17 @@ function connectWebSocket() {
                     handleAudioData(bytes.buffer);
                 }
             } else if (data.type == packetToNumber("GRP_VCH_RSP")) {
-                if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
+                if (data.data.SrcId !== myRid && data.data.DstId === currentTg && data.data.Status === 0) {
                     currentChannel = data.data.Channel;
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
-                } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
+                } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status === 0) {
                     currentChannel = data.data.Channel;
+                    tpt_generate();
                     micCapture.captureMicrophone(() => {
                         console.log('Microphone captured');
                     });
+                } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status !== 0) {
+                    bonk();
                 }
             } else if (data.type == packetToNumber("GRP_VCH_RLS")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
@@ -161,9 +164,81 @@ function handleAudioData(data) {
     }
 }
 
-function onAudioFrameReady(buffer, rms) {
-    console.log('Received audio chunk:', buffer);
+function beep(frequency, duration, volume, type) {
+    var oscillator = beepAudioCtx.createOscillator();
+    var gainNode = beepAudioCtx.createGain();
 
+    oscillator.connect(gainNode);
+    gainNode.connect(beepAudioCtx.destination);
+    vol = 1;
+    gainNode.gain.value = vol;
+    oscillator.frequency.value = frequency;
+    oscillator.type = type;
+
+    oscillator.start();
+
+    setTimeout(
+        function () {
+            oscillator.stop();
+        },
+        duration
+    );
+}
+function tpt_generate(){
+    beep(910, 30, 20, 'sine');
+    setTimeout(function () {
+        beep(0, 20, 20, 'sine');
+    }, 30);
+    setTimeout(function () {
+        beep(910, 30, 20, 'sine');
+    }, 50);
+    setTimeout(function () {
+        beep(0, 20, 20, 'sine');
+    }, 80);
+    setTimeout(function () {
+        beep(910, 50, 20, 'sine');
+    }, 100);
+}
+
+function play_page_alert(){
+    beep(910, 150, 20, 'sine');
+    setTimeout(function () {
+        beep(0, 150, 20, 'sine');
+    }, 150);
+    setTimeout(()=>{
+        beep(910, 150, 20, 'sine');
+    }, 300);
+    setTimeout(()=>{
+        beep(0, 150, 20, 'sine');
+    }, 450);
+    setTimeout(()=>{
+        beep(910, 150, 20, 'sine');
+    }, 600);
+    setTimeout(()=>{
+        beep(0, 150, 20, 'sine');
+    }, 750);
+    setTimeout(()=>{
+        beep(910, 150, 20, 'sine');
+    }, 900);
+}
+
+function emergency_tone_generate(){
+    beep(610, 500, 20, 'sine');
+    setTimeout(function () {
+        beep(910, 500, 20, 'sine');
+    }, 500);
+    setTimeout(function () {
+        beep(610, 500, 20, 'sine');
+    }, 1000);
+    setTimeout(function () {
+        beep(910, 500, 20, 'sine');
+    }, 1500);
+}
+function bonk(){
+    beep(310, 1000, 5, 'sine');
+}
+
+function onAudioFrameReady(buffer, rms) {
     audioBuffer.push(...buffer);
 
     if (audioBuffer.length >= EXPECTED_PCM_LENGTH) {
@@ -183,8 +258,6 @@ function onAudioFrameReady(buffer, rms) {
 
         const jsonString = JSON.stringify(response);
         socket.send(jsonString);
-
-        console.log('Sent audio frame:', fullFrame);
     }
 }
 
