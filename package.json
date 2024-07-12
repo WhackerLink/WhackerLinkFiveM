@@ -1,0 +1,11 @@
+{
+  "name": "whackerlinkfivem",
+  "version": "1.0.0",
+  "main": "server/server.js",
+  "license": "MIT",
+  "dependencies": {
+    "@citizenfx/client": "^2.0.8903-1",
+    "@citizenfx/server": "^2.0.8903-1",
+    "ws": "^8.18.0"
+  }
+}
