@@ -5,17 +5,35 @@ const CHUNK_SIZE = 320;
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 let socket;
-let currentChannel;
+let currentChannelIndex = 0;
+let currentZoneIndex = 0;
+let currentFrequncyChannel;
+let currentCodeplug;
 let isTxing = false;
 let audioBuffer = [];
 
 let myRid = "1234";
 let currentTg = "2001";
+let radioModel;
+
+function socketOpen(){
+    return socket && socket.readyState === WebSocket.OPEN;
+}
 
 window.addEventListener('message', async function (event) {
     if (event.data.type === 'openRadio') {
+        currentCodeplug = event.data.codeplug;
+
+        console.log("model: " + radioModel);
+
+        if (radioModel == null) {
+            radioModel = currentCodeplug.radioWide.model;
+        }
+
+        loadRadioModelAssets(radioModel);
         document.getElementById('radio-container').style.display = 'block';
         connectWebSocket();
+        updateDisplay();
     } else if (event.data.type === 'closeRadio') {
         await SendDeRegistrationRequest();
         document.getElementById('radio-container').style.display = 'none';
@@ -25,34 +43,109 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === "pttRelease") {
         if (isTxing) {
             SendGroupVoiceRelease();
-            currentChannel = null;
+            currentFrequncyChannel = null;
+            micCapture.stopCapture();
+            console.debug('Recording stopped');
+        } else {
+            console.debug("not txing not releasing");
         }
+
         isTxing = false;
-        micCapture.stopCapture();
-        console.debug('Recording stopped');
     } else if (event.data.type === 'showStartupMessage') {
         document.getElementById('startup-message').style.display = 'block';
     } else if (event.data.type === 'hideStartupMessage') {
         document.getElementById('startup-message').style.display = 'none';
     } else if (event.data.type === 'setRid') {
         myRid = event.data.rid;
+    } else if (event.data.type === 'setModel') {
+        loadRadioModelAssets(event.data.model);
+        radioModel = event.data.model;
     }
 });
 
-function socketOpen(){
-    return socket && socket.readyState === WebSocket.OPEN;
+document.addEventListener('keydown', function (event) {
+    console.log("Key event")
+    if (event.key === 'Escape') {
+        console.log("Sending fetch" + `https://${GetParentResourceName()}/unFocus`);
+        fetch(`https://${GetParentResourceName()}/unFocus`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        });
+    }
+});
+
+document.getElementById('channel-up').addEventListener('click', () => {
+    changeChannel(1);
+});
+
+document.getElementById('zone-up').addEventListener('click', () => {
+    changeZone(1);
+});
+
+function changeChannel(direction) {
+    currentChannelIndex += direction;
+    const currentZone = currentCodeplug.zones[currentZoneIndex];
+    if (currentChannelIndex >= currentZone.channels.length) {
+        currentChannelIndex = 0;
+    } else if (currentChannelIndex < 0) {
+        currentChannelIndex = currentZone.channels.length - 1;
+    }
+    updateDisplay();
+    reconnectIfSystemChanged();
+}
+
+function changeZone(direction) {
+    currentZoneIndex += direction;
+    if (currentZoneIndex >= currentCodeplug.zones.length) {
+        currentZoneIndex = 0;
+    } else if (currentZoneIndex < 0) {
+        currentZoneIndex = currentCodeplug.zones.length - 1;
+    }
+    currentChannelIndex = 0;
+    updateDisplay();
+    reconnectIfSystemChanged();
+}
+
+function updateDisplay() {
+    const currentZone = currentCodeplug.zones[currentZoneIndex];
+    const currentChannel = currentZone.channels[currentChannelIndex];
+    document.getElementById('line1').innerText = currentZone.name;
+    document.getElementById('line2').innerText = currentChannel.name;
+    currentTg = currentChannel.tgid;
+}
+
+function reconnectIfSystemChanged() {
+    const currentZone = currentCodeplug.zones[currentZoneIndex];
+    const currentChannel = currentZone.channels[currentChannelIndex];
+    const currentSystem = currentCodeplug.systems.find(system => system.name === currentChannel.system);
+
+    if (socket && socket.url !== `ws://${currentSystem.address}:${currentSystem.port}/client`) {
+        disconnectWebSocket();
+        connectWebSocket();
+    }
 }
 
 function connectWebSocket() {
+    //console.log(JSON.stringify(currentCodeplug));
+    const currentZone = currentCodeplug.zones[currentZoneIndex];
+    const currentChannel = currentZone.channels[currentChannelIndex];
+    const currentSystem = currentCodeplug.systems.find(system => system.name === currentChannel.system);
+
+    console.debug("Connecting to master...");
     if (socket && socket.readyState === WebSocket.OPEN) {
+        console.log("Already connect?")
         return;
     }
 
-    socket = new WebSocket('ws://fne.zone1.scan.stream:3015/client');
+    socket = new WebSocket(`ws://${currentSystem.address}:${currentSystem.port}/client`);
     socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
         console.debug('WebSocket connection established');
+        console.debug("Codeplug: " + currentCodeplug);
         SendRegistrationRequest();
     };
 
@@ -63,7 +156,7 @@ function connectWebSocket() {
             console.debug(`Received master message: ${event.data}`);
 
             if (data.type == packetToNumber("AUDIO_DATA")) {
-                if (data.voiceChannel.SrcId !== myRid && data.voiceChannel.DstId == currentTg && data.voiceChannel.Frequency == currentChannel) {
+                if (data.voiceChannel.SrcId !== myRid && data.voiceChannel.DstId == currentTg && data.voiceChannel.Frequency == currentFrequncyChannel) {
                     const binaryString = atob(data.data);
                     const len = binaryString.length;
                     const bytes = new Uint8Array(len);
@@ -74,11 +167,11 @@ function connectWebSocket() {
                 }
             } else if (data.type == packetToNumber("GRP_VCH_RSP")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg && data.data.Status === 0) {
-                    currentChannel = data.data.Channel;
+                    currentFrequncyChannel = data.data.Channel;
                     isTxing = false;
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status === 0) {
-                    currentChannel = data.data.Channel;
+                    currentFrequncyChannel = data.data.Channel;
                     isTxing = true;
                     tpt_generate();
                     micCapture.captureMicrophone(() => {
@@ -90,7 +183,7 @@ function connectWebSocket() {
             } else if (data.type == packetToNumber("GRP_VCH_RLS")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
                     document.getElementById("line3").innerHTML = '';
-                    currentChannel = null;
+                    currentFrequncyChannel = null;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
 
                 }
@@ -135,62 +228,64 @@ function beep(frequency, duration, volume, type) {
         duration
     );
 }
+
 function tpt_generate(){
-    beep(910, 30, 20, 'sine');
+    beep(910, 30, 30, 'sine');
     setTimeout(function () {
-        beep(0, 20, 20, 'sine');
+        beep(0, 20, 30, 'sine');
     }, 30);
     setTimeout(function () {
-        beep(910, 30, 20, 'sine');
+        beep(910, 30, 30, 'sine');
     }, 50);
     setTimeout(function () {
-        beep(0, 20, 20, 'sine');
+        beep(0, 20, 30, 'sine');
     }, 80);
     setTimeout(function () {
-        beep(910, 50, 20, 'sine');
+        beep(910, 50, 30, 'sine');
     }, 100);
 }
 
 function play_page_alert(){
-    beep(910, 150, 20, 'sine');
+    beep(910, 150, 30, 'sine');
     setTimeout(function () {
-        beep(0, 150, 20, 'sine');
+        beep(0, 150, 30, 'sine');
     }, 150);
     setTimeout(()=>{
-        beep(910, 150, 20, 'sine');
+        beep(910, 150, 30, 'sine');
     }, 300);
     setTimeout(()=>{
-        beep(0, 150, 20, 'sine');
+        beep(0, 150, 30, 'sine');
     }, 450);
     setTimeout(()=>{
-        beep(910, 150, 20, 'sine');
+        beep(910, 150, 30, 'sine');
     }, 600);
     setTimeout(()=>{
-        beep(0, 150, 20, 'sine');
+        beep(0, 150, 30, 'sine');
     }, 750);
     setTimeout(()=>{
-        beep(910, 150, 20, 'sine');
+        beep(910, 150, 30, 'sine');
     }, 900);
 }
 
 function emergency_tone_generate(){
-    beep(610, 500, 20, 'sine');
+    beep(610, 500, 30, 'sine');
     setTimeout(function () {
-        beep(910, 500, 20, 'sine');
+        beep(910, 500, 30, 'sine');
     }, 500);
     setTimeout(function () {
-        beep(610, 500, 20, 'sine');
+        beep(610, 500, 30, 'sine');
     }, 1000);
     setTimeout(function () {
-        beep(910, 500, 20, 'sine');
+        beep(910, 500, 30, 'sine');
     }, 1500);
 }
+
 function bonk(){
-    beep(310, 1000, 5, 'sine');
+    beep(310, 1000, 30, 'sine');
 }
 
 function onAudioFrameReady(buffer, rms) {
-    if (isTxing && currentChannel !== null) {
+    if (isTxing && currentFrequncyChannel !== null) {
         audioBuffer.push(...buffer);
 
         if (audioBuffer.length >= EXPECTED_PCM_LENGTH) {
@@ -203,7 +298,7 @@ function onAudioFrameReady(buffer, rms) {
                 voiceChannel: {
                     SrcId: myRid,
                     DstId: currentTg,
-                    Frequency: currentChannel
+                    Frequency: currentFrequncyChannel
                 },
                 data: fullFrame
             };
@@ -221,4 +316,12 @@ function disconnectWebSocket() {
         socket.close();
         socket = null;
     }
+}
+
+function loadRadioModelAssets(model) {
+    const radioImage = document.getElementById('radio-image');
+    const radioStylesheet = document.getElementById('radio-stylesheet');
+
+    radioImage.src = `models/${model}/radio.png`;
+    radioStylesheet.href = `models/${model}/style.css`;
 }

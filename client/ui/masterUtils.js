@@ -46,7 +46,7 @@ function SendGroupVoiceRelease() {
         data: {
             SrcId: myRid,
             DstId: currentTg,
-            Channel: currentChannel
+            Channel: currentFrequncyChannel
         }
     }
 

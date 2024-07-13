@@ -7,7 +7,7 @@
 
 #radio-image {
     display: block;
-    width: 300px;
+    width: auto;
     height: auto;
     position: relative;
 }
@@ -16,6 +16,7 @@
     position: absolute;
     transform: translateX(-50%);
     top: 91%;
+    width: 40px;
     z-index: 1;
     display: block;
     margin: 10px auto;
@@ -27,20 +28,22 @@
 }
 
 #channel-up {
-    left: 63%;
+    top: 70%;
+    left: 50%;
 }
 
 #zone-up {
-    left: 37%;
+    top: 70%;
+    left: 25%;
 }
 
 #line1, #line2, #line3, #softText1, #softText2, #softText3 {
     position: absolute;
-    left: 50%;
+    left: 37.5%;
     transform: translateX(-50%);
     z-index: 1;
     color: black;
-    font-size: 17px;
+    font-size: 19px;
     font-family: Helvetica, serif;
     font-weight: bold;
     text-align: center;
@@ -48,35 +51,38 @@
 }
 
 #softText1 {
-    font-size: 12px;
-    top: 87%;
-    left: 36%;
+    color: white;
+    font-size: 14px;
+    top: 53%;
+    left: 26%;
 }
 
 #softText2 {
-    font-size: 12px;
-    top: 87%;
-    left: 36%;
+    color: white;
+    font-size: 14px;
+    top: 53%;
+    left: 26%;
 }
 
 #softText3 {
-    font-size: 12px;
-    top: 87%;
-    left: 63.5%;
+    color: white;
+    font-size: 14px;
+    top: 53%;
+    left: 48.5%;
 }
 
 #line1 {
-    top: 73%;
+    top: 28%;
 }
 
 #line2 {
-    top: 77%;
-    font-size: 15px;
+    top: 36.5%;
+    font-size: 17px;
 }
 
 #line3 {
-    top: 81.5%;
-    font-size: 14px;
+    top: 44%;
+    font-size: 15px;
 }
 
 #startup-message {

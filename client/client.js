@@ -1,7 +1,10 @@
 let isRadioOpen = false;
 let isPttPressed = false;
+let nuiFocused = false;
 let lastPttTime = 0;
 let pttPressStartTime = 0;
+let currentCodeplug = {};
+let inVehicle = false;
 
 const PTT_COOLDOWN_MS = 2000;
 const MIN_PTT_DURATION_MS = 500;
@@ -40,7 +43,21 @@ onNet('open_radio', () => {
     ToggleRadio();
 });
 
+onNet('receiveCodeplug', (codeplug) => {
+    console.debug('Received new codeplug:', codeplug);
+    currentCodeplug = codeplug;
+    SetResourceKvp('currentCodeplug', JSON.stringify(currentCodeplug));
+});
+
+RegisterNuiCallbackType('unFocus');
+on('__cfx_nui:unFocus', (data, cb) => {
+    console.debug("Set NUI focus to false");
+    SetNuiFocus(false, false);
+    cb({});
+});
+
 RegisterKeyMapping('toggle_radio', 'Toggle Radio', 'keyboard', 'Y');
+RegisterKeyMapping('toggle_radio_focus', 'Toggle Radio Focus', 'keyboard', ']');
 RegisterKeyMapping('+ptt', 'Push-To-Talk', 'keyboard', 'N');
 
 RegisterCommand('+ptt', () => {
@@ -49,6 +66,19 @@ RegisterCommand('+ptt', () => {
 
 RegisterCommand('-ptt', () => {
     handlePTTUp();
+}, false);
+
+RegisterCommand('toggle_radio_focus', () => {
+    console.debug("Current NUI focus state:", nuiFocused);
+    if (!nuiFocused) {
+        console.debug("Setting NUI focus to true");
+        nuiFocused = true;
+        SetNuiFocus(true, true);
+    } else {
+        console.debug("Setting NUI focus to false");
+        nuiFocused = false;
+        SetNuiFocus(false, false);
+    }
 }, false);
 
 function ToggleRadio() {
@@ -61,7 +91,14 @@ function ToggleRadio() {
 
 function OpenRadio() {
     console.debug('Open radio command received');
-    SendNuiMessage(JSON.stringify({ type: 'openRadio' }));
+    const codeplug = JSON.parse(GetResourceKvpString('currentCodeplug'));
+    console.log(GetResourceKvpString('currentCodeplug'));
+    currentCodeplug = codeplug;
+    if (codeplug === undefined || codeplug === null) {
+        console.debug('No codeplug loaded');
+        return;
+    }
+    SendNuiMessage(JSON.stringify({ type: 'openRadio', codeplug }));
     SendNuiMessage(JSON.stringify({ type: 'setRid', rid: GetResourceKvpString('myRid') }));
     SetNuiFocus(false, false);
     isRadioOpen = true;
@@ -108,6 +145,20 @@ function handlePTTUp() {
 }
 
 setTick(async () => {
+    if (currentCodeplug && currentCodeplug.radioWide && currentCodeplug.radioWide.model) {
+        if (IsPedInAnyVehicle(PlayerPedId(), false)) {
+            if (!inVehicle) {
+                inVehicle = true;
+                SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode}));
+            }
+        } else {
+            if (inVehicle) {
+                inVehicle = false;
+                console.debug('Sending Setting model to:', currentCodeplug.radioWide.model);
+                SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model}));
+            }
+        }
+    }
     await Wait(0);
 });
 
