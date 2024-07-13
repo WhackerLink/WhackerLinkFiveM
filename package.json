@@ -6,6 +6,8 @@
   "dependencies": {
     "@citizenfx/client": "^2.0.8903-1",
     "@citizenfx/server": "^2.0.8903-1",
+    "fs": "^0.0.1-security",
+    "js-yaml": "^4.1.0",
     "ws": "^8.18.0"
   }
 }

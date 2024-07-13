@@ -6,6 +6,7 @@ const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 let socket;
 let currentChannel;
+let isTxing = false;
 let audioBuffer = [];
 
 let myRid = "1234";
@@ -22,9 +23,10 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === "pttPress") {
         SendGroupVoiceRequest();
     } else if (event.data.type === "pttRelease") {
-        micCapture.stopCapture();
-        console.log('Recording stopped');
+        isTxing = false;
         SendGroupVoiceRelease();
+        micCapture.stopCapture();
+        console.debug('Recording stopped');
         currentChannel = null;
     } else if (event.data.type === 'showStartupMessage') {
         document.getElementById('startup-message').style.display = 'block';
@@ -37,61 +39,6 @@ window.addEventListener('message', async function (event) {
 
 function socketOpen(){
     return socket && socket.readyState === WebSocket.OPEN;
-}
-
-function SendRegistrationRequest() {
-    if (!socketOpen) { return; }
-
-    const request = {
-        type: packetToNumber("U_REG_REQ"),
-        data: {
-            SrcId: myRid
-        }
-    }
-
-    socket.send(JSON.stringify(request));
-}
-
-function SendDeRegistrationRequest() {
-    if (!socketOpen) { return; }
-
-    const request = {
-        type: packetToNumber("U_DE_REG_REQ"),
-        data: {
-            SrcId: myRid
-        }
-    }
-
-    socket.send(JSON.stringify(request));
-}
-
-function SendGroupVoiceRequest() {
-    if (!socketOpen) { return; }
-
-    const request = {
-        type: packetToNumber("GRP_VCH_REQ"),
-        data: {
-            SrcId: myRid,
-            DstId: currentTg
-        }
-    }
-
-    socket.send(JSON.stringify(request));
-}
-
-function SendGroupVoiceRelease() {
-    if (!socketOpen) { return; }
-
-    const request = {
-        type: packetToNumber("GRP_VCH_RLS"),
-        data: {
-            SrcId: myRid,
-            DstId: currentTg,
-            Channel: currentChannel
-        }
-    }
-
-    socket.send(JSON.stringify(request));
 }
 
 function connectWebSocket() {
@@ -129,6 +76,7 @@ function connectWebSocket() {
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status === 0) {
                     currentChannel = data.data.Channel;
+                    isTxing = true;
                     tpt_generate();
                     micCapture.captureMicrophone(() => {
                         console.log('Microphone captured');
@@ -239,25 +187,29 @@ function bonk(){
 }
 
 function onAudioFrameReady(buffer, rms) {
-    audioBuffer.push(...buffer);
+    if (isTxing && currentChannel !== null) {
+        audioBuffer.push(...buffer);
 
-    if (audioBuffer.length >= EXPECTED_PCM_LENGTH) {
-        const fullFrame = audioBuffer.slice(0, EXPECTED_PCM_LENGTH);
-        audioBuffer = audioBuffer.slice(EXPECTED_PCM_LENGTH);
+        if (audioBuffer.length >= EXPECTED_PCM_LENGTH) {
+            const fullFrame = audioBuffer.slice(0, EXPECTED_PCM_LENGTH);
+            audioBuffer = audioBuffer.slice(EXPECTED_PCM_LENGTH);
 
-        const response = {
-            type: 1,
-            rms: rms * 30.0,
-            voiceChannel: {
-                SrcId: myRid,
-                DstId: currentTg,
-                Frequency: currentChannel
-            },
-            data: fullFrame
-        };
+            const response = {
+                type: 1,
+                rms: rms * 30.0,
+                voiceChannel: {
+                    SrcId: myRid,
+                    DstId: currentTg,
+                    Frequency: currentChannel
+                },
+                data: fullFrame
+            };
 
-        const jsonString = JSON.stringify(response);
-        socket.send(jsonString);
+            const jsonString = JSON.stringify(response);
+            socket.send(jsonString);
+        }
+    } else {
+        console.debug("Skipping audio send; not permitted to send");
     }
 }
 
