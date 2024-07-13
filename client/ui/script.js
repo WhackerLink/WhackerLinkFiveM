@@ -25,11 +25,11 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === "pttRelease") {
         if (isTxing) {
             SendGroupVoiceRelease();
+            currentChannel = null;
         }
         isTxing = false;
         micCapture.stopCapture();
         console.debug('Recording stopped');
-        currentChannel = null;
     } else if (event.data.type === 'showStartupMessage') {
         document.getElementById('startup-message').style.display = 'block';
     } else if (event.data.type === 'hideStartupMessage') {
