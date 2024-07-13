@@ -24,7 +24,9 @@ window.addEventListener('message', async function (event) {
         SendGroupVoiceRequest();
     } else if (event.data.type === "pttRelease") {
         isTxing = false;
-        SendGroupVoiceRelease();
+        if (currentChannel !== null) {
+            SendGroupVoiceRelease();
+        }
         micCapture.stopCapture();
         console.debug('Recording stopped');
         currentChannel = null;
