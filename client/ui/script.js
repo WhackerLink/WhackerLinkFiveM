@@ -23,10 +23,10 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === "pttPress") {
         SendGroupVoiceRequest();
     } else if (event.data.type === "pttRelease") {
-        isTxing = false;
-        if (currentChannel !== null) {
+        if (isTxing) {
             SendGroupVoiceRelease();
         }
+        isTxing = false;
         micCapture.stopCapture();
         console.debug('Recording stopped');
         currentChannel = null;
@@ -75,6 +75,7 @@ function connectWebSocket() {
             } else if (data.type == packetToNumber("GRP_VCH_RSP")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg && data.data.Status === 0) {
                     currentChannel = data.data.Channel;
+                    isTxing = false;
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status === 0) {
                     currentChannel = data.data.Channel;
