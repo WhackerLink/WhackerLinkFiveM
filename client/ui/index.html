@@ -6,8 +6,40 @@
     <title>Radio</title>
     <link rel="stylesheet" href="" id="radio-stylesheet">
 </head>
+<style>
+    #notification {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(255, 0, 0, 0.8);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 24px;
+        text-align: center;
+        z-index: 1000;
+        display: none;
+    }
+
+    #startup-message {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: black;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 24px;
+        text-align: center;
+        z-index: 1000;
+        display: none;
+    }
+</style>
 <body>
-<div id="startup-message" style="display: none;"></div>
+<div id="notification" style="display: none;"></div>
+<div id="startup-message" style="display: none;">WhackerLinkFiveM, https://github.com/whackerlink</div>
 <div id="radio-container" style="display: none;">
     <img src="" id="radio-image" alt="Radio">
     <div id="line1"></div>

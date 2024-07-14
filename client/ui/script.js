@@ -9,6 +9,7 @@ let currentChannelIndex = 0;
 let currentZoneIndex = 0;
 let currentFrequncyChannel;
 let currentCodeplug;
+let isInRange = false;
 let isTxing = false;
 let audioBuffer = [];
 
@@ -24,7 +25,14 @@ window.addEventListener('message', async function (event) {
     if (event.data.type === 'openRadio') {
         currentCodeplug = event.data.codeplug;
 
-        console.log("model: " + radioModel);
+        if (currentCodeplug == null) {
+            document.getElementById('notification').innerText = "Please set your codeplug first with /set_codeplug <codeplug>";
+            document.getElementById('notification').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('notification').style.display = 'none';
+            }, 2000);
+            return;
+        }
 
         if (radioModel == null) {
             radioModel = currentCodeplug.radioWide.model;
@@ -136,7 +144,7 @@ function connectWebSocket() {
 
     console.debug("Connecting to master...");
     if (socket && socket.readyState === WebSocket.OPEN) {
-        console.log("Already connect?")
+        console.log("Already connected?")
         return;
     }
 
@@ -144,10 +152,24 @@ function connectWebSocket() {
     socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
+        isInRange = true;
+        setUiOOR(isInRange);
         console.debug('WebSocket connection established');
-        console.debug("Codeplug: " + currentCodeplug);
+        // console.debug("Codeplug: " + currentCodeplug);
         SendRegistrationRequest();
     };
+
+    socket.onclose = () => {
+        isInRange = false;
+        setUiOOR(isInRange);
+        console.debug('WebSocket connection closed');
+    }
+
+    socket.onerror = (error) => {
+        isInRange = false;
+        setUiOOR(isInRange);
+        console.error('WebSocket error:', error);
+    }
 
     socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -196,6 +218,19 @@ function connectWebSocket() {
             console.debug('Unknown data type received:', event.data);
         }
     };
+}
+
+function setUiOOR(inRange) {
+    const line3 = document.getElementById('line3');
+
+    if (inRange) {
+        line3.innerHTML = '';
+        line3.style.backgroundColor = '';
+    } else {
+        line3.innerHTML = 'Out of range';
+        line3.style.color = 'white';
+        line3.style.backgroundColor = 'red';
+    }
 }
 
 function handleAudioData(data) {

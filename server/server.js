@@ -34,7 +34,7 @@ function loadCodeplugs() {
 RegisterCommand('set_codeplug', (source, args, rawCommand) => {
     const codeplugName = args[0];
     if (codeplugs[codeplugName]) {
-        console.debug(`Setting codeplug for player ${source}: ${codeplugName}`);
+        // console.debug(`Setting codeplug for player ${source}: ${codeplugName}`);
         emitNet('receiveCodeplug', source, codeplugs[codeplugName]);
     } else {
         console.debug(`Codeplug not found: ${codeplugName}`);

@@ -8,6 +8,11 @@ radioWide:
 
 systems:
   - name: "System 1"
+    address: "fne.zone1.scan.stream"
+    port: 3015
+    rid: "123456"
+
+  - name: "System 2"
     address: "localhost"
     port: 3015
     rid: "123456"
@@ -28,10 +33,10 @@ zones:
   - name: "Zone 2"
     channels:
       - name: "Channel A"
-        system: "System 1"
+        system: "System 2"
         tgid: "16001"
       - name: "Channel B"
-        system: "System 1"
+        system: "System 2"
         tgid: "16002"
       - name: "Channel C"
         system: "System 1"
