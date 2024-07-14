@@ -38,11 +38,17 @@ window.addEventListener('message', async function (event) {
             radioModel = currentCodeplug.radioWide.model;
         }
 
+        micCapture.captureMicrophone(() => {
+            console.log('Microphone captured');
+        });
+
         loadRadioModelAssets(radioModel);
         document.getElementById('radio-container').style.display = 'block';
         connectWebSocket();
         updateDisplay();
     } else if (event.data.type === 'closeRadio') {
+        micCapture.stopCapture();
+        console.debug('Recording stopped');
         await SendDeRegistrationRequest();
         document.getElementById('radio-container').style.display = 'none';
         disconnectWebSocket();
@@ -52,8 +58,8 @@ window.addEventListener('message', async function (event) {
         if (isTxing) {
             SendGroupVoiceRelease();
             currentFrequncyChannel = null;
-            micCapture.stopCapture();
-            console.debug('Recording stopped');
+/*            micCapture.stopCapture();
+            console.debug('Recording stopped');*/
         } else {
             console.debug("not txing not releasing");
         }
@@ -197,9 +203,9 @@ function connectWebSocket() {
                     currentFrequncyChannel = data.data.Channel;
                     isTxing = true;
                     tpt_generate();
-                    micCapture.captureMicrophone(() => {
+/*                    micCapture.captureMicrophone(() => {
                         console.log('Microphone captured');
-                    });
+                    });*/
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status !== 0) {
                     bonk();
                 }
