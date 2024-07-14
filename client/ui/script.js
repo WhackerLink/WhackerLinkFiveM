@@ -191,6 +191,7 @@ function connectWebSocket() {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg && data.data.Status === 0) {
                     currentFrequncyChannel = data.data.Channel;
                     isTxing = false;
+                    document.getElementById("line3").style.color = "black";
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status === 0) {
                     currentFrequncyChannel = data.data.Channel;
