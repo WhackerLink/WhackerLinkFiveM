@@ -39,7 +39,7 @@
 
 #line1, #line2, #line3, #softText1, #softText2, #softText3 {
     position: absolute;
-    left: 37.5%;
+    left: 37.6%;
     transform: translateX(-50%);
     z-index: 1;
     color: black;
@@ -47,7 +47,7 @@
     font-family: Helvetica, serif;
     font-weight: bold;
     text-align: center;
-    width: 90%;
+    width: 30.1%;
 }
 
 #softText1 {
