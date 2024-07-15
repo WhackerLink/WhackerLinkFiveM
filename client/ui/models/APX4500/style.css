@@ -11,16 +11,12 @@
     height: auto;
     position: relative;
 }
-
 #rssi-icon {
-    position: absolute;
-    transform: translateX(-50%);
-    z-index: 1;
-    display: block;
-    top: 20%;
-    left: 23.8%;
+ position: fixed;
+    bottom: 194px;
+    right: 588px;
+    display: inline-block;
 }
-
 #channel-up, #zone-up {
     position: absolute;
     transform: translateX(-50%);
@@ -67,7 +63,7 @@
     display: block;
     margin: 10px auto;
     padding: 7px;
-    background-color: orange;
+    background-color: transparent;
 	color: transparent;
     border: none;
     cursor: pointer;
@@ -159,6 +155,7 @@
 #line3 {
     top: 44%;
     font-size: 15px;
+	width: 30.1%;
 }
 
 #startup-message {
