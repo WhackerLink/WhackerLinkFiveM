@@ -32,6 +32,68 @@
     cursor: pointer;
 }
 
+#channel-knbu {
+	  left: 52%;
+
+}
+#channel-knbd {
+	  left: 44%;
+
+}
+#btn-emer {
+	  left: 96%;
+
+}
+#btn-emer {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 5%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+	color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+
+ #unused-btn {
+    position: absolute;
+    transform: translateX(-50%);
+	visibility: hidden;
+    top: 91%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: red;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+
+
+
+#channel-knbu, #channel-knbd {
+    position: absolute;
+    transform: translateX(-50%);
+	visibility: hidden;
+    top: 35%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+	color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+
+
 #channel-up {
     left: 69%;
     top: 75%;
