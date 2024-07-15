@@ -35,18 +35,18 @@
 #channel-up {
     top: 70%;
     left: 50%;
-	background-color: red;
+	background-color: transparent;
 }
 
 #zone-up {
     top: 70%;
     left: 25%;
-	background-color: red;
+	background-color: transparent;
 }
 #rssi-btn {
     top: 70%;
     left: 33%;
-	 background-color: green;
+	background-color: transparent;
 }
 
 
