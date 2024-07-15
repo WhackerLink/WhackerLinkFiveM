@@ -42,14 +42,19 @@
 <div id="startup-message" style="display: none;">WhackerLinkFiveM, https://github.com/whackerlink</div>
 <div id="radio-container" style="display: none;">
     <img src="" id="radio-image" alt="Radio">
+	<img src="" id="rssi-icon" alt="rssi">
     <div id="line1"></div>
     <div id="line2"></div>
     <div id="line3"></div>
     <div id="softText1">ZnUp</div>
     <div id="softText2"></div>
     <div id="softText3">ChUp</div>
-    <button id="channel-up">C</button>
-    <button id="zone-up">Z</button>
+    <button  onclick="buttonBeep()" id="channel-up">C</button>
+	<button id="channel-knbu">U</button>
+	<button id="channel-knbd">D</button>
+	<button id="btn-emer">E</button>
+    <button onclick="buttonBeep()" id="zone-up">Z </button>
+	<button onclick="buttonBonk()" id="unused-btn">b</button>
 </div>
 <script src="PacketType.js"></script>
 <script src="masterUtils.js"></script>
@@ -58,3 +63,7 @@
 <script src="script.js"></script>
 </body>
 </html>
+
+ 
+
+   
