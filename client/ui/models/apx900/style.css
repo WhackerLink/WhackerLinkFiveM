@@ -7,25 +7,34 @@
 
 #radio-image {
     display: block;
-    width: 300px;
+    width: 250px;
     height: auto;
     position: relative;
 }
 #rssi-icon {
  position: fixed;
-    bottom: 163px;
-    right: 200px;
+     top: 80.5%;
+    right: 11%;
     display: inline-block;
 }
+
+
+
+
+
+
+
+
 
 #channel-up, #zone-up, #unused-btn {
     position: absolute;
     transform: translateX(-50%);
-    top: 91%;
+    top: 90%;
     z-index: 1;
     display: block;
     margin: 10px auto;
-    padding: 7px;
+    padding-left: 7px;
+	padding-right: 7px;
     background-color: transparent;
     color: transparent;
     border: none;
@@ -33,37 +42,53 @@
 }
 
 #channel-up {
-    left: 63%;
+    left: 72%;
+   
 }
 
 #zone-up {
-    left: 37%;
+    left: 28%;
 }
 
-#unused-btn {
-    left: 50%;
+
+ 
+
+ #unused-btn {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 91%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+     background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+	visibility: hidden;
 }
+
 
 
 
 
 #channel-knbu {
-	  left: 52%;
+	  left: 53%;
 
 }
 #channel-knbd {
-	  left: 44%;
+	  left: 43%;
 
 }
 #btn-emer {
-	  left: 28%;
+	  left: 59%;
 
 }
 
 #btn-emer {
     position: absolute;
     transform: translateX(-50%);
-    top: 45%;
+    top: 44%;
     z-index: 1;
     display: block;
     margin: 10px auto;
@@ -127,33 +152,33 @@
 
 #softText1 {
     font-size: 12px;
-    top: 87.2%;
+    top: 85.2%;
     left: 36%;
 }
 
 #softText2 {
     font-size: 12px;
-      top: 87.2%;
+    top: 85.2%;
     left: 36%;
 }
 
 #softText3 {
     font-size: 12px;
-      top: 87.2%;
+    top: 85.2%;
     left: 63.5%;
 }
 
 #line1 {
-    top: 73%;
+    top: 77.2%;
 }
 
 #line2 {
-    top: 77%;
+     top: 79.5%;
     font-size: 15px;
 }
 
 #line3 {
-    top: 81.5%;
+      top: 81.5%;
     font-size: 14px;
     left: 49.5%;
     width: 41%;
