@@ -1,6 +1,7 @@
 const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 8000});
 const EXPECTED_PCM_LENGTH = 1600;
 const CHUNK_SIZE = 320;
+const HOST_VERSION = "1.0.0";
 
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 

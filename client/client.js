@@ -56,6 +56,7 @@ onNet('receiveCodeplug', (codeplug) => {
 });
 
 RegisterNuiCallbackType('unFocus');
+
 on('__cfx_nui:unFocus', (data, cb) => {
     console.debug("Set NUI focus to false");
     SetNuiFocus(false, false);
