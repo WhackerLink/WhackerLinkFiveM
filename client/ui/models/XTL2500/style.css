@@ -7,18 +7,18 @@
 
 #radio-image {
     display: block;
-    width: 300px;
+    width: 600px;
     height: auto;
     position: relative;
 }
 #rssi-icon {
  position: fixed;
-    bottom: 163px;
-    right: 200px;
+    bottom: 130px;
+    right: 425px;
     display: inline-block;
 }
 
-#channel-up, #zone-up, #unused-btn {
+#channel-up, #zone-up {
     position: absolute;
     transform: translateX(-50%);
     top: 91%;
@@ -32,21 +32,6 @@
     cursor: pointer;
 }
 
-#channel-up {
-    left: 63%;
-}
-
-#zone-up {
-    left: 37%;
-}
-
-#unused-btn {
-    left: 50%;
-}
-
-
-
-
 #channel-knbu {
 	  left: 52%;
 
@@ -56,14 +41,13 @@
 
 }
 #btn-emer {
-	  left: 28%;
+	  left: 96%;
 
 }
-
 #btn-emer {
     position: absolute;
     transform: translateX(-50%);
-    top: 45%;
+    top: 5%;
     z-index: 1;
     display: block;
     margin: 10px auto;
@@ -75,6 +59,20 @@
 }
 
 
+ #unused-btn {
+    position: absolute;
+    transform: translateX(-50%);
+	visibility: hidden;
+    top: 91%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: red;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
 
 
 
@@ -82,6 +80,7 @@
 #channel-knbu, #channel-knbd {
     position: absolute;
     transform: translateX(-50%);
+	visibility: hidden;
     top: 35%;
     z-index: 1;
     display: block;
@@ -95,6 +94,15 @@
 
 
 
+#channel-up {
+    left: 69%;
+    top: 75%;
+}
+
+#zone-up {
+    left: 32%;
+    top: 75%;
+}
 
 #line1, #line2, #line3 {
     position: absolute;
@@ -115,7 +123,7 @@
     left: 50%;
     transform: translateX(-50%);
     z-index: 1;
-    color: white;
+    color: #8EA595;
     font-size: 17px;
     font-family: Helvetica, serif;
     font-weight: bold;
@@ -127,33 +135,33 @@
 
 #softText1 {
     font-size: 12px;
-    top: 87.2%;
-    left: 36%;
+    top: 54%;
+    left: 32%;
 }
 
 #softText2 {
     font-size: 12px;
-      top: 87.2%;
+    top: 87%;
     left: 36%;
 }
 
 #softText3 {
     font-size: 12px;
-      top: 87.2%;
-    left: 63.5%;
+    top: 54%;
+    left: 69%;
 }
 
 #line1 {
-    top: 73%;
+    top: 25%;
 }
 
 #line2 {
-    top: 77%;
+    top: 35%;
     font-size: 15px;
 }
 
 #line3 {
-    top: 81.5%;
+    top: 43%;
     font-size: 14px;
     left: 49.5%;
     width: 41%;
