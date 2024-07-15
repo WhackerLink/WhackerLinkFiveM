@@ -12,6 +12,8 @@ files {
     'client/ui/models/**/style.css',
     'client/ui/models',
     'client/ui/index.html',
+	'client/ui/buttonbeep.wav',
+	'client/ui/buttonbonk.wav',
     'client/ui/style.css',
     'client/ui/script.js',
     'client/ui/masterUtils.js',
@@ -20,6 +22,7 @@ files {
     'client/ui/PcmRecorder.js',
     'client/ui/radio.png'
 }
+
 
 author 'Caleb, KO4UYJ (_php_)'
 version '1.0.0'
