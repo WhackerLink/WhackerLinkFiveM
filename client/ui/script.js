@@ -421,6 +421,20 @@ function playSoundEffect(audioPath) {
     audio.play();
 }
 
+
+function knobClick() {
+    playSoundEffect('knob-click.wav');
+}
+
+
+function playSoundEffect(audioPath) {
+    var audio = new Audio(audioPath);
+    audio.play();
+}
+
+
+
+
 function buttonBonk() {
     playSoundEffect('buttonbonk.wav');
 }

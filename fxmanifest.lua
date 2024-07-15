@@ -14,6 +14,7 @@ files {
     'client/ui/index.html',
 	'client/ui/buttonbeep.wav',
 	'client/ui/buttonbonk.wav',
+	'client/ui/knob-click.wav',
     'client/ui/style.css',
     'client/ui/script.js',
     'client/ui/masterUtils.js',
