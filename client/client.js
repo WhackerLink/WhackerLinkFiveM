@@ -123,6 +123,9 @@ function handlePTTDown() {
         SendNuiMessage(JSON.stringify({ type: 'pttPress' }));
         isPttPressed = true;
         pttPressStartTime = currentTime;
+        if (!inVehicle) {
+            playRadioAnimation();
+        }
     } else {
         console.debug('PTT press ignored due to cooldown');
     }
@@ -137,9 +140,11 @@ function handlePTTUp() {
             console.debug('PTT released');
             SendNuiMessage(JSON.stringify({ type: 'pttRelease' }));
             lastPttTime = currentTime;
+            stopRadioAnimation();
         } else {
             console.debug('PTT release ignored due to short press duration');
         }
+
         isPttPressed = false;
     }
 }
@@ -161,6 +166,29 @@ setTick(async () => {
     }
     await Wait(0);
 });
+
+function playRadioAnimation() {
+    const playerPed = PlayerPedId();
+    console.debug('Playing radio animation1');
+    if (!IsEntityPlayingAnim(playerPed, 'random@arrests', 'generic_radio_chatter', 3)) {
+        console.debug('Playing radio animation2');
+        RequestAnimDict('random@arrests');
+        const interval = setInterval(() => {
+            if (HasAnimDictLoaded('random@arrests')) {
+                console.debug('Playing radio animation3');
+                TaskPlayAnim(playerPed, 'random@arrests', 'generic_radio_chatter', 8.0, -8.0, -1, 49, 0, false, false, false);
+                clearInterval(interval);
+            }
+        }, 100);
+    }
+}
+
+function stopRadioAnimation() {
+    const playerPed = PlayerPedId();
+    if (IsEntityPlayingAnim(playerPed, 'random@arrests', 'generic_radio_chatter', 3)) {
+        StopAnimTask(playerPed, 'random@arrests', 'generic_radio_chatter', 3.0);
+    }
+}
 
 function setRid(newRid) {
     myRid = newRid;

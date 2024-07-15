@@ -1,4 +1,4 @@
-const pcmPlayer = new PCMPlayer({ encoding: '16bitInt', channels: 1, sampleRate: 8000 });
+const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 8000});
 const EXPECTED_PCM_LENGTH = 1600;
 const CHUNK_SIZE = 320;
 
@@ -17,7 +17,7 @@ let myRid = "1234";
 let currentTg = "2001";
 let radioModel;
 
-function socketOpen(){
+function socketOpen() {
     return socket && socket.readyState === WebSocket.OPEN;
 }
 
@@ -59,11 +59,11 @@ window.addEventListener('message', async function (event) {
         if (isTxing) {
             SendGroupVoiceRelease();
             currentFrequncyChannel = null;
-/*            micCapture.stopCapture();
-            console.debug('Recording stopped');*/
+            /*            micCapture.stopCapture();
+                        console.debug('Recording stopped');*/
         } else {
             console.debug("not txing not releasing");
-			
+
         }
 
         isTxing = false;
@@ -213,9 +213,9 @@ function connectWebSocket() {
                     isTxing = true;
                     tpt_generate();
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
-/*                    micCapture.captureMicrophone(() => {
-                        console.log('Microphone captured');
-                    });*/
+                    /*                    micCapture.captureMicrophone(() => {
+                                            console.log('Microphone captured');
+                                        });*/
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status !== 0) {
                     bonk();
                 }
@@ -282,7 +282,7 @@ function beep(frequency, duration, volume, type) {
     );
 }
 
-function tpt_generate(){
+function tpt_generate() {
     beep(910, 30, 30, 'sine');
     setTimeout(function () {
         beep(0, 20, 30, 'sine');
@@ -298,29 +298,29 @@ function tpt_generate(){
     }, 100);
 }
 
-function play_page_alert(){
+function play_page_alert() {
     beep(910, 150, 30, 'sine');
     setTimeout(function () {
         beep(0, 150, 30, 'sine');
     }, 150);
-    setTimeout(()=>{
+    setTimeout(() => {
         beep(910, 150, 30, 'sine');
     }, 300);
-    setTimeout(()=>{
+    setTimeout(() => {
         beep(0, 150, 30, 'sine');
     }, 450);
-    setTimeout(()=>{
+    setTimeout(() => {
         beep(910, 150, 30, 'sine');
     }, 600);
-    setTimeout(()=>{
+    setTimeout(() => {
         beep(0, 150, 30, 'sine');
     }, 750);
-    setTimeout(()=>{
+    setTimeout(() => {
         beep(910, 150, 30, 'sine');
     }, 900);
 }
 
-function emergency_tone_generate(){
+function emergency_tone_generate() {
     beep(610, 500, 30, 'sine');
     setTimeout(function () {
         beep(910, 500, 30, 'sine');
@@ -333,7 +333,7 @@ function emergency_tone_generate(){
     }, 1500);
 }
 
-function bonk(){
+function bonk() {
     beep(310, 1000, 30, 'sine');
 }
 
@@ -360,7 +360,7 @@ function onAudioFrameReady(buffer, rms) {
             socket.send(jsonString);
         }
     } else {
-        console.debug("Skipping audio send; not permitted to send");
+        // console.debug("Skipping audio send; not permitted to send");
     }
 }
 
@@ -371,29 +371,25 @@ function disconnectWebSocket() {
     }
 }
 
-      function buttonBeep() {
-            playSoundEffect('buttonbeep.wav');
-        }
-    
-
-        function playSoundEffect(audioPath) {
-            var audio = new Audio(audioPath);
-            audio.play();
-        }
-    function buttonBonk() {
-            playSoundEffect('buttonbonk.wav');
-        }
-    
-
-        function playSoundEffect(audioPath) {
-            var audio = new Audio(audioPath);
-            audio.play();
-        }
+function buttonBeep() {
+    playSoundEffect('buttonbeep.wav');
+}
 
 
+function playSoundEffect(audioPath) {
+    var audio = new Audio(audioPath);
+    audio.play();
+}
+
+function buttonBonk() {
+    playSoundEffect('buttonbonk.wav');
+}
 
 
-
+function playSoundEffect(audioPath) {
+    var audio = new Audio(audioPath);
+    audio.play();
+}
 
 function loadRadioModelAssets(model) {
     const radioImage = document.getElementById('radio-image');
