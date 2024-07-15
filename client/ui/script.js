@@ -1,6 +1,7 @@
-const pcmPlayer = new PCMPlayer({ encoding: '16bitInt', channels: 1, sampleRate: 8000 });
+const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 8000});
 const EXPECTED_PCM_LENGTH = 1600;
 const CHUNK_SIZE = 320;
+const HOST_VERSION = "1.0.0";
 
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -16,8 +17,10 @@ let audioBuffer = [];
 let myRid = "1234";
 let currentTg = "2001";
 let radioModel;
+let currentRssiLevel;
+let currentSite;
 
-function socketOpen(){
+function socketOpen() {
     return socket && socket.readyState === WebSocket.OPEN;
 }
 
@@ -53,17 +56,22 @@ window.addEventListener('message', async function (event) {
         document.getElementById('radio-container').style.display = 'none';
         disconnectWebSocket();
     } else if (event.data.type === "pttPress") {
+        if (!isInRange) {
+            console.debug("Not in range, not txing");
+            bonk();
+            return;
+        }
+
         SendGroupVoiceRequest();
     } else if (event.data.type === "pttRelease") {
 
         if (isTxing) {
             SendGroupVoiceRelease();
             currentFrequncyChannel = null;
-/*            micCapture.stopCapture();
-            console.debug('Recording stopped');*/
+            /*            micCapture.stopCapture();
+                        console.debug('Recording stopped');*/
         } else {
             console.debug("not txing not releasing");
-			
         }
 
         isTxing = false;
@@ -76,6 +84,25 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === 'setModel') {
         loadRadioModelAssets(event.data.model);
         radioModel = event.data.model;
+    } else if (event.data.type === 'setRssiLevel') {
+        const rssiIcon = document.getElementById('rssi-icon');
+        currentSite = event.data.site;
+
+        if (event.data.level === 0) {
+            isInRange = false;
+            setUiOOR(isInRange);
+        } else if (event.data.level > 0 && !isInRange) {
+            isInRange = true;
+            setUiOOR(isInRange);
+        }
+
+        if (currentRssiLevel !== null && currentRssiLevel === parseInt(event.data.level)) {
+            // console.debug("RSSI Level not changed")
+            return;
+        }
+
+        currentRssiLevel = event.data.level;
+        rssiIcon.src = `models/${radioModel}/icons/rssi${event.data.level}.png`;
     }
 });
 
@@ -96,15 +123,28 @@ document.addEventListener('keydown', function (event) {
 document.getElementById('channel-up').addEventListener('click', () => {
     changeChannel(1);
 });
+
 document.getElementById('channel-knbu').addEventListener('click', () => {
     changeChannel(1);
 });
+
 document.getElementById('channel-knbd').addEventListener('click', () => {
     changeChannel(-1);
 });
 
 document.getElementById('zone-up').addEventListener('click', () => {
     changeZone(1);
+});
+
+document.getElementById('rssi-btn').addEventListener('click', () => {
+    buttonBeep();
+    const line3 = document.getElementById('line3');
+    line3.style.backgroundColor = '';
+    line3.style.color = 'black';
+    line3.innerHTML = `SITE: ${currentSite.siteID}`;
+    setTimeout(() => {
+        line3.innerHTML = '';
+    }, 2000);
 });
 
 function changeChannel(direction) {
@@ -166,22 +206,22 @@ function connectWebSocket() {
     socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
-        isInRange = true;
-        setUiOOR(isInRange);
+        // isInRange = true;
+        // setUiOOR(isInRange); // TODO: Site Trunking
         console.debug('WebSocket connection established');
         // console.debug("Codeplug: " + currentCodeplug);
         SendRegistrationRequest();
     };
 
     socket.onclose = () => {
-        isInRange = false;
-        setUiOOR(isInRange);
+        // isInRange = false;
+        // setUiOOR(isInRange); // TODO: Site Trunking
         console.debug('WebSocket connection closed');
     }
 
     socket.onerror = (error) => {
-        isInRange = false;
-        setUiOOR(isInRange);
+        // isInRange = false;
+        // setUiOOR(isInRange); // TODO: Site Trunking
         console.error('WebSocket error:', error);
     }
 
@@ -213,9 +253,9 @@ function connectWebSocket() {
                     isTxing = true;
                     tpt_generate();
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
-/*                    micCapture.captureMicrophone(() => {
-                        console.log('Microphone captured');
-                    });*/
+                    /*                    micCapture.captureMicrophone(() => {
+                                            console.log('Microphone captured');
+                                        });*/
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status !== 0) {
                     bonk();
                 }
@@ -223,9 +263,9 @@ function connectWebSocket() {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
                     document.getElementById("line3").innerHTML = '';
                     currentFrequncyChannel = null;
-                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi4bar.png`;
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
-                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi4bar.png`;
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                 }
             } else {
                 //console.debug(event.data);
@@ -282,7 +322,7 @@ function beep(frequency, duration, volume, type) {
     );
 }
 
-function tpt_generate(){
+function tpt_generate() {
     beep(910, 30, 30, 'sine');
     setTimeout(function () {
         beep(0, 20, 30, 'sine');
@@ -298,29 +338,29 @@ function tpt_generate(){
     }, 100);
 }
 
-function play_page_alert(){
+function play_page_alert() {
     beep(910, 150, 30, 'sine');
     setTimeout(function () {
         beep(0, 150, 30, 'sine');
     }, 150);
-    setTimeout(()=>{
+    setTimeout(() => {
         beep(910, 150, 30, 'sine');
     }, 300);
-    setTimeout(()=>{
+    setTimeout(() => {
         beep(0, 150, 30, 'sine');
     }, 450);
-    setTimeout(()=>{
+    setTimeout(() => {
         beep(910, 150, 30, 'sine');
     }, 600);
-    setTimeout(()=>{
+    setTimeout(() => {
         beep(0, 150, 30, 'sine');
     }, 750);
-    setTimeout(()=>{
+    setTimeout(() => {
         beep(910, 150, 30, 'sine');
     }, 900);
 }
 
-function emergency_tone_generate(){
+function emergency_tone_generate() {
     beep(610, 500, 30, 'sine');
     setTimeout(function () {
         beep(910, 500, 30, 'sine');
@@ -333,7 +373,7 @@ function emergency_tone_generate(){
     }, 1500);
 }
 
-function bonk(){
+function bonk() {
     beep(310, 1000, 30, 'sine');
 }
 
@@ -360,7 +400,7 @@ function onAudioFrameReady(buffer, rms) {
             socket.send(jsonString);
         }
     } else {
-        console.debug("Skipping audio send; not permitted to send");
+        // console.debug("Skipping audio send; not permitted to send");
     }
 }
 
@@ -371,29 +411,25 @@ function disconnectWebSocket() {
     }
 }
 
-      function buttonBeep() {
-            playSoundEffect('buttonbeep.wav');
-        }
-    
-
-        function playSoundEffect(audioPath) {
-            var audio = new Audio(audioPath);
-            audio.play();
-        }
-    function buttonBonk() {
-            playSoundEffect('buttonbonk.wav');
-        }
-    
-
-        function playSoundEffect(audioPath) {
-            var audio = new Audio(audioPath);
-            audio.play();
-        }
+function buttonBeep() {
+    playSoundEffect('buttonbeep.wav');
+}
 
 
+function playSoundEffect(audioPath) {
+    var audio = new Audio(audioPath);
+    audio.play();
+}
+
+function buttonBonk() {
+    playSoundEffect('buttonbonk.wav');
+}
 
 
-
+function playSoundEffect(audioPath) {
+    var audio = new Audio(audioPath);
+    audio.play();
+}
 
 function loadRadioModelAssets(model) {
     const radioImage = document.getElementById('radio-image');
@@ -401,5 +437,10 @@ function loadRadioModelAssets(model) {
     const radioStylesheet = document.getElementById('radio-stylesheet');
     radioImage.src = `models/${model}/radio.png`;
     radioStylesheet.href = `models/${model}/style.css`;
-    rssiIcon.src = `models/${model}/icons/rssi4bar.png`;
+
+    if (currentRssiLevel !== null) {
+        rssiIcon.src = `models/${model}/icons/rssi${currentRssiLevel}.png`;
+    } else {
+        rssiIcon.src = `models/${model}/icons/rssi4.png`;
+    }
 }

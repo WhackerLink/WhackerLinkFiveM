@@ -26,7 +26,7 @@
 
 
 
-#channel-up, #zone-up, #unused-btn {
+#channel-up, #zone-up {
     position: absolute;
     transform: translateX(-50%);
     top: 90%;
@@ -53,7 +53,7 @@
 
  
 
- #unused-btn {
+ #rssi-btn {
     position: absolute;
     transform: translateX(-50%);
     top: 91%;
@@ -160,6 +160,7 @@
     font-size: 12px;
     top: 85.2%;
     left: 36%;
+	visibility: hidden;
 }
 
 #softText3 {

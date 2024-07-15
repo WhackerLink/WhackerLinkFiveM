@@ -25,7 +25,8 @@
     z-index: 1;
     display: block;
     margin: 10px auto;
-    padding: 7px;
+       padding-top: 5px;
+	padding-left: 30px;
     background-color: transparent;
     color: transparent;
     border: none;
@@ -36,6 +37,11 @@
 	  left: 52%;
 
 }
+#rssi-btn {
+	  left: 52%;
+
+}
+
 #channel-knbd {
 	  left: 44%;
 
@@ -59,16 +65,17 @@
 }
 
 
- #unused-btn {
+#rssi-btn {
     position: absolute;
     transform: translateX(-50%);
-	visibility: hidden;
-    top: 91%;
+    top: 75%;
+    left: 41%;
     z-index: 1;
     display: block;
     margin: 10px auto;
-    padding: 7px;
-    background-color: red;
+    padding-top: 5px;
+	padding-left: 30px;
+    background-color: transparent;
     color: transparent;
     border: none;
     cursor: pointer;
@@ -141,8 +148,8 @@
 
 #softText2 {
     font-size: 12px;
-    top: 87%;
-    left: 36%;
+     top: 54%;
+    left: 41%;
 }
 
 #softText3 {
