@@ -3,9 +3,11 @@ const fs = require('fs');
 const yaml = require('js-yaml');
 
 let codeplugs = {};
+let sites;
 
 displayStartupMessage();
 loadCodeplugs();
+loadSitesConfig();
 
 on('playerConnecting', (name, setKickReason, deferrals) => {
     // console.debug(`${name} is connecting to the server.`);
@@ -13,6 +15,11 @@ on('playerConnecting', (name, setKickReason, deferrals) => {
 
 on('playerDropped', (reason) => {
     // console.debug(`A player has left the server: ${reason}`);
+});
+
+onNet('getSitesConfig', () => {
+    console.debug(`Player ${source} requested sites config.`);
+    emitNet('receiveSitesConfig', source, sites);
 });
 
 function loadCodeplugs() {
@@ -28,6 +35,16 @@ function loadCodeplugs() {
         // console.debug('Codeplugs loaded:', Object.keys(codeplugs));
     } catch (e) {
         console.error('Error loading codeplugs:', e);
+    }
+}
+
+function loadSitesConfig() {
+    try {
+        const fileContents = fs.readFileSync( GetResourcePath(GetCurrentResourceName()) + '/sites.yml', 'utf8');
+        sites = yaml.load(fileContents).sites;
+        console.debug('Sites config loaded:', sites);
+    } catch (e) {
+        console.error('Error loading sites config:', e);
     }
 }
 

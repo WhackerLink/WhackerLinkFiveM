@@ -1,0 +1,7 @@
+sites:
+  - name: "Site 1"
+    location:
+      X: 757.89
+      Y: 1274.17
+      Z: 360.3
+    systemID: 1

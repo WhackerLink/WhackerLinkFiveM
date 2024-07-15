@@ -16,7 +16,7 @@ let audioBuffer = [];
 let myRid = "1234";
 let currentTg = "2001";
 let radioModel;
-
+let currentRssiLevel ;
 function socketOpen() {
     return socket && socket.readyState === WebSocket.OPEN;
 }
@@ -76,6 +76,25 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === 'setModel') {
         loadRadioModelAssets(event.data.model);
         radioModel = event.data.model;
+    } else if (event.data.type === 'setRssiLevel') {
+        const rssiIcon = document.getElementById('rssi-icon');
+
+        console.debug("RSSI Level: " + event.data.level);
+
+        console.log(currentRssiLevel);
+
+        if (currentRssiLevel !== null && currentRssiLevel === parseInt(event.data.level)) {
+            console.debug("RSSI Level not changed")
+            return;
+        }
+
+        currentRssiLevel = event.data.level;
+
+        if (currentRssiLevel > 0) {
+            rssiIcon.src = `models/${radioModel}/icons/rssi${event.data.level}bar.png`;
+        } else {
+            rssiIcon.src = `models/${radioModel}/icons/outofrng.png`;
+        }
     }
 });
 
@@ -223,9 +242,9 @@ function connectWebSocket() {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
                     document.getElementById("line3").innerHTML = '';
                     currentFrequncyChannel = null;
-                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi4bar.png`;
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}bar.png`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
-                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi4bar.png`;
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}bar.png`;
                 }
             } else {
                 //console.debug(event.data);

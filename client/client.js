@@ -5,6 +5,7 @@ let lastPttTime = 0;
 let pttPressStartTime = 0;
 let currentCodeplug = {};
 let inVehicle = false;
+let sites = [];
 
 const PTT_COOLDOWN_MS = 2000;
 const MIN_PTT_DURATION_MS = 500;
@@ -25,6 +26,11 @@ on('onClientResourceStart', (resourceName) => {
         return;
     }
     displayStartupMessage();
+});
+
+onNet('receiveSitesConfig', (receivedSites) => {
+    sites = receivedSites;
+    console.debug('Received sites config:', sites);
 });
 
 RegisterCommand('toggle_radio', () => {
@@ -102,6 +108,8 @@ function OpenRadio() {
     SendNuiMessage(JSON.stringify({ type: 'setRid', rid: GetResourceKvpString('myRid') }));
     SetNuiFocus(false, false);
     isRadioOpen = true;
+
+    emitNet('getSitesConfig');
 }
 
 function CloseRadio() {
@@ -164,18 +172,57 @@ setTick(async () => {
             }
         }
     }
-    await Wait(0);
+    checkPlayerRSSI();
+    await Wait(100);
 });
+
+function checkPlayerRSSI() {
+    const playerPed = PlayerPedId();
+    const playerCoords = GetEntityCoords(playerPed);
+
+    let closestSite = null;
+    let minDistance = Infinity;
+
+    sites.forEach(site => {
+        const siteCoords = site.location;
+        // console.log('Site:', site.name, 'Coords:', siteCoords.X, siteCoords.Y, siteCoords.Z);
+        const distance = Vdist(playerCoords[0], playerCoords[1], playerCoords[2], siteCoords.X, siteCoords.Y, siteCoords.Z);
+        // console.log('Distance:', distance, 'Site:', site.name)
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestSite = site;
+        }
+    });
+    // console.log('Closest site:', closestSite, 'Distance:', minDistance);
+    if (closestSite) {
+        let rssiLevel;
+        if (minDistance < 100) {
+            rssiLevel = 4;
+        } else if (minDistance < 200) {
+            rssiLevel = 3;
+        } else if (minDistance < 300) {
+            rssiLevel = 2;
+        } else if (minDistance < 400) {
+            rssiLevel = 1;
+        } else {
+            rssiLevel = 0;
+        }
+
+        updateRSSIIcon(rssiLevel);
+    }
+}
+
+function updateRSSIIcon(level) {
+    SendNuiMessage(JSON.stringify({type: 'setRssiLevel', level: level}));
+    // console.debug('RSSI level:', level);
+}
 
 function playRadioAnimation() {
     const playerPed = PlayerPedId();
-    console.debug('Playing radio animation1');
     if (!IsEntityPlayingAnim(playerPed, 'random@arrests', 'generic_radio_chatter', 3)) {
-        console.debug('Playing radio animation2');
         RequestAnimDict('random@arrests');
         const interval = setInterval(() => {
             if (HasAnimDictLoaded('random@arrests')) {
-                console.debug('Playing radio animation3');
                 TaskPlayAnim(playerPed, 'random@arrests', 'generic_radio_chatter', 8.0, -8.0, -1, 49, 0, false, false, false);
                 clearInterval(interval);
             }
