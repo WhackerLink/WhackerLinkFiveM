@@ -8,7 +8,7 @@ ui_page 'client/ui/index.html'
 
 files {
     'client/ui/models/**/radio.png',
-    'client/ui/models/**/icons/rssi4bar.png',
+    'client/ui/models/**/icons/*.png',
     'client/ui/models/**/style.css',
     'client/ui/models',
     'client/ui/index.html',
