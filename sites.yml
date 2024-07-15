@@ -6,7 +6,7 @@ sites:
       Z: 360.3
     systemID: 1
     siteID: 1
-    range: 2.0
+    range: 1.5
 
   - name: "Central-West Site"
     location:
@@ -15,4 +15,31 @@ sites:
       Z: 188.6
     systemID: 1
     siteID: 2
+    range: 2.0
+
+  - name: "City-FBI Site"
+    location:
+      X: 148.69
+      Y: -770.36
+      Z: 262.85
+    systemID: 1
+    siteID: 3
+    range: 2.0
+
+  - name: "North-East Site"
+    location:
+      X: 1869.07
+      Y: 3715.00
+      Z: 33.06
+    systemID: 1
+    siteID: 4
+    range: 1.5
+
+  - name: "North-Central Site"
+    location:
+      X: 450.82
+      Y: 5567.40
+      Z: 796.62
+    systemID: 1
+    siteID: 5
     range: 2.0
