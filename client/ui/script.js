@@ -55,6 +55,7 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === "pttPress") {
         SendGroupVoiceRequest();
     } else if (event.data.type === "pttRelease") {
+
         if (isTxing) {
             SendGroupVoiceRelease();
             currentFrequncyChannel = null;
@@ -62,6 +63,7 @@ window.addEventListener('message', async function (event) {
             console.debug('Recording stopped');*/
         } else {
             console.debug("not txing not releasing");
+			
         }
 
         isTxing = false;
@@ -93,6 +95,12 @@ document.addEventListener('keydown', function (event) {
 
 document.getElementById('channel-up').addEventListener('click', () => {
     changeChannel(1);
+});
+document.getElementById('channel-knbu').addEventListener('click', () => {
+    changeChannel(1);
+});
+document.getElementById('channel-knbd').addEventListener('click', () => {
+    changeChannel(-1);
 });
 
 document.getElementById('zone-up').addEventListener('click', () => {
@@ -360,11 +368,34 @@ function disconnectWebSocket() {
     }
 }
 
+      function buttonBeep() {
+            playSoundEffect('buttonbeep.wav');
+        }
+    
+
+        function playSoundEffect(audioPath) {
+            var audio = new Audio(audioPath);
+            audio.play();
+        }
+    function buttonBonk() {
+            playSoundEffect('buttonbonk.wav');
+        }
+    
+
+        function playSoundEffect(audioPath) {
+            var audio = new Audio(audioPath);
+            audio.play();
+        }
+
+
+
+
+
+
 function loadRadioModelAssets(model) {
     const radioImage = document.getElementById('radio-image');
  const rssiIcon = document.getElementById('rssi-icon');
     const radioStylesheet = document.getElementById('radio-stylesheet');
-
     radioImage.src = `models/${model}/radio.png`;
     radioStylesheet.href = `models/${model}/style.css`;
     rssiIcon.src = `models/${model}/icons/rssi4bar.png`;
