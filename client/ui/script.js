@@ -90,12 +90,7 @@ window.addEventListener('message', async function (event) {
         }
 
         currentRssiLevel = event.data.level;
-
-        if (currentRssiLevel > 0) {
-            rssiIcon.src = `models/${radioModel}/icons/rssi${event.data.level}bar.png`;
-        } else {
-            rssiIcon.src = `models/${radioModel}/icons/outofrng.png`;
-        }
+        rssiIcon.src = `models/${radioModel}/icons/rssi${event.data.level}.png`;
     }
 });
 
@@ -243,9 +238,9 @@ function connectWebSocket() {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
                     document.getElementById("line3").innerHTML = '';
                     currentFrequncyChannel = null;
-                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}bar.png`;
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
-                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}bar.png`;
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                 }
             } else {
                 //console.debug(event.data);
@@ -419,8 +414,8 @@ function loadRadioModelAssets(model) {
     radioStylesheet.href = `models/${model}/style.css`;
 
     if (currentRssiLevel !== null) {
-        rssiIcon.src = `models/${model}/icons/rssi${currentRssiLevel}bar.png`;
+        rssiIcon.src = `models/${model}/icons/rssi${currentRssiLevel}.png`;
     } else {
-        rssiIcon.src = `models/${model}/icons/rssi4bar.png`;
+        rssiIcon.src = `models/${model}/icons/rssi4.png`;
     }
 }
