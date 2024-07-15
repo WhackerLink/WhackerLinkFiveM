@@ -17,7 +17,7 @@
     left: 22.7%;
     display: block;
 }
-#channel-up, #zone-up {
+#channel-up, #zone-up, #rssi-btn {
     position: absolute;
     transform: translateX(-50%);
     top: 91%;
@@ -35,12 +35,20 @@
 #channel-up {
     top: 70%;
     left: 50%;
+	background-color: red;
 }
 
 #zone-up {
     top: 70%;
     left: 25%;
+	background-color: red;
 }
+#rssi-btn {
+    top: 70%;
+    left: 33%;
+	 background-color: green;
+}
+
 
 
 #channel-knbu {
@@ -70,20 +78,7 @@
 }
 
 
- #unused-btn {
-    position: absolute;
-    transform: translateX(-50%);
-	visibility: hidden;
-    top: 91%;
-    z-index: 1;
-    display: block;
-    margin: 10px auto;
-    padding: 7px;
-    background-color: red;
-    color: transparent;
-    border: none;
-    cursor: pointer;
-}
+
 
 
 
@@ -133,7 +128,7 @@
     color: white;
     font-size: 14px;
     top: 53%;
-    left: 26%;
+    left: 33.5%;
 }
 
 #softText3 {

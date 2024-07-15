@@ -19,7 +19,7 @@
     display: block;
 }
 
-#channel-up, #zone-up, #unused-btn {
+#channel-up, #zone-up, #rssi-btn {
     position: absolute;
     transform: translateX(-50%);
     top: 91%;
@@ -41,7 +41,7 @@
     left: 37%;
 }
 
-#unused-btn {
+#rssi-btn {
     left: 50%;
 }
 

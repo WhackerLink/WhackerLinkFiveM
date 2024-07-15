@@ -136,7 +136,7 @@ document.getElementById('zone-up').addEventListener('click', () => {
     changeZone(1);
 });
 
-document.getElementById('unused-btn').addEventListener('click', () => {
+document.getElementById('rssi-btn').addEventListener('click', () => {
     buttonBeep();
     const line3 = document.getElementById('line3');
     line3.style.backgroundColor = '';
