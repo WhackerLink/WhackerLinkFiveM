@@ -11,7 +11,12 @@
     height: auto;
     position: relative;
 }
-
+#rssi-icon {
+ position: fixed;
+    bottom: 194px;
+    right: 588px;
+    display: inline-block;
+}
 #channel-up, #zone-up {
     position: absolute;
     transform: translateX(-50%);
@@ -39,7 +44,7 @@
 
 #line1, #line2, #line3, #softText1, #softText2, #softText3 {
     position: absolute;
-    left: 37.6%;
+    left: 37.5%;
     transform: translateX(-50%);
     z-index: 1;
     color: black;
@@ -47,7 +52,7 @@
     font-family: Helvetica, serif;
     font-weight: bold;
     text-align: center;
-    width: 30.1%;
+    width: 90%;
 }
 
 #softText1 {
