@@ -54,6 +54,12 @@ window.addEventListener('message', async function (event) {
         document.getElementById('radio-container').style.display = 'none';
         disconnectWebSocket();
     } else if (event.data.type === "pttPress") {
+        if (!isInRange) {
+            console.debug("Not in range, not txing");
+            bonk();
+            return;
+        }
+
         SendGroupVoiceRequest();
     } else if (event.data.type === "pttRelease") {
 
@@ -64,7 +70,6 @@ window.addEventListener('message', async function (event) {
                         console.debug('Recording stopped');*/
         } else {
             console.debug("not txing not releasing");
-
         }
 
         isTxing = false;
@@ -80,7 +85,7 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === 'setRssiLevel') {
         const rssiIcon = document.getElementById('rssi-icon');
 
-        console.log(currentRssiLevel);
+        // console.log(currentRssiLevel);
 
         if (event.data.level === 0) {
             isInRange = false;
@@ -91,7 +96,7 @@ window.addEventListener('message', async function (event) {
         }
 
         if (currentRssiLevel !== null && currentRssiLevel === parseInt(event.data.level)) {
-            console.debug("RSSI Level not changed")
+            // console.debug("RSSI Level not changed")
             return;
         }
 

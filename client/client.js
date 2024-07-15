@@ -53,6 +53,15 @@ onNet('receiveCodeplug', (codeplug) => {
     console.debug('Received new codeplug:', codeplug);
     currentCodeplug = codeplug;
     SetResourceKvp('currentCodeplug', JSON.stringify(currentCodeplug));
+
+    if (inVehicle) {
+        SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode}));
+    } else {
+        SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model}));
+    }
+
+    CloseRadio();
+    OpenRadio();
 });
 
 RegisterNuiCallbackType('unFocus');
