@@ -185,24 +185,24 @@ function checkPlayerRSSI() {
 
     sites.forEach(site => {
         const siteCoords = site.location;
-        // console.log('Site:', site.name, 'Coords:', siteCoords.X, siteCoords.Y, siteCoords.Z);
         const distance = Vdist(playerCoords[0], playerCoords[1], playerCoords[2], siteCoords.X, siteCoords.Y, siteCoords.Z);
-        // console.log('Distance:', distance, 'Site:', site.name)
-        if (distance < minDistance) {
-            minDistance = distance;
+        const distanceInMiles = distance / 1609.34;
+
+        if (distanceInMiles < minDistance) {
+            minDistance = distanceInMiles;
             closestSite = site;
         }
     });
-    // console.log('Closest site:', closestSite, 'Distance:', minDistance);
+
     if (closestSite) {
         let rssiLevel;
-        if (minDistance < 100) {
+        if (minDistance < closestSite.range * 0.2) {
             rssiLevel = 4;
-        } else if (minDistance < 200) {
+        } else if (minDistance < closestSite.range * 0.4) {
             rssiLevel = 3;
-        } else if (minDistance < 300) {
+        } else if (minDistance < closestSite.range * 0.6) {
             rssiLevel = 2;
-        } else if (minDistance < 400) {
+        } else if (minDistance < closestSite.range * 0.8) {
             rssiLevel = 1;
         } else {
             rssiLevel = 0;

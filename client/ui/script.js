@@ -416,5 +416,10 @@ function loadRadioModelAssets(model) {
     const radioStylesheet = document.getElementById('radio-stylesheet');
     radioImage.src = `models/${model}/radio.png`;
     radioStylesheet.href = `models/${model}/style.css`;
-    rssiIcon.src = `models/${model}/icons/rssi4bar.png`;
+
+    if (currentRssiLevel !== null) {
+        rssiIcon.src = `models/${model}/icons/rssi${currentRssiLevel}bar.png`;
+    } else {
+        rssiIcon.src = `models/${model}/icons/rssi4bar.png`;
+    }
 }
