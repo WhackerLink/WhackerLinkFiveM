@@ -11,12 +11,16 @@
     height: auto;
     position: relative;
 }
+
 #rssi-icon {
- position: fixed;
-    bottom: 194px;
-    right: 588px;
-    display: inline-block;
+    position: absolute;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: block;
+    top: 20%;
+    left: 23.8%;
 }
+
 #channel-up, #zone-up {
     position: absolute;
     transform: translateX(-50%);

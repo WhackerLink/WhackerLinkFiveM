@@ -11,11 +11,14 @@
     height: auto;
     position: relative;
 }
+
 #rssi-icon {
- position: fixed;
-    bottom: 163px;
-    right: 200px;
-    display: inline-block;
+    position: absolute;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: block;
+    top: 68.9%;
+    left: 32.5%;
 }
 
 #channel-up, #zone-up {

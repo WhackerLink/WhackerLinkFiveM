@@ -199,10 +199,12 @@ function connectWebSocket() {
                     isTxing = false;
                     document.getElementById("line3").style.color = "black";
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status === 0) {
                     currentFrequncyChannel = data.data.Channel;
                     isTxing = true;
                     tpt_generate();
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
 /*                    micCapture.captureMicrophone(() => {
                         console.log('Microphone captured');
                     });*/
@@ -213,8 +215,9 @@ function connectWebSocket() {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
                     document.getElementById("line3").innerHTML = '';
                     currentFrequncyChannel = null;
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi4bar.png`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
-
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi4bar.png`;
                 }
             } else {
                 //console.debug(event.data);
@@ -362,7 +365,7 @@ function disconnectWebSocket() {
 
 function loadRadioModelAssets(model) {
     const radioImage = document.getElementById('radio-image');
- const rssiIcon = document.getElementById('rssi-icon');
+    const rssiIcon = document.getElementById('rssi-icon');
     const radioStylesheet = document.getElementById('radio-stylesheet');
 
     radioImage.src = `models/${model}/radio.png`;
