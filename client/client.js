@@ -198,12 +198,14 @@ function checkPlayerRSSI() {
     if (closestSite) {
         let rssiLevel;
         if (minDistance < closestSite.range * 0.2) {
-            rssiLevel = 4;
+            rssiLevel = 5;
         } else if (minDistance < closestSite.range * 0.4) {
-            rssiLevel = 3;
+            rssiLevel = 4;
         } else if (minDistance < closestSite.range * 0.6) {
-            rssiLevel = 2;
+            rssiLevel = 3;
         } else if (minDistance < closestSite.range * 0.8) {
+            rssiLevel = 2;
+        } else if (minDistance < closestSite.range) {
             rssiLevel = 1;
         } else {
             rssiLevel = 0;
