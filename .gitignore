@@ -1,3 +1,7 @@
+# Condeplugs
+codeplugs/*
+!codeplugs/codeplug.example.yml
+
 # IDE
 .idea/
 
