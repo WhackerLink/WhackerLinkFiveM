@@ -12,11 +12,12 @@
     position: relative;
 }
 #rssi-icon {
- position: fixed;
-    bottom: 193px;
-    right: 195px;
-    display: inline-block;
+   position: absolute;
+    top: 70.8%;
+    left: 32.5%;
+    display: block;
 }
+
 
 #channel-up, #zone-up, #unused-btn {
     position: absolute;

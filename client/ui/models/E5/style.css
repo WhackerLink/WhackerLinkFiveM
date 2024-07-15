@@ -12,10 +12,10 @@
     position: relative;
 }
 #rssi-icon {
- position: fixed;
-    top: 87.6%;
-    left: 80.4%;
-    display: inline-block;
+   position: absolute;
+    top: 13.2%;
+    left: 26.7%;
+    display: block;
 }
 
 #channel-up, #zone-up, #unused-btn {
@@ -145,16 +145,16 @@
 }
 
 #line1 {
-    top: 16%;
+    top: 19%;
 }
 
 #line2 {
-   top: 26%;
+   top: 29%;
     font-size: 15px;
 }
 
 #line3 {
-    top: 35%;
+    top: 38%;
     font-size: 14px;
     left: 49.5%;
     width: 41%;
