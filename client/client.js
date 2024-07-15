@@ -220,12 +220,12 @@ function checkPlayerRSSI() {
             rssiLevel = 0;
         }
 
-        updateRSSIIcon(rssiLevel);
+        updateRSSIIcon(rssiLevel, closestSite);
     }
 }
 
-function updateRSSIIcon(level) {
-    SendNuiMessage(JSON.stringify({type: 'setRssiLevel', level: level}));
+function updateRSSIIcon(level, site) {
+    SendNuiMessage(JSON.stringify({type: 'setRssiLevel', level: level, site: site}));
     // console.debug('RSSI level:', level);
 }
 

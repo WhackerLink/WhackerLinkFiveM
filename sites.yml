@@ -1,8 +1,18 @@
 sites:
-  - name: "Site 1"
+  - name: "Central Site"
     location:
       X: 757.89
       Y: 1274.17
       Z: 360.3
     systemID: 1
+    siteID: 1
+    range: 2.0
+
+  - name: "Central-West Site"
+    location:
+      X: -2312.05
+      Y: 336.79
+      Z: 188.6
+    systemID: 1
+    siteID: 2
     range: 2.0

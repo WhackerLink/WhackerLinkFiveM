@@ -17,7 +17,9 @@ let audioBuffer = [];
 let myRid = "1234";
 let currentTg = "2001";
 let radioModel;
-let currentRssiLevel ;
+let currentRssiLevel;
+let currentSite;
+
 function socketOpen() {
     return socket && socket.readyState === WebSocket.OPEN;
 }
@@ -84,8 +86,7 @@ window.addEventListener('message', async function (event) {
         radioModel = event.data.model;
     } else if (event.data.type === 'setRssiLevel') {
         const rssiIcon = document.getElementById('rssi-icon');
-
-        // console.log(currentRssiLevel);
+        currentSite = event.data.site;
 
         if (event.data.level === 0) {
             isInRange = false;
@@ -122,15 +123,28 @@ document.addEventListener('keydown', function (event) {
 document.getElementById('channel-up').addEventListener('click', () => {
     changeChannel(1);
 });
+
 document.getElementById('channel-knbu').addEventListener('click', () => {
     changeChannel(1);
 });
+
 document.getElementById('channel-knbd').addEventListener('click', () => {
     changeChannel(-1);
 });
 
 document.getElementById('zone-up').addEventListener('click', () => {
     changeZone(1);
+});
+
+document.getElementById('unused-btn').addEventListener('click', () => {
+    buttonBeep();
+    const line3 = document.getElementById('line3');
+    line3.style.backgroundColor = '';
+    line3.style.color = 'black';
+    line3.innerHTML = `SITE: ${currentSite.siteID}`;
+    setTimeout(() => {
+        line3.innerHTML = '';
+    }, 2000);
 });
 
 function changeChannel(direction) {
