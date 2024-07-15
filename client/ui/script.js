@@ -80,9 +80,15 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === 'setRssiLevel') {
         const rssiIcon = document.getElementById('rssi-icon');
 
-        console.debug("RSSI Level: " + event.data.level);
-
         console.log(currentRssiLevel);
+
+        if (event.data.level === 0) {
+            isInRange = false;
+            setUiOOR(isInRange);
+        } else if (event.data.level > 0 && !isInRange) {
+            isInRange = true;
+            setUiOOR(isInRange);
+        }
 
         if (currentRssiLevel !== null && currentRssiLevel === parseInt(event.data.level)) {
             console.debug("RSSI Level not changed")
@@ -181,22 +187,22 @@ function connectWebSocket() {
     socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
-        isInRange = true;
-        setUiOOR(isInRange);
+        // isInRange = true;
+        // setUiOOR(isInRange); // TODO: Site Trunking
         console.debug('WebSocket connection established');
         // console.debug("Codeplug: " + currentCodeplug);
         SendRegistrationRequest();
     };
 
     socket.onclose = () => {
-        isInRange = false;
-        setUiOOR(isInRange);
+        // isInRange = false;
+        // setUiOOR(isInRange); // TODO: Site Trunking
         console.debug('WebSocket connection closed');
     }
 
     socket.onerror = (error) => {
-        isInRange = false;
-        setUiOOR(isInRange);
+        // isInRange = false;
+        // setUiOOR(isInRange); // TODO: Site Trunking
         console.error('WebSocket error:', error);
     }
 
