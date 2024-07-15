@@ -231,6 +231,11 @@ function connectWebSocket() {
         if (typeof event.data === 'string') {
             console.debug(`Received master message: ${event.data}`);
 
+            if (!isInRange) {
+                console.debug("Not in range, not processing message");
+                return;
+            }
+
             if (data.type == packetToNumber("AUDIO_DATA")) {
                 if (data.voiceChannel.SrcId !== myRid && data.voiceChannel.DstId == currentTg && data.voiceChannel.Frequency == currentFrequncyChannel) {
                     const binaryString = atob(data.data);
