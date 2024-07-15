@@ -362,8 +362,10 @@ function disconnectWebSocket() {
 
 function loadRadioModelAssets(model) {
     const radioImage = document.getElementById('radio-image');
+ const rssiIcon = document.getElementById('rssi-icon');
     const radioStylesheet = document.getElementById('radio-stylesheet');
 
     radioImage.src = `models/${model}/radio.png`;
     radioStylesheet.href = `models/${model}/style.css`;
+    rssiIcon.src = `models/${model}/icons/rssi4bar.png`;
 }

@@ -7,21 +7,21 @@
 
 #radio-image {
     display: block;
-    width: auto;
+    width: 600px;
     height: auto;
     position: relative;
 }
 #rssi-icon {
  position: fixed;
-    bottom: 194px;
-    right: 588px;
+    bottom: 130px;
+    right: 425px;
     display: inline-block;
 }
+
 #channel-up, #zone-up {
     position: absolute;
     transform: translateX(-50%);
     top: 91%;
-    width: 40px;
     z-index: 1;
     display: block;
     margin: 10px auto;
@@ -33,61 +33,76 @@
 }
 
 #channel-up {
-    top: 70%;
-    left: 50%;
+    left: 69%;
+    top: 75%;
 }
 
 #zone-up {
-    top: 70%;
-    left: 25%;
+    left: 32%;
+    top: 75%;
 }
 
-#line1, #line2, #line3, #softText1, #softText2, #softText3 {
+#line1, #line2, #line3 {
     position: absolute;
-    left: 37.5%;
+    left: 50%;
     transform: translateX(-50%);
     z-index: 1;
     color: black;
-    font-size: 19px;
+    font-size: 17px;
     font-family: Helvetica, serif;
     font-weight: bold;
     text-align: center;
     width: 90%;
 }
 
+
+#softText1, #softText2, #softText3 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    color: #8EA595;
+    font-size: 17px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+}
+
+
+
 #softText1 {
-    color: white;
-    font-size: 14px;
-    top: 53%;
-    left: 26%;
+    font-size: 12px;
+    top: 54%;
+    left: 32%;
 }
 
 #softText2 {
-    color: white;
-    font-size: 14px;
-    top: 53%;
-    left: 26%;
+    font-size: 12px;
+    top: 87%;
+    left: 36%;
 }
 
 #softText3 {
-    color: white;
-    font-size: 14px;
-    top: 53%;
-    left: 48.5%;
+    font-size: 12px;
+    top: 54%;
+    left: 69%;
 }
 
 #line1 {
-    top: 28%;
+    top: 25%;
 }
 
 #line2 {
-    top: 36.5%;
-    font-size: 17px;
+    top: 35%;
+    font-size: 15px;
 }
 
 #line3 {
-    top: 44%;
-    font-size: 15px;
+    top: 43%;
+    font-size: 14px;
+    left: 49.5%;
+    width: 41%;
 }
 
 #startup-message {
