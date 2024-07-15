@@ -12,10 +12,10 @@
     position: relative;
 }
 #rssi-icon {
- position: fixed;
-     top: 80.5%;
-    right: 11%;
-    display: inline-block;
+   position: absolute;
+    top: 74.8%;
+    left: 25.5%;
+    display: block;
 }
 
 
