@@ -186,6 +186,19 @@ setTick(async () => {
     await Wait(100);
 });
 
+function calculateDbRssiLevel(distance, frequency) {
+    const speedOfLight = 3e8;
+
+    frequency = frequency * 1e6;
+
+    const fspl = 20 * Math.log10(distance) + 20 * Math.log10(frequency) + 20 * Math.log10(4 * Math.PI / speedOfLight);
+
+    const rssiAtOneMeter = -35;
+
+    const rssi = rssiAtOneMeter - fspl;
+    return Math.max(rssi, -120);
+}
+
 function checkPlayerRSSI() {
     const playerPed = PlayerPedId();
     const playerCoords = GetEntityCoords(playerPed);
@@ -220,12 +233,14 @@ function checkPlayerRSSI() {
             rssiLevel = 0;
         }
 
-        updateRSSIIcon(rssiLevel, closestSite);
+        const distanceInMeters = minDistance * 1609.34;
+        const dbRssiLevel = calculateDbRssiLevel(distanceInMeters, 0.8549625);
+        updateRSSIIcon(rssiLevel, closestSite, dbRssiLevel);
     }
 }
 
-function updateRSSIIcon(level, site) {
-    SendNuiMessage(JSON.stringify({type: 'setRssiLevel', level: level, site: site}));
+function updateRSSIIcon(level, site, dbRssi) {
+    SendNuiMessage(JSON.stringify({type: 'setRssiLevel', level: level, site: site, dbRssi}));
     // console.debug('RSSI level:', level);
 }
 

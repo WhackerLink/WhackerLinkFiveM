@@ -18,6 +18,7 @@ let myRid = "1234";
 let currentTg = "2001";
 let radioModel;
 let currentRssiLevel;
+let currentDbLevel;
 let currentSite;
 
 function socketOpen() {
@@ -108,6 +109,7 @@ window.addEventListener('message', async function (event) {
         }
 
         currentRssiLevel = event.data.level;
+        currentDbLevel = event.data.dbRssi;
         rssiIcon.src = `models/${radioModel}/icons/rssi${event.data.level}.png`;
     }
 });
@@ -149,8 +151,11 @@ document.getElementById('rssi-btn').addEventListener('click', () => {
     line3.style.color = 'black';
     line3.innerHTML = `SITE: ${currentSite.siteID}`;
     setTimeout(() => {
-        line3.innerHTML = '';
+        line3.innerHTML = `RSSI: ${ Math.round(currentDbLevel)} dBm`;
     }, 2000);
+    setTimeout(() => {
+        line3.innerHTML = '';
+    }, 4000);
 });
 
 function changeChannel(direction) {
