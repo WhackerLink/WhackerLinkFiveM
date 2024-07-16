@@ -1,7 +1,7 @@
 const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 8000});
 const EXPECTED_PCM_LENGTH = 1600;
 const CHUNK_SIZE = 320;
-const HOST_VERSION = "1.0.0";
+const HOST_VERSION = "R1.0.0";
 
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -13,6 +13,8 @@ let currentCodeplug;
 let isInRange = false;
 let isTxing = false;
 let audioBuffer = [];
+let bootScreenInterval;
+let currentMessageIndex = 0;
 
 let myRid = "1234";
 let currentTg = "2001";
@@ -49,11 +51,21 @@ window.addEventListener('message', async function (event) {
             console.log('Microphone captured');
         });
 
-        responsiveVoice.speak(`${currentZone.name}`, `US English Female`,  {rate: .8});
-        responsiveVoice.speak(`${currentChannel.name}`, `US English Female`,  {rate: .8});
-
         loadRadioModelAssets(radioModel);
         document.getElementById('radio-container').style.display = 'block';
+
+        const bootScreenMessages = [
+            { text: "", duration: 0, line: "line1" },
+            { text: "", duration: 0, line: "line3" },
+            { text: HOST_VERSION, duration: 1500, line: "line2" },
+            { text: radioModel, duration: 1500, line: "line2" }
+        ];
+
+        await displayBootScreen(bootScreenMessages);
+        currentMessageIndex = 0;
+
+        responsiveVoice.speak(`${currentZone.name}`, `US English Female`,  {rate: .8});
+        responsiveVoice.speak(`${currentChannel.name}`, `US English Female`,  {rate: .8});
         connectWebSocket();
         updateDisplay();
     } else if (event.data.type === 'closeRadio') {
@@ -113,6 +125,24 @@ window.addEventListener('message', async function (event) {
         rssiIcon.src = `models/${radioModel}/icons/rssi${event.data.level}.png`;
     }
 });
+
+function displayBootScreen(bootScreenMessages) {
+    return new Promise((resolve) => {
+        function showNextMessage() {
+            if (currentMessageIndex < bootScreenMessages.length) {
+                const message = bootScreenMessages[currentMessageIndex];
+                document.getElementById(message.line).innerHTML = message.text;
+                setTimeout(() => {
+                    currentMessageIndex++;
+                    showNextMessage();
+                }, message.duration);
+            } else {
+                resolve();
+            }
+        }
+        showNextMessage();
+    });
+}
 
 document.addEventListener('keydown', function (event) {
     console.log("Key event")
