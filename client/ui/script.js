@@ -41,9 +41,15 @@ window.addEventListener('message', async function (event) {
             radioModel = currentCodeplug.radioWide.model;
         }
 
+        const currentZone = currentCodeplug.zones[currentZoneIndex];
+        const currentChannel = currentZone.channels[currentChannelIndex];
+
         micCapture.captureMicrophone(() => {
             console.log('Microphone captured');
         });
+
+        responsiveVoice.speak(`${currentZone.name}`, `US English Female`,  {rate: .8});
+        responsiveVoice.speak(`${currentChannel.name}`, `US English Female`,  {rate: .8});
 
         loadRadioModelAssets(radioModel);
         document.getElementById('radio-container').style.display = 'block';
@@ -149,24 +155,37 @@ document.getElementById('rssi-btn').addEventListener('click', () => {
 
 function changeChannel(direction) {
     currentChannelIndex += direction;
+
     const currentZone = currentCodeplug.zones[currentZoneIndex];
+
     if (currentChannelIndex >= currentZone.channels.length) {
         currentChannelIndex = 0;
     } else if (currentChannelIndex < 0) {
         currentChannelIndex = currentZone.channels.length - 1;
     }
+
+    const currentChannel = currentZone.channels[currentChannelIndex];
+
+    responsiveVoice.speak(`${currentChannel.name}`, `US English Female`,  {rate: .8});
     updateDisplay();
     reconnectIfSystemChanged();
 }
 
 function changeZone(direction) {
     currentZoneIndex += direction;
+
     if (currentZoneIndex >= currentCodeplug.zones.length) {
         currentZoneIndex = 0;
     } else if (currentZoneIndex < 0) {
         currentZoneIndex = currentCodeplug.zones.length - 1;
     }
+
     currentChannelIndex = 0;
+    const currentZone = currentCodeplug.zones[currentZoneIndex];
+    const currentChannel = currentZone.channels[currentChannelIndex];
+
+    responsiveVoice.speak(`${currentZone.name}`, `US English Female`,  {rate: .8});
+    responsiveVoice.speak(`${currentChannel.name}`, `US English Female`,  {rate: .8});
     updateDisplay();
     reconnectIfSystemChanged();
 }
@@ -174,6 +193,7 @@ function changeZone(direction) {
 function updateDisplay() {
     const currentZone = currentCodeplug.zones[currentZoneIndex];
     const currentChannel = currentZone.channels[currentChannelIndex];
+
     document.getElementById('line1').innerText = currentZone.name;
     document.getElementById('line2').innerText = currentChannel.name;
     currentTg = currentChannel.tgid;
