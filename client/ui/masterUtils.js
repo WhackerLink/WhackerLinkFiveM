@@ -52,3 +52,17 @@ function SendGroupVoiceRelease() {
 
     socket.send(JSON.stringify(request));
 }
+
+function SendEmergencyAlarmRequest() {
+    if (!socketOpen) { return; }
+
+    const request = {
+        type: packetToNumber("EMRG_ALRM_REQ"),
+        data: {
+            SrcId: myRid,
+            DstId: currentTg
+        }
+    }
+
+    socket.send(JSON.stringify(request));
+}

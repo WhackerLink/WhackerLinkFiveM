@@ -158,6 +158,11 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
+document.getElementById('btn-emer').addEventListener('click', () => {
+    emergency_tone_generate();
+    SendEmergencyAlarmRequest();
+});
+
 document.getElementById('channel-up').addEventListener('click', () => {
     changeChannel(1);
 });
@@ -326,6 +331,20 @@ function connectWebSocket() {
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                }
+            } else if (data.type == packetToNumber("EMRG_ALRM_REQ")) {
+                if (data.data.SrcId !== myRid && data.data.DstId !== currentTg) {
+                    const line3 = document.getElementById("line3");
+                    emergency_tone_generate();
+                    line3.style.color = "white";
+                    line3.style.backgroundColor = "orange";
+                    line3.innerHTML = `EM: ${data.data.SrcId}`;
+
+                    setTimeout(() => {
+                        line3.style.color = "black";
+                        line3.style.backgroundColor = '';
+                        line3.innerHTML = '';
+                    }, 5000);
                 }
             } else {
                 //console.debug(event.data);
