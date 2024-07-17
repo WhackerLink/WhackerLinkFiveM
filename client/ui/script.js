@@ -11,6 +11,7 @@ let currentZoneIndex = 0;
 let currentFrequncyChannel;
 let currentCodeplug;
 let isInRange = false;
+let isInSiteTrunking = false;
 let isTxing = false;
 let audioBuffer = [];
 let bootScreenInterval;
@@ -189,7 +190,13 @@ document.getElementById('rssi-btn').addEventListener('click', () => {
         line3.innerHTML = `RSSI: ${ Math.round(currentDbLevel)} dBm`;
     }, 2000);
     setTimeout(() => {
-        line3.innerHTML = '';
+        if (!isInRange) {
+            setUiOOR(isInRange);
+        } else if (isInSiteTrunking) {
+            setUiSiteTrunking(isInSiteTrunking);
+        } else {
+            line3.innerHTML = '';
+        }
     }, 4000);
 });
 
@@ -266,22 +273,22 @@ function connectWebSocket() {
     socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
-        // isInRange = true;
-        // setUiOOR(isInRange); // TODO: Site Trunking
+        isInSiteTrunking = true;
+        setUiSiteTrunking(isInSiteTrunking);
         console.debug('WebSocket connection established');
         // console.debug("Codeplug: " + currentCodeplug);
         SendRegistrationRequest();
     };
 
     socket.onclose = () => {
-        // isInRange = false;
-        // setUiOOR(isInRange); // TODO: Site Trunking
+        isInSiteTrunking = false;
+        setUiSiteTrunking(isInSiteTrunking);
         console.debug('WebSocket connection closed');
     }
 
     socket.onerror = (error) => {
-        // isInRange = false;
-        // setUiOOR(isInRange); // TODO: Site Trunking
+        isInSiteTrunking = false;
+        setUiSiteTrunking(isInRange);
         console.error('WebSocket error:', error);
     }
 
@@ -326,7 +333,13 @@ function connectWebSocket() {
                 }
             } else if (data.type == packetToNumber("GRP_VCH_RLS")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
-                    document.getElementById("line3").innerHTML = '';
+                    if (!isInRange) {
+                        setUiOOR(isInRange);
+                    } else if (isInSiteTrunking) {
+                        setUiSiteTrunking(isInSiteTrunking);
+                    } else {
+                        document.getElementById("line3").innerHTML = '';
+                    }
                     currentFrequncyChannel = null;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
@@ -343,7 +356,13 @@ function connectWebSocket() {
                     setTimeout(() => {
                         line3.style.color = "black";
                         line3.style.backgroundColor = '';
-                        line3.innerHTML = '';
+                        if (!isInRange) {
+                            setUiOOR(isInRange);
+                        } else if (isInSiteTrunking) {
+                            setUiSiteTrunking(isInSiteTrunking);
+                        } else {
+                            line3.innerHTML = '';
+                        }
                     }, 5000);
                 }
             } else {
@@ -367,6 +386,23 @@ function setUiOOR(inRange) {
         line3.innerHTML = 'Out of range';
         line3.style.color = 'white';
         line3.style.backgroundColor = 'red';
+    }
+}
+
+function setUiSiteTrunking(inSt) {
+    const line3 = document.getElementById('line3');
+
+    if (!isInRange) {
+        return;
+    }
+
+    if (inSt) {
+        line3.innerHTML = '';
+        line3.style.backgroundColor = '';
+    } else {
+        line3.innerHTML = 'Site trunking';
+        line3.style.color = 'black';
+        line3.style.backgroundColor = '';
     }
 }
 
