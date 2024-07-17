@@ -133,17 +133,27 @@ function handlePTTDown() {
     const timeSinceLastPtt = currentTime - lastPttTime;
 
     if (!isPttPressed && timeSinceLastPtt > PTT_COOLDOWN_MS) {
-        if (timeSinceLastPtt < MIN_PTT_DURATION_MS) {
-            console.debug('PTT press ignored due to short press duration');
-            return;
-        }
-        console.debug('PTT pressed');
-        SendNuiMessage(JSON.stringify({ type: 'pttPress' }));
+        console.debug('PTT press initiated');
         isPttPressed = true;
         pttPressStartTime = currentTime;
-        if (!inVehicle) {
-            playRadioAnimation();
-        }
+
+        // Start a timeout to check if the button is held down
+        setTimeout(() => {
+            console.log('Checking PTT press duration')
+            console.log('isPttPressed:', isPttPressed)
+            console.log('pttPressStartTime:', pttPressStartTime)
+            console.log('currentTime:', currentTime)
+            console.log(Date.now() - pttPressStartTime)
+            console.log((Date.now() - pttPressStartTime) >= MIN_PTT_DURATION_MS);
+
+            if (isPttPressed && (Date.now() - pttPressStartTime) >= MIN_PTT_DURATION_MS) {
+                console.debug('PTT press confirmed');
+                SendNuiMessage(JSON.stringify({ type: 'pttPress' }));
+                if (!inVehicle) {
+                    playRadioAnimation();
+                }
+            }
+        }, MIN_PTT_DURATION_MS + 100);
     } else {
         console.debug('PTT press ignored due to cooldown');
     }

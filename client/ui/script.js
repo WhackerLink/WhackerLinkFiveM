@@ -14,8 +14,10 @@ let isInRange = false;
 let isInSiteTrunking = false;
 let isTxing = false;
 let audioBuffer = [];
-let bootScreenInterval;
+let radioOn = false;
 let currentMessageIndex = 0;
+let affiliationCheckInterval;
+let registrationCheckInterval;
 
 let myRid = "1234";
 let currentTg = "2001";
@@ -67,9 +69,12 @@ window.addEventListener('message', async function (event) {
 
         responsiveVoice.speak(`${currentZone.name}`, `US English Female`,  {rate: .8});
         responsiveVoice.speak(`${currentChannel.name}`, `US English Female`,  {rate: .8});
-        connectWebSocket();
+
         updateDisplay();
+        radioOn = true;
+        connectWebSocket();
     } else if (event.data.type === 'closeRadio') {
+        radioOn = false;
         micCapture.stopCapture();
         console.debug('Recording stopped');
         await SendDeRegistrationRequest();
@@ -254,6 +259,7 @@ function reconnectIfSystemChanged() {
     if (socket && socket.url !== `ws://${currentSystem.address}:${currentSystem.port}/client`) {
         disconnectWebSocket();
         connectWebSocket();
+        SendGroupAffiliationRequest();
     }
 }
 
@@ -278,6 +284,7 @@ function connectWebSocket() {
         console.debug('WebSocket connection established');
         // console.debug("Codeplug: " + currentCodeplug);
         SendRegistrationRequest();
+        SendGroupAffiliationRequest();
     };
 
     socket.onclose = () => {
