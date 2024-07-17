@@ -332,7 +332,7 @@ function connectWebSocket() {
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                 }
-            } else if (data.type == packetToNumber("EMRG_ALRM_REQ")) {
+            } else if (data.type == packetToNumber("EMRG_ALRM_RSP")) {
                 if (data.data.SrcId !== myRid && data.data.DstId !== currentTg) {
                     const line3 = document.getElementById("line3");
                     emergency_tone_generate();
