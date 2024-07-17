@@ -2,7 +2,10 @@
     position: fixed;
     bottom: 5px;
     right: 10px;
+    width: 220px;
     display: inline-block;
+    cursor: move;
+    z-index: 1000;
 }
 
 #radio-image {

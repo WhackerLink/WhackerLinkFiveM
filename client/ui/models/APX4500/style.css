@@ -2,15 +2,21 @@
     position: fixed;
     bottom: 5px;
     right: 10px;
+    width: 700px;
     display: inline-block;
+    cursor: move;
+    z-index: 1000;
+    border: 2px solid black;
+
 }
 
 #radio-image {
     display: block;
-    width: auto;
+    width: 700px;
     height: auto;
     position: relative;
 }
+
 #rssi-icon {
    position: absolute;
     top: 21.5%;

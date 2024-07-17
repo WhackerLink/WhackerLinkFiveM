@@ -2,7 +2,12 @@
     position: fixed;
     bottom: 5px;
     right: 10px;
+    width: 500px;
     display: inline-block;
+    cursor: move;
+    z-index: 1000;
+    border: 2px solid black;
+
 }
 
 #radio-image {
@@ -11,6 +16,7 @@
     height: auto;
     position: relative;
 }
+
 #rssi-icon {
    position: absolute;
     top: 13.2%;

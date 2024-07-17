@@ -1,16 +1,20 @@
 #radio-container {
-    position: fixed;
+    position: relative;
     bottom: 5px;
     right: 10px;
+    width: 300px;
+    border: 2px solid black;
     display: inline-block;
+    cursor: move;
+    z-index: 1000;
 }
 
 #radio-image {
     display: block;
     width: 300px;
     height: auto;
-    position: relative;
 }
+
 #rssi-icon {
    position: absolute;
     top: 70.8%;

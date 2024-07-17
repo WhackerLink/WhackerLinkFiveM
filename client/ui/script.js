@@ -18,6 +18,7 @@ let radioOn = false;
 let currentMessageIndex = 0;
 let affiliationCheckInterval;
 let registrationCheckInterval;
+let savedPosition = { left: null, top: null };
 
 let myRid = "1234";
 let currentTg = "2001";
@@ -59,7 +60,29 @@ window.addEventListener('message', async function (event) {
         });
 
         loadRadioModelAssets(radioModel);
-        document.getElementById('radio-container').style.display = 'block';
+
+        radioContainer.style.display = 'block';
+
+        if (savedPosition.left !== null && savedPosition.top !== null) {
+            radioContainer.style.right = savedPosition.left;
+            radioContainer.style.bottom = savedPosition.top;
+        } else {
+            let right = "-1400px";
+            let bottom = "-900px";
+
+            const modelConfig = currentCodeplug.currentModelConfig;
+
+            if (modelConfig) {
+                right = modelConfig.defaultLocation.right;
+                bottom = modelConfig.defaultLocation.bottom;
+            }
+
+            savedPosition.left = right;
+            savedPosition.top = bottom;
+
+            radioContainer.style.right = right;
+            radioContainer.style.bottom = bottom;
+        }
 
         const bootScreenMessages = [
             { text: "", duration: 0, line: "line1" },
@@ -586,5 +609,14 @@ function loadRadioModelAssets(model) {
         rssiIcon.src = `models/${model}/icons/rssi${currentRssiLevel}.png`;
     } else {
         rssiIcon.src = `models/${model}/icons/rssi4.png`;
+    }
+
+    console.debug("CURRENT CPG: " + JSON.stringify(currentCodeplug));
+
+    const modelConfig = currentCodeplug.currentModelConfig;
+    console.log("MODEL CONFIG: " + modelConfig.defaultLocation.right + " " + modelConfig.defaultLocation.bottom);
+    if (modelConfig) {
+        radioContainer.style.right = modelConfig.defaultLocation.right;
+        radioContainer.style.bottom = modelConfig.defaultLocation.bottom;
     }
 }

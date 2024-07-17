@@ -52,13 +52,16 @@ onNet('open_radio', () => {
 onNet('receiveCodeplug', (codeplug) => {
     console.debug('Received new codeplug:', codeplug);
     currentCodeplug = codeplug;
-    SetResourceKvp('currentCodeplug', JSON.stringify(currentCodeplug));
 
     if (inVehicle) {
+        currentCodeplug.currentModelConfig = currentCodeplug.inCarModeConfig;
         SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode}));
     } else {
+        currentCodeplug.currentModelConfig = currentCodeplug.modelConfig;
         SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model}));
     }
+
+    SetResourceKvp('currentCodeplug', JSON.stringify(currentCodeplug));
 
     CloseRadio();
     OpenRadio();
@@ -108,7 +111,7 @@ function ToggleRadio() {
 function OpenRadio() {
     console.debug('Open radio command received');
     const codeplug = JSON.parse(GetResourceKvpString('currentCodeplug'));
-    console.log(GetResourceKvpString('currentCodeplug'));
+
     currentCodeplug = codeplug;
     if (codeplug === undefined || codeplug === null) {
         console.debug('No codeplug loaded');
@@ -137,14 +140,8 @@ function handlePTTDown() {
         isPttPressed = true;
         pttPressStartTime = currentTime;
 
-        // Start a timeout to check if the button is held down
         setTimeout(() => {
             console.log('Checking PTT press duration')
-            console.log('isPttPressed:', isPttPressed)
-            console.log('pttPressStartTime:', pttPressStartTime)
-            console.log('currentTime:', currentTime)
-            console.log(Date.now() - pttPressStartTime)
-            console.log((Date.now() - pttPressStartTime) >= MIN_PTT_DURATION_MS);
 
             if (isPttPressed && (Date.now() - pttPressStartTime) >= MIN_PTT_DURATION_MS) {
                 console.debug('PTT press confirmed');

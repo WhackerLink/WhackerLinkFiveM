@@ -1,30 +1,26 @@
 #radio-container {
-    position: fixed;
+    position: relative;
     bottom: 5px;
     right: 10px;
+    width: 300px;
+    border: 2px solid black;
     display: inline-block;
+    cursor: move;
+    z-index: 1000;
 }
 
 #radio-image {
     display: block;
-    width: 250px;
+    width: 300px;
     height: auto;
-    position: relative;
 }
+
 #rssi-icon {
-   position: absolute;
+    position: absolute;
     top: 74.8%;
     left: 25.5%;
     display: block;
 }
-
-
-
-
-
-
-
-
 
 #channel-up, #zone-up {
     position: absolute;
@@ -50,9 +46,6 @@
     left: 28%;
 }
 
-
- 
-
  #rssi-btn {
     position: absolute;
     transform: translateX(-50%);
@@ -67,10 +60,6 @@
     cursor: pointer;
 	visibility: hidden;
 }
-
-
-
-
 
 #channel-knbu {
 	  left: 53%;

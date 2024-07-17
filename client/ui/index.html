@@ -4,57 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio</title>
-    <link rel="stylesheet" href="" id="radio-stylesheet">
+    <link rel="stylesheet" href="style.css" id="radio-stylesheet">
+    <style>
+        #radio-container {
+            position: relative;
+            bottom: 5px;
+            right: 10px;
+            display: inline-block;
+            cursor: move;
+            z-index: 1000;
+        }
+    </style>
 </head>
-<style>
-    #notification {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: rgba(255, 0, 0, 0.8);
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        font-size: 24px;
-        text-align: center;
-        z-index: 1000;
-        display: none;
-    }
-
-    #startup-message {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: black;
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        font-size: 24px;
-        text-align: center;
-        z-index: 1000;
-        display: none;
-    }
-</style>
 <body>
-<div id="notification" style="display: none;"></div>
-<div id="startup-message" style="display: none;">WhackerLinkFiveM, https://github.com/whackerlink</div>
+<div id="notification"></div>
+<div id="startup-message">WhackerLinkFiveM, https://github.com/whackerlink</div>
 <div id="radio-container" style="display: none;">
     <img src="" id="radio-image" alt="Radio">
-	<img src="" id="rssi-icon" alt="rssi">
+    <img src="" id="rssi-icon" alt="rssi">
     <div id="line1"></div>
     <div id="line2"></div>
     <div id="line3"></div>
     <div id="softText1">ZnUp</div>
     <div id="softText2">RSSI</div>
     <div id="softText3">ChUp</div>
-    <button  onclick="buttonBeep()" id="channel-up">C</button>
-	<button  onclick="knobClick()" id="channel-knbu">U</button>
-	<button onclick="knobClick()" id="channel-knbd">D</button>
-	<button  onclick="buttonBeep()" id="btn-emer">E</button>
-    <button onclick="buttonBeep()" id="zone-up">Z </button>
-	<button  onclick="buttonBeep()" id="rssi-btn">r</button>
+    <button onclick="buttonBeep()" id="channel-up">C</button>
+    <button onclick="knobClick()" id="channel-knbu">U</button>
+    <button onclick="knobClick()" id="channel-knbd">D</button>
+    <button onclick="buttonBeep()" id="btn-emer">E</button>
+    <button onclick="buttonBeep()" id="zone-up">Z</button>
+    <button onclick="buttonBeep()" id="rssi-btn">r</button>
+    <div id="resize-handle"></div>
 </div>
 <script src="PacketType.js"></script>
 <script src="masterUtils.js"></script>
@@ -62,9 +42,76 @@
 <script src="PcmRecorder.js"></script>
 <script src="script.js"></script>
 <script src="https://code.responsivevoice.org/responsivevoice.js?key=PekkZld1"></script>
+<script>
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let originalX = 0;
+    let originalY = 0;
+
+    let isResizing = false;
+    let resizeStartX = 0;
+    let resizeStartY = 0;
+    let originalWidth = 0;
+    let originalHeight = 0;
+
+    const radioContainer = document.getElementById('radio-container');
+    const resizeHandle = document.getElementById('resize-handle');
+
+    radioContainer.addEventListener('mousedown', (e) => {
+        if (e.target === resizeHandle) {
+            return;
+        }
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        originalX = radioContainer.offsetLeft;
+        originalY = radioContainer.offsetTop;
+        document.addEventListener('mousemove', handleDrag);
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            document.removeEventListener('mousemove', handleDrag);
+        });
+    });
+
+    function handleDrag(e) {
+        if (!isDragging) return;
+        const dx = e.clientX - dragStartX;
+        const dy = e.clientY - dragStartY;
+        radioContainer.style.left = `${originalX + dx}px`;
+        radioContainer.style.top = `${originalY + dy}px`;
+    }
+
+    resizeHandle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        resizeStartX = e.clientX;
+        resizeStartY = e.clientY;
+        originalWidth = radioContainer.clientWidth;
+        originalHeight = radioContainer.clientHeight;
+        document.addEventListener('mousemove', handleResize);
+        document.addEventListener('mouseup', () => {
+            isResizing = false;
+            document.removeEventListener('mousemove', handleResize);
+        });
+    });
+
+    function handleResize(e) {
+        if (!isResizing) return;
+        const dx = e.clientX - resizeStartX;
+        const dy = e.clientY - resizeStartY;
+        radioContainer.style.width = `${originalWidth + dx}px`;
+        radioContainer.style.height = `${originalHeight + dy}px`;
+        adjustElements();
+    }
+
+    function adjustElements() {
+        const elements = radioContainer.querySelectorAll('#rssi-icon, #channel-up, #zone-up, #rssi-btn, #channel-knbu, #channel-knbd, #btn-emer, #line1, #line2, #line3, #softText1, #softText2, #softText3');
+        elements.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            el.style.left = (rect.left - radioContainer.offsetLeft) + 'px';
+            el.style.top = (rect.top - radioContainer.offsetTop) + 'px';
+        });
+    }
+</script>
 </body>
 </html>
-
- 
-
-   

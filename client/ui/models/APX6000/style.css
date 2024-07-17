@@ -1,19 +1,21 @@
 #radio-container {
-    position: fixed;
+    position: relative;
     bottom: 5px;
     right: 10px;
+    width: 300px;
     display: inline-block;
+    cursor: move;
+    z-index: 1000;
 }
 
 #radio-image {
     display: block;
-    width: 300px;
+    width: 100%;
     height: auto;
-    position: relative;
 }
 
 #rssi-icon {
-   position: absolute;
+    position: absolute;
     top: 69.5%;
     left: 30%;
     display: block;
@@ -46,40 +48,28 @@
 }
 
 #channel-knbu {
-	  left: 52%;
-}
-#channel-knbd {
-	  left: 44%;
-
-}
-#btn-emer {
-	  left: 28%;
-}
-
-#btn-emer {
-    position: absolute;
-    transform: translateX(-50%);
-    top: 45%;
-    z-index: 1;
-    display: block;
-    margin: 10px auto;
-    padding: 7px;
-    background-color: transparent;
-	color: transparent;
-    border: none;
-    cursor: pointer;
-}
-
-#channel-knbu, #channel-knbd {
-    position: absolute;
-    transform: translateX(-50%);
+    left: 52%;
     top: 35%;
-    z-index: 1;
+}
+
+#channel-knbd {
+    left: 44%;
+    top: 35%;
+}
+
+#btn-emer {
+    left: 28%;
+    top: 45%;
+}
+
+#btn-emer, #channel-knbu, #channel-knbd {
+    position: absolute;
+    transform: translateX(-50%);
     display: block;
     margin: 10px auto;
     padding: 7px;
     background-color: transparent;
-	color: transparent;
+    color: transparent;
     border: none;
     cursor: pointer;
 }
