@@ -31,6 +31,8 @@ function socketOpen() {
 }
 
 window.addEventListener('message', async function (event) {
+    const rssiIcon = document.getElementById('rssi-icon');
+
     if (event.data.type === 'openRadio') {
         currentCodeplug = event.data.codeplug;
 
@@ -42,6 +44,8 @@ window.addEventListener('message', async function (event) {
             }, 2000);
             return;
         }
+
+        rssiIcon.style.display = 'none';
 
         if (radioModel == null) {
             radioModel = currentCodeplug.radioWide.model;
@@ -72,6 +76,7 @@ window.addEventListener('message', async function (event) {
 
         updateDisplay();
         radioOn = true;
+        rssiIcon.style.display = 'block';
         connectWebSocket();
     } else if (event.data.type === 'closeRadio') {
         radioOn = false;
@@ -112,6 +117,10 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === 'setRssiLevel') {
         const rssiIcon = document.getElementById('rssi-icon');
         currentSite = event.data.site;
+
+        if (!radioOn) {
+            return;
+        }
 
         if (event.data.level === 0) {
             isInRange = false;
@@ -305,8 +314,8 @@ function connectWebSocket() {
         if (typeof event.data === 'string') {
             console.debug(`Received master message: ${event.data}`);
 
-            if (!isInRange) {
-                console.debug("Not in range, not processing message");
+            if (!isInRange || !radioOn) {
+                console.debug("Not in range or powered off, not processing message");
                 return;
             }
 
