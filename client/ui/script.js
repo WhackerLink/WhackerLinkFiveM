@@ -178,7 +178,7 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === 'closeRadio') {
         document.getElementById('radio-container').style.display = 'none';
     } else if (event.data.type === "pttPress") {
-        if (!isInRange) {
+        if (!isInRange || !isRegistered) {
             console.debug("Not in range, not txing");
             bonk();
             return;
@@ -198,7 +198,7 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === "pttRelease") {
         isVoiceGrantHandled = false;
 
-        if (isTxing) {
+        if (isTxing && isRegistered) {
             SendGroupVoiceRelease();
             currentFrequncyChannel = null;
         } else {
