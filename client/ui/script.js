@@ -466,6 +466,9 @@ function connectWebSocket() {
         isInSiteTrunking = true;
         setUiSiteTrunking(isInSiteTrunking);
         console.debug('WebSocket connection established');
+        isVoiceGranted = false;
+        isVoiceRequested = false;
+        isVoiceGrantHandled = false;
         // console.debug("Codeplug: " + currentCodeplug);
         startCheckLoop();
     };
@@ -473,12 +476,18 @@ function connectWebSocket() {
     socket.onclose = () => {
         isInSiteTrunking = false;
         setUiSiteTrunking(isInSiteTrunking);
+        isVoiceGranted = false;
+        isVoiceRequested = false;
+        isVoiceGrantHandled = false;
         console.debug('WebSocket connection closed');
     }
 
     socket.onerror = (error) => {
         isInSiteTrunking = false;
         setUiSiteTrunking(isInRange);
+        isVoiceGranted = false;
+        isVoiceRequested = false;
+        isVoiceGrantHandled = false;
         console.error('WebSocket error:', error);
     }
 
