@@ -11,7 +11,6 @@
             bottom: 5px;
             right: 10px;
             display: inline-block;
-            cursor: move;
             z-index: 1000;
         }
     </style>
@@ -35,7 +34,6 @@
     <button onclick="buttonBeep()" id="btn-emer">E</button>
     <button onclick="buttonBeep()" id="zone-up">Z</button>
     <button onclick="buttonBeep()" id="rssi-btn">r</button>
-    <div id="resize-handle"></div>
 </div>
 <script src="PacketType.js"></script>
 <script src="masterUtils.js"></script>
@@ -44,75 +42,7 @@
 <script src="script.js"></script>
 <script src="https://code.responsivevoice.org/responsivevoice.js?key=PekkZld1"></script>
 <script>
-    let isDragging = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
-    let originalX = 0;
-    let originalY = 0;
-
-    let isResizing = false;
-    let resizeStartX = 0;
-    let resizeStartY = 0;
-    let originalWidth = 0;
-    let originalHeight = 0;
-
     const radioContainer = document.getElementById('radio-container');
-    const resizeHandle = document.getElementById('resize-handle');
-
-    radioContainer.addEventListener('mousedown', (e) => {
-        if (e.target === resizeHandle) {
-            return;
-        }
-        isDragging = true;
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
-        originalX = radioContainer.offsetLeft;
-        originalY = radioContainer.offsetTop;
-        document.addEventListener('mousemove', handleDrag);
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-            document.removeEventListener('mousemove', handleDrag);
-        });
-    });
-
-    function handleDrag(e) {
-        if (!isDragging) return;
-        const dx = e.clientX - dragStartX;
-        const dy = e.clientY - dragStartY;
-        radioContainer.style.left = `${originalX + dx}px`;
-        radioContainer.style.top = `${originalY + dy}px`;
-    }
-
-    resizeHandle.addEventListener('mousedown', (e) => {
-        isResizing = true;
-        resizeStartX = e.clientX;
-        resizeStartY = e.clientY;
-        originalWidth = radioContainer.clientWidth;
-        originalHeight = radioContainer.clientHeight;
-        document.addEventListener('mousemove', handleResize);
-        document.addEventListener('mouseup', () => {
-            isResizing = false;
-            document.removeEventListener('mousemove', handleResize);
-        });
-    });
-
-    function handleResize(e) {
-        if (!isResizing) return;
-        const dx = e.clientX - resizeStartX;
-        const dy = e.clientY - resizeStartY;
-        radioContainer.style.width = `${originalWidth + dx}px`;
-        radioContainer.style.height = `${originalHeight + dy}px`;
-        adjustElements();
-    }
-
-    function adjustElements() {
-        const elements = radioContainer.querySelectorAll('#rssi-icon, #channel-up, #zone-up, #rssi-btn, #channel-knbu, #channel-knbd, #btn-emer, #line1, #line2, #line3, #softText1, #softText2, #softText3');
-        elements.forEach(el => {
-            const rect = el.getBoundingClientRect();
-            el.style.left = (rect.left - radioContainer.offsetLeft) + 'px';
-            el.style.top = (rect.top - radioContainer.offsetTop) + 'px';
-        });
-    }
 </script>
 </body>
 </html>
