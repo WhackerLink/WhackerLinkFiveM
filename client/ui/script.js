@@ -571,6 +571,7 @@ function connectWebSocket() {
                         currentFrequncyChannel = data.data.Channel;
                         isTxing = true;
                         isVoiceGranted = true;
+                        isVoiceRequested = false;
                     } else {
                         isTxing = false;
                         isVoiceGranted = false;
