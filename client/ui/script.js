@@ -411,7 +411,12 @@ function changeChannel(direction) {
     const currentChannel = currentZone.channels[currentChannelIndex];
 
     responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
-    sendAffiliation().then(r => {});
+    if (!isInSiteTrunking) {
+        sendAffiliation().then(r => {
+        });
+    } else {
+        isAffiliated = false;
+    }
     updateDisplay();
     reconnectIfSystemChanged();
 }
@@ -452,7 +457,12 @@ function reconnectIfSystemChanged() {
     if (socket && socket.url !== `ws://${currentSystem.address}:${currentSystem.port}/client`) {
         disconnectWebSocket();
         connectWebSocket();
-        sendRegistration().then(() => {});
+        if (!isInSiteTrunking) {
+            sendRegistration().then(() => {
+            });
+        } else {
+            isRegistered = false;
+        }
     }
 }
 
@@ -557,9 +567,14 @@ function connectWebSocket() {
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status === 0) {
-                    currentFrequncyChannel = data.data.Channel;
-                    isTxing = true;
-                    isVoiceGranted = true;
+                    if (!isVoiceGranted && isVoiceRequested) {
+                        currentFrequncyChannel = data.data.Channel;
+                        isTxing = true;
+                        isVoiceGranted = true;
+                    } else {
+                        isTxing = false;
+                        isVoiceGranted = false;
+                    }
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status !== 0) {
                     bonk();
                 }
