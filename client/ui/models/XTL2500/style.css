@@ -4,9 +4,7 @@
     right: 10px;
     width: 600px;
     display: inline-block;
-    cursor: move;
     z-index: 1000;
-    border: 2px solid black;
 }
 
 #radio-image {
@@ -46,6 +44,10 @@
 	  left: 52%;
 
 }
+#power-btn {
+	  left: 18%;
+
+}
 
 #channel-knbd {
 	  left: 44%;
@@ -82,6 +84,19 @@
 	padding-left: 30px;
     background-color: transparent;
     color: transparent;
+    border: none;
+    cursor: pointer;
+}
+#power-btn {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 55%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+	color: transparent;
     border: none;
     cursor: pointer;
 }
