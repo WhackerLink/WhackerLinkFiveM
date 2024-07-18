@@ -28,6 +28,7 @@ let isVoiceGrantHandled = false;
 let affiliationCheckInterval;
 let registrationCheckInterval;
 let groupGrantCheckInterval;
+let reconnectInterval;
 
 let myRid = "1234";
 let currentTg = "2001";
@@ -39,6 +40,12 @@ let currentSite;
 function socketOpen() {
     return socket && socket.readyState === WebSocket.OPEN;
 }
+
+reconnectInterval = setInterval(() => {
+    if (isInSiteTrunking && radioOn) {
+        connectWebSocket();
+    }
+}, 2000);
 
 function startCheckLoop() {
     if (!socketOpen() || !isInRange || !radioOn) {
@@ -457,6 +464,7 @@ function connectWebSocket() {
 
     console.debug("Connecting to master...");
     if (socket && socket.readyState === WebSocket.OPEN) {
+        isInSiteTrunking = false;
         console.log("Already connected?")
         return;
     }
@@ -465,7 +473,7 @@ function connectWebSocket() {
     socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
-        isInSiteTrunking = true;
+        isInSiteTrunking = false;
         setUiSiteTrunking(isInSiteTrunking);
         console.debug('WebSocket connection established');
         isVoiceGranted = false;
@@ -477,7 +485,7 @@ function connectWebSocket() {
     };
 
     socket.onclose = () => {
-        isInSiteTrunking = false;
+        isInSiteTrunking = true;
         setUiSiteTrunking(isInSiteTrunking);
         isVoiceGranted = false;
         isVoiceRequested = false;
@@ -487,7 +495,7 @@ function connectWebSocket() {
     }
 
     socket.onerror = (error) => {
-        isInSiteTrunking = false;
+        isInSiteTrunking = true;
         setUiSiteTrunking(isInRange);
         isVoiceGranted = false;
         isVoiceRequested = false;
@@ -622,7 +630,7 @@ function setUiSiteTrunking(inSt) {
         return;
     }
 
-    if (inSt) {
+    if (!inSt) {
         line3.innerHTML = '';
         line3.style.backgroundColor = '';
     } else {
