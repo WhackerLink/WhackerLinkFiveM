@@ -96,7 +96,7 @@ function startCheckLoop() {
 
     groupGrantCheckInterval = setInterval(() => {
         setTimeout(() => {
-            if (isVoiceRequested && !isVoiceGranted) {
+            if (isVoiceRequested && !isVoiceGranted && !isVoiceGrantHandled) {
                 document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
                 SendGroupVoiceRequest();
 
