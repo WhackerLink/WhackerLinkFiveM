@@ -5,6 +5,8 @@ const HOST_VERSION = "R1.0.0";
 
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+const rssiIcon = document.getElementById('rssi-icon');
+
 let socket;
 let currentChannelIndex = 0;
 let currentZoneIndex = 0;
@@ -16,14 +18,21 @@ let isTxing = false;
 let audioBuffer = [];
 let radioOn = false;
 let currentMessageIndex = 0;
+
+let isAffiliated = false;
+let isRegistered = false;
+let isVoiceGranted = false;
+let isVoiceRequested = false;
+let isVoiceGrantHandled = false;
+
 let affiliationCheckInterval;
 let registrationCheckInterval;
-let savedPosition = {left: null, top: null};
+let groupGrantCheckInterval;
 
 let myRid = "1234";
 let currentTg = "2001";
 let radioModel;
-let currentRssiLevel;
+let currentRssiLevel = "0";
 let currentDbLevel;
 let currentSite;
 
@@ -31,9 +40,118 @@ function socketOpen() {
     return socket && socket.readyState === WebSocket.OPEN;
 }
 
-window.addEventListener('message', async function (event) {
-    const rssiIcon = document.getElementById('rssi-icon');
+function startCheckLoop() {
+    if (!socketOpen() || !isInRange || !radioOn) {
+        return;
+    }
 
+    setTimeout(() => {
+        sendRegistration().then(() => {
+            setTimeout(() => {
+                if (isRegistered) {
+                    sendAffiliation().then(() => {
+                    });
+                } else {
+                    document.getElementById('line3').innerHTML = 'Sys reg refusd';
+                }
+            }, 800);
+        });
+    }, 200);
+
+    affiliationCheckInterval = setInterval(() => {
+        if (!socketOpen() || !isInRange || !radioOn) {
+            return;
+        }
+
+        if (!isAffiliated && isRegistered) {
+            sendAffiliation().then(() => {
+            });
+        }
+    }, 5000);
+
+    registrationCheckInterval = setInterval(() => {
+        if (!socketOpen() || !isInRange || !radioOn) {
+            return;
+        }
+
+        if (!isRegistered) {
+            sendRegistration().then(r => {
+            });
+            setTimeout(() => {
+                if (!isRegistered) {
+                    document.getElementById('line3').innerHTML = 'Sys reg refusd';
+                }
+            }, 800);
+        } else {
+            document.getElementById('line3').innerHTML = '';
+        }
+    }, 5000);
+
+    groupGrantCheckInterval = setInterval(() => {
+        if (isVoiceRequested && !isVoiceGranted) {
+            document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
+            SendGroupVoiceRequest();
+
+            if (!isVoiceGranted && isVoiceRequested) {
+                setTimeout(() => {
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                }, 400);
+            }
+
+            setTimeout(() => {
+                if (!isVoiceGranted && !isTxing && isVoiceRequested) {
+                    isVoiceRequested = false;
+                    isVoiceGranted = false;
+                    isTxing = false;
+                    bonk();
+                }
+            }, 3000);
+        }
+
+        if (isVoiceGranted && isTxing && !isVoiceGrantHandled) {
+            document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+            isVoiceRequested = false;
+            isVoiceGranted = true;
+            setTimeout(() => {
+                tpt_generate();
+                document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
+            }, 250);
+            isVoiceGrantHandled = true;
+        }
+    }, 200);
+}
+
+function stopCheckLoop() {
+    clearInterval(affiliationCheckInterval);
+    clearInterval(registrationCheckInterval);
+    clearInterval(groupGrantCheckInterval);
+}
+
+async function sendAffiliation() {
+    try {
+        rssiIcon.src = `models/${radioModel}/icons/tx.png`;
+        await SendGroupAffiliationRequest();
+        setTimeout(() => {
+            rssiIcon.src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+        }, 150);
+    } catch (error) {
+        console.error('Error sending affiliation:', error);
+    }
+}
+
+async function sendRegistration() {
+    try {
+        rssiIcon.src = `models/${radioModel}/icons/tx.png`;
+        await SendRegistrationRequest();
+        setTimeout(() => {
+            rssiIcon.src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+        }, 150);
+    } catch (error) {
+        console.error('Error sending registration:', error);
+    }
+}
+
+window.addEventListener('message', async function (event) {
     if (event.data.type === 'openRadio') {
         currentCodeplug = event.data.codeplug;
 
@@ -57,23 +175,6 @@ window.addEventListener('message', async function (event) {
         loadRadioModelAssets(radioModel);
 
         document.getElementById('radio-container').style.display = 'block';
-
-        let right = "-1400px";
-        let bottom = "-900px";
-
-        const modelConfig = currentCodeplug.currentModelConfig;
-
-        if (modelConfig) {
-            right = modelConfig.defaultLocation.right;
-            bottom = modelConfig.defaultLocation.bottom;
-        }
-
-        savedPosition.left = right;
-        savedPosition.top = bottom;
-
-        radioContainer.style.right = right;
-        radioContainer.style.bottom = bottom;
-
     } else if (event.data.type === 'closeRadio') {
         document.getElementById('radio-container').style.display = 'none';
     } else if (event.data.type === "pttPress") {
@@ -83,14 +184,23 @@ window.addEventListener('message', async function (event) {
             return;
         }
 
-        SendGroupVoiceRequest();
+        if (!isInSiteTrunking) {
+            document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
+            setTimeout(() => {
+                SendGroupVoiceRequest();
+                isVoiceRequested = true;
+                isVoiceGranted = false;
+            }, 200);
+        } else {
+            isVoiceGranted = false;
+            isVoiceRequested = true;
+        }
     } else if (event.data.type === "pttRelease") {
+        isVoiceGrantHandled = false;
 
         if (isTxing) {
             SendGroupVoiceRelease();
             currentFrequncyChannel = null;
-            /*            micCapture.stopCapture();
-                        console.debug('Recording stopped');*/
         } else {
             console.debug("not txing not releasing");
         }
@@ -107,7 +217,6 @@ window.addEventListener('message', async function (event) {
         loadRadioModelAssets(event.data.model);
         radioModel = event.data.model;
     } else if (event.data.type === 'setRssiLevel') {
-        const rssiIcon = document.getElementById('rssi-icon');
         currentSite = event.data.site;
 
         if (!radioOn) {
@@ -134,8 +243,6 @@ window.addEventListener('message', async function (event) {
 });
 
 async function powerOn() {
-    const rssiIcon = document.getElementById('rssi-icon');
-
     const currentZone = currentCodeplug.zones[currentZoneIndex];
     const currentChannel = currentZone.channels[currentChannelIndex];
 
@@ -172,6 +279,15 @@ async function powerOn() {
 }
 
 async function powerOff() {
+    stopCheckLoop();
+    isAffiliated = false;
+    isRegistered = false;
+    isVoiceGranted = false;
+    isVoiceRequested = false;
+    isVoiceGrantHandled = false;
+    isInRange = false;
+    isInSiteTrunking = false;
+    isTxing = false;
     radioOn = false;
     micCapture.stopCapture();
     console.debug('Recording stopped');
@@ -328,7 +444,6 @@ function reconnectIfSystemChanged() {
     if (socket && socket.url !== `ws://${currentSystem.address}:${currentSystem.port}/client`) {
         disconnectWebSocket();
         connectWebSocket();
-        SendGroupAffiliationRequest();
     }
 }
 
@@ -352,8 +467,7 @@ function connectWebSocket() {
         setUiSiteTrunking(isInSiteTrunking);
         console.debug('WebSocket connection established');
         // console.debug("Codeplug: " + currentCodeplug);
-        SendRegistrationRequest();
-        SendGroupAffiliationRequest();
+        startCheckLoop();
     };
 
     socket.onclose = () => {
@@ -379,7 +493,31 @@ function connectWebSocket() {
                 return;
             }
 
-            if (data.type == packetToNumber("AUDIO_DATA")) {
+            if (data.type == packetToNumber("GRP_AFF_RSP")) {
+                if (data.data.SrcId !== myRid || data.data.DstId !== currentTg) {
+                    return;
+                }
+
+                if (data.data.Status === 0) {
+                    isAffiliated = true;
+                    console.debug("Affiliation granted");
+                } else {
+                    isAffiliated = false;
+                    console.debug("Affiliation denied");
+                }
+            } else if (data.type == packetToNumber("U_REG_RSP")) {
+                if (data.data.SrcId !== myRid) {
+                    return;
+                }
+
+                if (data.data.Status === 0) {
+                    isRegistered = true;
+                    console.debug("Registration granted");
+                } else {
+                    isRegistered = false;
+                    console.debug("Registration refused");
+                }
+            } else if (data.type == packetToNumber("AUDIO_DATA")) {
                 if (data.voiceChannel.SrcId !== myRid && data.voiceChannel.DstId == currentTg && data.voiceChannel.Frequency == currentFrequncyChannel) {
                     const binaryString = atob(data.data);
                     const len = binaryString.length;
@@ -399,11 +537,7 @@ function connectWebSocket() {
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status === 0) {
                     currentFrequncyChannel = data.data.Channel;
                     isTxing = true;
-                    tpt_generate();
-                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
-                    /*                    micCapture.captureMicrophone(() => {
-                                            console.log('Microphone captured');
-                                        });*/
+                    isVoiceGranted = true;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status !== 0) {
                     bonk();
                 }
@@ -419,6 +553,8 @@ function connectWebSocket() {
                     currentFrequncyChannel = null;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
+                    isVoiceGranted = false;
+                    isVoiceRequested = false;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                 }
             } else if (data.type == packetToNumber("EMRG_ALRM_RSP")) {
@@ -636,7 +772,6 @@ function playSoundEffect(audioPath) {
 
 function loadRadioModelAssets(model) {
     const radioImage = document.getElementById('radio-image');
-    const rssiIcon = document.getElementById('rssi-icon');
     const radioStylesheet = document.getElementById('radio-stylesheet');
     radioImage.src = `models/${model}/radio.png`;
     radioStylesheet.href = `models/${model}/style.css`;
@@ -644,15 +779,6 @@ function loadRadioModelAssets(model) {
     if (currentRssiLevel !== null) {
         rssiIcon.src = `models/${model}/icons/rssi${currentRssiLevel}.png`;
     } else {
-        rssiIcon.src = `models/${model}/icons/rssi4.png`;
-    }
-
-    console.debug("CURRENT CPG: " + JSON.stringify(currentCodeplug));
-
-    const modelConfig = currentCodeplug.currentModelConfig;
-    console.log("MODEL CONFIG: " + modelConfig.defaultLocation.right + " " + modelConfig.defaultLocation.bottom);
-    if (modelConfig) {
-        radioContainer.style.right = modelConfig.defaultLocation.right;
-        radioContainer.style.bottom = modelConfig.defaultLocation.bottom;
+        rssiIcon.src = `models/${model}/icons/rssi${currentRssiLevel}.png`;
     }
 }

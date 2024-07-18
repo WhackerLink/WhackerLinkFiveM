@@ -6,12 +6,34 @@
     <title>Radio</title>
     <link rel="stylesheet" href="style.css" id="radio-stylesheet">
     <style>
-        #radio-container {
-            position: relative;
-            bottom: 5px;
-            right: 10px;
-            display: inline-block;
+        #notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 24px;
+            text-align: center;
             z-index: 1000;
+            display: none;
+        }
+
+        #startup-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: black;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 24px;
+            text-align: center;
+            z-index: 1000;
+            display: none;
         }
     </style>
 </head>
@@ -41,8 +63,5 @@
 <script src="PcmRecorder.js"></script>
 <script src="script.js"></script>
 <script src="https://code.responsivevoice.org/responsivevoice.js?key=PekkZld1"></script>
-<script>
-    const radioContainer = document.getElementById('radio-container');
-</script>
 </body>
 </html>

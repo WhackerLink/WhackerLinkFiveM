@@ -7,7 +7,7 @@ let currentCodeplug = {};
 let inVehicle = false;
 let sites = [];
 
-const PTT_COOLDOWN_MS = 1500;
+const PTT_COOLDOWN_MS = 1000;
 const MIN_PTT_DURATION_MS = 500;
 
 function displayStartupMessage() {

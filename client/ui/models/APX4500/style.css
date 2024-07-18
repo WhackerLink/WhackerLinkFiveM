@@ -2,27 +2,23 @@
     position: fixed;
     bottom: 5px;
     right: 10px;
-    width: 700px;
     display: inline-block;
-    cursor: move;
-    z-index: 1000;
-    border: 2px solid black;
-
 }
 
 #radio-image {
     display: block;
-    width: 700px;
+    width: auto;
     height: auto;
     position: relative;
 }
 
 #rssi-icon {
-   position: absolute;
+    position: absolute;
     top: 21.5%;
     left: 22.7%;
     display: block;
 }
+
 #channel-up, #zone-up, #rssi-btn {
     position: absolute;
     transform: translateX(-50%);
@@ -41,34 +37,51 @@
 #channel-up {
     top: 70%;
     left: 50%;
-	background-color: transparent;
+    background-color: transparent;
 }
 
 #zone-up {
     top: 70%;
     left: 25%;
-	background-color: transparent;
+    background-color: transparent;
 }
+
 #rssi-btn {
     top: 70%;
     left: 33%;
-	background-color: transparent;
+    background-color: transparent;
 }
-
-
 
 #channel-knbu {
-	  left: 52%;
-
+    left: 52%;
+    top: 35%;
 }
+
 #channel-knbd {
-	  left: 44%;
-
+    left: 44%;
+    top: 35%;
 }
+
 #btn-emer {
-	  left: 88.5%;
-
+    left: 88.5%;
 }
+
+#power-btn {
+    left: 13%;
+    top: 12%;
+    width: 35px;
+    position: absolute;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
 #btn-emer {
     position: absolute;
     transform: translateX(-50%);
@@ -78,37 +91,24 @@
     margin: 10px auto;
     padding: 7px;
     background-color: transparent;
-	color: transparent;
+    color: transparent;
     border: none;
     cursor: pointer;
 }
-
-
-
-
-
-
 
 #channel-knbu, #channel-knbd {
     position: absolute;
     transform: translateX(-50%);
-	visibility: hidden;
-    top: 35%;
+    visibility: hidden;
     z-index: 1;
     display: block;
     margin: 10px auto;
     padding: 7px;
-    background-color: transparent;
-	color: transparent;
+    background-color: white;
+    color: white;
     border: none;
     cursor: pointer;
 }
-
-
-
-
-
-
 
 #line1, #line2, #line3, #softText1, #softText2, #softText3 {
     position: absolute;
@@ -156,7 +156,7 @@
 #line3 {
     top: 44%;
     font-size: 15px;
-	width: 30.1%;
+    width: 30.1%;
 }
 
 #startup-message {

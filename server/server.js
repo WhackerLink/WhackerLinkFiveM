@@ -33,22 +33,6 @@ function loadCodeplugs() {
                 const fileContents = fs.readFileSync(codeplugDir + file, 'utf8');
                 const codeplug = yaml.load(fileContents);
 
-                const modelConfigPath = `${modelsDir}${codeplug.radioWide.model}/config.yml`;
-                console.log('Model config path:', modelConfigPath)
-                const modelConfigPathVehicle = `${modelsDir}${codeplug.radioWide.inCarMode}/config.yml`;
-                console.log('Model config path:', modelConfigPathVehicle)
-                if (fs.existsSync(modelConfigPath)) {
-                    const modelConfigContents = fs.readFileSync(modelConfigPath, 'utf8');
-                    codeplug.modelConfig = yaml.load(modelConfigContents);
-                    // console.log('Model config loaded:', codeplug.modelConfig);
-                }
-
-                if (fs.existsSync(modelConfigPathVehicle)) {
-                    const modelConfigContents = fs.readFileSync(modelConfigPathVehicle, 'utf8');
-                    codeplug.inCarModeConfig = yaml.load(modelConfigContents);
-                    console.log('Model config loaded:', codeplug.inCarModeConfig);
-                }
-
                 codeplugs[codeplugName] = codeplug;
             }
         });
