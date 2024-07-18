@@ -18,7 +18,7 @@ let radioOn = false;
 let currentMessageIndex = 0;
 let affiliationCheckInterval;
 let registrationCheckInterval;
-let savedPosition = { left: null, top: null };
+let savedPosition = {left: null, top: null};
 
 let myRid = "1234";
 let currentTg = "2001";
@@ -37,6 +37,10 @@ window.addEventListener('message', async function (event) {
     if (event.data.type === 'openRadio') {
         currentCodeplug = event.data.codeplug;
 
+        if (!radioOn) {
+            rssiIcon.style.display = 'none';
+        }
+
         if (currentCodeplug == null) {
             document.getElementById('notification').innerText = "Please set your codeplug first with /set_codeplug <codeplug>";
             document.getElementById('notification').style.display = 'block';
@@ -46,68 +50,32 @@ window.addEventListener('message', async function (event) {
             return;
         }
 
-        rssiIcon.style.display = 'none';
-
         if (radioModel == null) {
             radioModel = currentCodeplug.radioWide.model;
         }
 
-        const currentZone = currentCodeplug.zones[currentZoneIndex];
-        const currentChannel = currentZone.channels[currentChannelIndex];
-
-        micCapture.captureMicrophone(() => {
-            console.log('Microphone captured');
-        });
-
         loadRadioModelAssets(radioModel);
 
-        radioContainer.style.display = 'block';
+        document.getElementById('radio-container').style.display = 'block';
 
-        if (savedPosition.left !== null && savedPosition.top !== null) {
-            radioContainer.style.right = savedPosition.left;
-            radioContainer.style.bottom = savedPosition.top;
-        } else {
-            let right = "-1400px";
-            let bottom = "-900px";
+        let right = "-1400px";
+        let bottom = "-900px";
 
-            const modelConfig = currentCodeplug.currentModelConfig;
+        const modelConfig = currentCodeplug.currentModelConfig;
 
-            if (modelConfig) {
-                right = modelConfig.defaultLocation.right;
-                bottom = modelConfig.defaultLocation.bottom;
-            }
-
-            savedPosition.left = right;
-            savedPosition.top = bottom;
-
-            radioContainer.style.right = right;
-            radioContainer.style.bottom = bottom;
+        if (modelConfig) {
+            right = modelConfig.defaultLocation.right;
+            bottom = modelConfig.defaultLocation.bottom;
         }
 
-        const bootScreenMessages = [
-            { text: "", duration: 0, line: "line1" },
-            { text: "", duration: 0, line: "line3" },
-            { text: HOST_VERSION, duration: 1500, line: "line2" },
-            { text: radioModel, duration: 1500, line: "line2" }
-        ];
+        savedPosition.left = right;
+        savedPosition.top = bottom;
 
-        await displayBootScreen(bootScreenMessages);
-        currentMessageIndex = 0;
+        radioContainer.style.right = right;
+        radioContainer.style.bottom = bottom;
 
-        responsiveVoice.speak(`${currentZone.name}`, `US English Female`,  {rate: .8});
-        responsiveVoice.speak(`${currentChannel.name}`, `US English Female`,  {rate: .8});
-
-        updateDisplay();
-        radioOn = true;
-        rssiIcon.style.display = 'block';
-        connectWebSocket();
     } else if (event.data.type === 'closeRadio') {
-        radioOn = false;
-        micCapture.stopCapture();
-        console.debug('Recording stopped');
-        await SendDeRegistrationRequest();
         document.getElementById('radio-container').style.display = 'none';
-        disconnectWebSocket();
     } else if (event.data.type === "pttPress") {
         if (!isInRange) {
             console.debug("Not in range, not txing");
@@ -135,6 +103,7 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === 'setRid') {
         myRid = event.data.rid;
     } else if (event.data.type === 'setModel') {
+        currentCodeplug = event.data.currentCodeplug;
         loadRadioModelAssets(event.data.model);
         radioModel = event.data.model;
     } else if (event.data.type === 'setRssiLevel') {
@@ -164,6 +133,65 @@ window.addEventListener('message', async function (event) {
     }
 });
 
+async function powerOn() {
+    const rssiIcon = document.getElementById('rssi-icon');
+
+    const currentZone = currentCodeplug.zones[currentZoneIndex];
+    const currentChannel = currentZone.channels[currentChannelIndex];
+
+    micCapture.captureMicrophone(() => {
+        console.log('Microphone captured');
+    });
+
+    const bootScreenMessages = [
+        {text: "", duration: 0, line: "line1"},
+        {text: "", duration: 0, line: "line3"},
+        {text: HOST_VERSION, duration: 1500, line: "line2"},
+        {text: radioModel, duration: 1500, line: "line2"}
+    ];
+
+    await displayBootScreen(bootScreenMessages);
+    currentMessageIndex = 0;
+
+    responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
+    responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
+
+    updateDisplay();
+    document.getElementById("softText1").innerHTML = 'ZnUp';
+    document.getElementById("softText2").innerHTML = 'RSSI';
+    document.getElementById("softText3").innerHTML = 'ChUp';
+    document.getElementById("softText1").style.display = 'block';
+    document.getElementById("softText2").style.display = 'block';
+    document.getElementById("softText3").style.display = 'block';
+    document.getElementById("line1").style.display = 'block';
+    document.getElementById("line2").style.display = 'block';
+    document.getElementById("line3").style.display = 'block';
+    radioOn = true;
+    rssiIcon.style.display = 'block';
+    connectWebSocket();
+}
+
+async function powerOff() {
+    radioOn = false;
+    micCapture.stopCapture();
+    console.debug('Recording stopped');
+    document.getElementById("line1").innerHTML = '';
+    document.getElementById("line2").innerHTML = '';
+    document.getElementById("line3").innerHTML = '';
+    document.getElementById("line1").style.display = 'none';
+    document.getElementById("line2").style.display = 'none';
+    document.getElementById("line3").style.display = 'none';
+    document.getElementById("rssi-icon").style.display = 'none';
+    document.getElementById("softText1").innerHTML = '';
+    document.getElementById("softText2").innerHTML = '';
+    document.getElementById("softText3").innerHTML = '';
+    document.getElementById("softText1").style.display = 'none';
+    document.getElementById("softText2").style.display = 'none';
+    document.getElementById("softText3").style.display = 'none';
+    await SendDeRegistrationRequest();
+    disconnectWebSocket();
+}
+
 function displayBootScreen(bootScreenMessages) {
     return new Promise((resolve) => {
         function showNextMessage() {
@@ -178,6 +206,7 @@ function displayBootScreen(bootScreenMessages) {
                 resolve();
             }
         }
+
         showNextMessage();
     });
 }
@@ -193,6 +222,14 @@ document.addEventListener('keydown', function (event) {
             },
             body: JSON.stringify({})
         });
+    }
+});
+
+document.getElementById('power-btn').addEventListener('click', () => {
+    if (radioOn) {
+        powerOff().then(r => console.log("Radio off"));
+    } else {
+        powerOn().then(r => console.log("Radio on"));
     }
 });
 
@@ -224,7 +261,7 @@ document.getElementById('rssi-btn').addEventListener('click', () => {
     line3.style.color = 'black';
     line3.innerHTML = `SITE: ${currentSite.siteID}`;
     setTimeout(() => {
-        line3.innerHTML = `RSSI: ${ Math.round(currentDbLevel)} dBm`;
+        line3.innerHTML = `RSSI: ${Math.round(currentDbLevel)} dBm`;
     }, 2000);
     setTimeout(() => {
         if (!isInRange) {
@@ -250,7 +287,7 @@ function changeChannel(direction) {
 
     const currentChannel = currentZone.channels[currentChannelIndex];
 
-    responsiveVoice.speak(`${currentChannel.name}`, `US English Female`,  {rate: .8});
+    responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
     updateDisplay();
     reconnectIfSystemChanged();
 }
@@ -268,8 +305,8 @@ function changeZone(direction) {
     const currentZone = currentCodeplug.zones[currentZoneIndex];
     const currentChannel = currentZone.channels[currentChannelIndex];
 
-    responsiveVoice.speak(`${currentZone.name}`, `US English Female`,  {rate: .8});
-    responsiveVoice.speak(`${currentChannel.name}`, `US English Female`,  {rate: .8});
+    responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
+    responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
     updateDisplay();
     reconnectIfSystemChanged();
 }
@@ -585,7 +622,6 @@ function playSoundEffect(audioPath) {
     var audio = new Audio(audioPath);
     audio.play();
 }
-
 
 
 function buttonBonk() {

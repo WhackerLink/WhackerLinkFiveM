@@ -30,7 +30,7 @@ on('onClientResourceStart', (resourceName) => {
 
 onNet('receiveSitesConfig', (receivedSites) => {
     sites = receivedSites;
-    console.debug('Received sites config:', sites);
+    // console.debug('Received sites config:', sites);
 });
 
 RegisterCommand('toggle_radio', () => {
@@ -50,15 +50,15 @@ onNet('open_radio', () => {
 });
 
 onNet('receiveCodeplug', (codeplug) => {
-    console.debug('Received new codeplug:', codeplug);
+    // console.debug('Received new codeplug:', codeplug);
     currentCodeplug = codeplug;
 
     if (inVehicle) {
         currentCodeplug.currentModelConfig = currentCodeplug.inCarModeConfig;
-        SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode}));
+        SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode, currentCodeplug}));
     } else {
         currentCodeplug.currentModelConfig = currentCodeplug.modelConfig;
-        SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model}));
+        SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model, currentCodeplug}));
     }
 
     SetResourceKvp('currentCodeplug', JSON.stringify(currentCodeplug));
@@ -111,12 +111,13 @@ function ToggleRadio() {
 function OpenRadio() {
     console.debug('Open radio command received');
     const codeplug = JSON.parse(GetResourceKvpString('currentCodeplug'));
-
+    // console.log('CURRENT OPEN RADIO Codeplug:', codeplug)
     currentCodeplug = codeplug;
     if (codeplug === undefined || codeplug === null) {
         console.debug('No codeplug loaded');
         return;
     }
+
     SendNuiMessage(JSON.stringify({ type: 'openRadio', codeplug }));
     SendNuiMessage(JSON.stringify({ type: 'setRid', rid: GetResourceKvpString('myRid') }));
     SetNuiFocus(false, false);
@@ -179,13 +180,14 @@ setTick(async () => {
         if (IsPedInAnyVehicle(PlayerPedId(), false)) {
             if (!inVehicle) {
                 inVehicle = true;
-                SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode}));
+                currentCodeplug.currentModelConfig = currentCodeplug.inCarModeConfig;
+                SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode, currentCodeplug}));
             }
         } else {
             if (inVehicle) {
                 inVehicle = false;
-                console.debug('Sending Setting model to:', currentCodeplug.radioWide.model);
-                SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model}));
+                currentCodeplug.currentModelConfig = currentCodeplug.modelConfig;
+                SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model, currentCodeplug}));
             }
         }
     }

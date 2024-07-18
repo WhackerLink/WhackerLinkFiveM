@@ -35,6 +35,12 @@
     cursor: pointer;
 }
 
+#power-btn {
+    left: 87%;
+    top: 40%;
+    width: 20%;
+}
+
 #channel-up {
     left: 63%;
 }
@@ -62,7 +68,7 @@
     top: 45%;
 }
 
-#btn-emer, #channel-knbu, #channel-knbd {
+#btn-emer, #channel-knbu, #channel-knbd, #power-btn {
     position: absolute;
     transform: translateX(-50%);
     display: block;
