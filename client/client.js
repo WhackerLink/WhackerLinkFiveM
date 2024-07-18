@@ -7,7 +7,7 @@ let currentCodeplug = {};
 let inVehicle = false;
 let sites = [];
 
-const PTT_COOLDOWN_MS = 2000;
+const PTT_COOLDOWN_MS = 1500;
 const MIN_PTT_DURATION_MS = 500;
 
 function displayStartupMessage() {
@@ -30,7 +30,7 @@ on('onClientResourceStart', (resourceName) => {
 
 onNet('receiveSitesConfig', (receivedSites) => {
     sites = receivedSites;
-    console.debug('Received sites config:', sites);
+    // console.debug('Received sites config:', sites);
 });
 
 RegisterCommand('toggle_radio', () => {
@@ -50,15 +50,18 @@ onNet('open_radio', () => {
 });
 
 onNet('receiveCodeplug', (codeplug) => {
-    console.debug('Received new codeplug:', codeplug);
+    // console.debug('Received new codeplug:', codeplug);
     currentCodeplug = codeplug;
-    SetResourceKvp('currentCodeplug', JSON.stringify(currentCodeplug));
 
     if (inVehicle) {
-        SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode}));
+        currentCodeplug.currentModelConfig = currentCodeplug.inCarModeConfig;
+        SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode, currentCodeplug}));
     } else {
-        SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model}));
+        currentCodeplug.currentModelConfig = currentCodeplug.modelConfig;
+        SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model, currentCodeplug}));
     }
+
+    SetResourceKvp('currentCodeplug', JSON.stringify(currentCodeplug));
 
     CloseRadio();
     OpenRadio();
@@ -108,12 +111,13 @@ function ToggleRadio() {
 function OpenRadio() {
     console.debug('Open radio command received');
     const codeplug = JSON.parse(GetResourceKvpString('currentCodeplug'));
-    console.log(GetResourceKvpString('currentCodeplug'));
+    // console.log('CURRENT OPEN RADIO Codeplug:', codeplug)
     currentCodeplug = codeplug;
     if (codeplug === undefined || codeplug === null) {
         console.debug('No codeplug loaded');
         return;
     }
+
     SendNuiMessage(JSON.stringify({ type: 'openRadio', codeplug }));
     SendNuiMessage(JSON.stringify({ type: 'setRid', rid: GetResourceKvpString('myRid') }));
     SetNuiFocus(false, false);
@@ -133,17 +137,21 @@ function handlePTTDown() {
     const timeSinceLastPtt = currentTime - lastPttTime;
 
     if (!isPttPressed && timeSinceLastPtt > PTT_COOLDOWN_MS) {
-        if (timeSinceLastPtt < MIN_PTT_DURATION_MS) {
-            console.debug('PTT press ignored due to short press duration');
-            return;
-        }
-        console.debug('PTT pressed');
-        SendNuiMessage(JSON.stringify({ type: 'pttPress' }));
+        console.debug('PTT press initiated');
         isPttPressed = true;
         pttPressStartTime = currentTime;
-        if (!inVehicle) {
-            playRadioAnimation();
-        }
+
+        setTimeout(() => {
+            console.log('Checking PTT press duration')
+
+            if (isPttPressed && (Date.now() - pttPressStartTime) >= MIN_PTT_DURATION_MS) {
+                console.debug('PTT press confirmed');
+                SendNuiMessage(JSON.stringify({ type: 'pttPress' }));
+                if (!inVehicle) {
+                    playRadioAnimation();
+                }
+            }
+        }, MIN_PTT_DURATION_MS + 100);
     } else {
         console.debug('PTT press ignored due to cooldown');
     }
@@ -172,19 +180,33 @@ setTick(async () => {
         if (IsPedInAnyVehicle(PlayerPedId(), false)) {
             if (!inVehicle) {
                 inVehicle = true;
-                SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode}));
+                currentCodeplug.currentModelConfig = currentCodeplug.inCarModeConfig;
+                SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode, currentCodeplug}));
             }
         } else {
             if (inVehicle) {
                 inVehicle = false;
-                console.debug('Sending Setting model to:', currentCodeplug.radioWide.model);
-                SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model}));
+                currentCodeplug.currentModelConfig = currentCodeplug.modelConfig;
+                SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model, currentCodeplug}));
             }
         }
     }
     checkPlayerRSSI();
     await Wait(100);
 });
+
+function calculateDbRssiLevel(distance, frequency) {
+    const speedOfLight = 3e8;
+
+    frequency = frequency * 1e6;
+
+    const fspl = 20 * Math.log10(distance) + 20 * Math.log10(frequency) + 20 * Math.log10(4 * Math.PI / speedOfLight);
+
+    const rssiAtOneMeter = -35;
+
+    const rssi = rssiAtOneMeter - fspl;
+    return Math.max(rssi, -120);
+}
 
 function checkPlayerRSSI() {
     const playerPed = PlayerPedId();
@@ -220,12 +242,14 @@ function checkPlayerRSSI() {
             rssiLevel = 0;
         }
 
-        updateRSSIIcon(rssiLevel, closestSite);
+        const distanceInMeters = minDistance * 1609.34;
+        const dbRssiLevel = calculateDbRssiLevel(distanceInMeters, 0.8549625);
+        updateRSSIIcon(rssiLevel, closestSite, dbRssiLevel);
     }
 }
 
-function updateRSSIIcon(level, site) {
-    SendNuiMessage(JSON.stringify({type: 'setRssiLevel', level: level, site: site}));
+function updateRSSIIcon(level, site, dbRssi) {
+    SendNuiMessage(JSON.stringify({type: 'setRssiLevel', level: level, site: site, dbRssi}));
     // console.debug('RSSI level:', level);
 }
 

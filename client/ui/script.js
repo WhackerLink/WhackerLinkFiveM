@@ -1,7 +1,7 @@
 const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 8000});
 const EXPECTED_PCM_LENGTH = 1600;
 const CHUNK_SIZE = 320;
-const HOST_VERSION = "1.0.0";
+const HOST_VERSION = "R1.0.0";
 
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -11,13 +11,20 @@ let currentZoneIndex = 0;
 let currentFrequncyChannel;
 let currentCodeplug;
 let isInRange = false;
+let isInSiteTrunking = false;
 let isTxing = false;
 let audioBuffer = [];
+let radioOn = false;
+let currentMessageIndex = 0;
+let affiliationCheckInterval;
+let registrationCheckInterval;
+let savedPosition = {left: null, top: null};
 
 let myRid = "1234";
 let currentTg = "2001";
 let radioModel;
 let currentRssiLevel;
+let currentDbLevel;
 let currentSite;
 
 function socketOpen() {
@@ -25,8 +32,14 @@ function socketOpen() {
 }
 
 window.addEventListener('message', async function (event) {
+    const rssiIcon = document.getElementById('rssi-icon');
+
     if (event.data.type === 'openRadio') {
         currentCodeplug = event.data.codeplug;
+
+        if (!radioOn) {
+            rssiIcon.style.display = 'none';
+        }
 
         if (currentCodeplug == null) {
             document.getElementById('notification').innerText = "Please set your codeplug first with /set_codeplug <codeplug>";
@@ -41,20 +54,28 @@ window.addEventListener('message', async function (event) {
             radioModel = currentCodeplug.radioWide.model;
         }
 
-        micCapture.captureMicrophone(() => {
-            console.log('Microphone captured');
-        });
-
         loadRadioModelAssets(radioModel);
+
         document.getElementById('radio-container').style.display = 'block';
-        connectWebSocket();
-        updateDisplay();
+
+        let right = "-1400px";
+        let bottom = "-900px";
+
+        const modelConfig = currentCodeplug.currentModelConfig;
+
+        if (modelConfig) {
+            right = modelConfig.defaultLocation.right;
+            bottom = modelConfig.defaultLocation.bottom;
+        }
+
+        savedPosition.left = right;
+        savedPosition.top = bottom;
+
+        radioContainer.style.right = right;
+        radioContainer.style.bottom = bottom;
+
     } else if (event.data.type === 'closeRadio') {
-        micCapture.stopCapture();
-        console.debug('Recording stopped');
-        await SendDeRegistrationRequest();
         document.getElementById('radio-container').style.display = 'none';
-        disconnectWebSocket();
     } else if (event.data.type === "pttPress") {
         if (!isInRange) {
             console.debug("Not in range, not txing");
@@ -82,11 +103,16 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === 'setRid') {
         myRid = event.data.rid;
     } else if (event.data.type === 'setModel') {
+        currentCodeplug = event.data.currentCodeplug;
         loadRadioModelAssets(event.data.model);
         radioModel = event.data.model;
     } else if (event.data.type === 'setRssiLevel') {
         const rssiIcon = document.getElementById('rssi-icon');
         currentSite = event.data.site;
+
+        if (!radioOn) {
+            return;
+        }
 
         if (event.data.level === 0) {
             isInRange = false;
@@ -102,9 +128,88 @@ window.addEventListener('message', async function (event) {
         }
 
         currentRssiLevel = event.data.level;
+        currentDbLevel = event.data.dbRssi;
         rssiIcon.src = `models/${radioModel}/icons/rssi${event.data.level}.png`;
     }
 });
+
+async function powerOn() {
+    const rssiIcon = document.getElementById('rssi-icon');
+
+    const currentZone = currentCodeplug.zones[currentZoneIndex];
+    const currentChannel = currentZone.channels[currentChannelIndex];
+
+    micCapture.captureMicrophone(() => {
+        console.log('Microphone captured');
+    });
+
+    const bootScreenMessages = [
+        {text: "", duration: 0, line: "line1"},
+        {text: "", duration: 0, line: "line3"},
+        {text: HOST_VERSION, duration: 1500, line: "line2"},
+        {text: radioModel, duration: 1500, line: "line2"}
+    ];
+
+    await displayBootScreen(bootScreenMessages);
+    currentMessageIndex = 0;
+
+    responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
+    responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
+
+    updateDisplay();
+    document.getElementById("softText1").innerHTML = 'ZnUp';
+    document.getElementById("softText2").innerHTML = 'RSSI';
+    document.getElementById("softText3").innerHTML = 'ChUp';
+    document.getElementById("softText1").style.display = 'block';
+    document.getElementById("softText2").style.display = 'block';
+    document.getElementById("softText3").style.display = 'block';
+    document.getElementById("line1").style.display = 'block';
+    document.getElementById("line2").style.display = 'block';
+    document.getElementById("line3").style.display = 'block';
+    radioOn = true;
+    rssiIcon.style.display = 'block';
+    connectWebSocket();
+}
+
+async function powerOff() {
+    radioOn = false;
+    micCapture.stopCapture();
+    console.debug('Recording stopped');
+    document.getElementById("line1").innerHTML = '';
+    document.getElementById("line2").innerHTML = '';
+    document.getElementById("line3").innerHTML = '';
+    document.getElementById("line1").style.display = 'none';
+    document.getElementById("line2").style.display = 'none';
+    document.getElementById("line3").style.display = 'none';
+    document.getElementById("rssi-icon").style.display = 'none';
+    document.getElementById("softText1").innerHTML = '';
+    document.getElementById("softText2").innerHTML = '';
+    document.getElementById("softText3").innerHTML = '';
+    document.getElementById("softText1").style.display = 'none';
+    document.getElementById("softText2").style.display = 'none';
+    document.getElementById("softText3").style.display = 'none';
+    await SendDeRegistrationRequest();
+    disconnectWebSocket();
+}
+
+function displayBootScreen(bootScreenMessages) {
+    return new Promise((resolve) => {
+        function showNextMessage() {
+            if (currentMessageIndex < bootScreenMessages.length) {
+                const message = bootScreenMessages[currentMessageIndex];
+                document.getElementById(message.line).innerHTML = message.text;
+                setTimeout(() => {
+                    currentMessageIndex++;
+                    showNextMessage();
+                }, message.duration);
+            } else {
+                resolve();
+            }
+        }
+
+        showNextMessage();
+    });
+}
 
 document.addEventListener('keydown', function (event) {
     console.log("Key event")
@@ -118,6 +223,19 @@ document.addEventListener('keydown', function (event) {
             body: JSON.stringify({})
         });
     }
+});
+
+document.getElementById('power-btn').addEventListener('click', () => {
+    if (radioOn) {
+        powerOff().then(r => console.log("Radio off"));
+    } else {
+        powerOn().then(r => console.log("Radio on"));
+    }
+});
+
+document.getElementById('btn-emer').addEventListener('click', () => {
+    emergency_tone_generate();
+    SendEmergencyAlarmRequest();
 });
 
 document.getElementById('channel-up').addEventListener('click', () => {
@@ -143,30 +261,52 @@ document.getElementById('rssi-btn').addEventListener('click', () => {
     line3.style.color = 'black';
     line3.innerHTML = `SITE: ${currentSite.siteID}`;
     setTimeout(() => {
-        line3.innerHTML = '';
+        line3.innerHTML = `RSSI: ${Math.round(currentDbLevel)} dBm`;
     }, 2000);
+    setTimeout(() => {
+        if (!isInRange) {
+            setUiOOR(isInRange);
+        } else if (isInSiteTrunking) {
+            setUiSiteTrunking(isInSiteTrunking);
+        } else {
+            line3.innerHTML = '';
+        }
+    }, 4000);
 });
 
 function changeChannel(direction) {
     currentChannelIndex += direction;
+
     const currentZone = currentCodeplug.zones[currentZoneIndex];
+
     if (currentChannelIndex >= currentZone.channels.length) {
         currentChannelIndex = 0;
     } else if (currentChannelIndex < 0) {
         currentChannelIndex = currentZone.channels.length - 1;
     }
+
+    const currentChannel = currentZone.channels[currentChannelIndex];
+
+    responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
     updateDisplay();
     reconnectIfSystemChanged();
 }
 
 function changeZone(direction) {
     currentZoneIndex += direction;
+
     if (currentZoneIndex >= currentCodeplug.zones.length) {
         currentZoneIndex = 0;
     } else if (currentZoneIndex < 0) {
         currentZoneIndex = currentCodeplug.zones.length - 1;
     }
+
     currentChannelIndex = 0;
+    const currentZone = currentCodeplug.zones[currentZoneIndex];
+    const currentChannel = currentZone.channels[currentChannelIndex];
+
+    responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
+    responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
     updateDisplay();
     reconnectIfSystemChanged();
 }
@@ -174,6 +314,7 @@ function changeZone(direction) {
 function updateDisplay() {
     const currentZone = currentCodeplug.zones[currentZoneIndex];
     const currentChannel = currentZone.channels[currentChannelIndex];
+
     document.getElementById('line1').innerText = currentZone.name;
     document.getElementById('line2').innerText = currentChannel.name;
     currentTg = currentChannel.tgid;
@@ -187,6 +328,7 @@ function reconnectIfSystemChanged() {
     if (socket && socket.url !== `ws://${currentSystem.address}:${currentSystem.port}/client`) {
         disconnectWebSocket();
         connectWebSocket();
+        SendGroupAffiliationRequest();
     }
 }
 
@@ -206,22 +348,23 @@ function connectWebSocket() {
     socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
-        // isInRange = true;
-        // setUiOOR(isInRange); // TODO: Site Trunking
+        isInSiteTrunking = true;
+        setUiSiteTrunking(isInSiteTrunking);
         console.debug('WebSocket connection established');
         // console.debug("Codeplug: " + currentCodeplug);
         SendRegistrationRequest();
+        SendGroupAffiliationRequest();
     };
 
     socket.onclose = () => {
-        // isInRange = false;
-        // setUiOOR(isInRange); // TODO: Site Trunking
+        isInSiteTrunking = false;
+        setUiSiteTrunking(isInSiteTrunking);
         console.debug('WebSocket connection closed');
     }
 
     socket.onerror = (error) => {
-        // isInRange = false;
-        // setUiOOR(isInRange); // TODO: Site Trunking
+        isInSiteTrunking = false;
+        setUiSiteTrunking(isInRange);
         console.error('WebSocket error:', error);
     }
 
@@ -231,8 +374,8 @@ function connectWebSocket() {
         if (typeof event.data === 'string') {
             console.debug(`Received master message: ${event.data}`);
 
-            if (!isInRange) {
-                console.debug("Not in range, not processing message");
+            if (!isInRange || !radioOn) {
+                console.debug("Not in range or powered off, not processing message");
                 return;
             }
 
@@ -266,11 +409,37 @@ function connectWebSocket() {
                 }
             } else if (data.type == packetToNumber("GRP_VCH_RLS")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
-                    document.getElementById("line3").innerHTML = '';
+                    if (!isInRange) {
+                        setUiOOR(isInRange);
+                    } else if (isInSiteTrunking) {
+                        setUiSiteTrunking(isInSiteTrunking);
+                    } else {
+                        document.getElementById("line3").innerHTML = '';
+                    }
                     currentFrequncyChannel = null;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                }
+            } else if (data.type == packetToNumber("EMRG_ALRM_RSP")) {
+                if (data.data.SrcId !== myRid && data.data.DstId == currentTg) {
+                    const line3 = document.getElementById("line3");
+                    emergency_tone_generate();
+                    line3.style.color = "white";
+                    line3.style.backgroundColor = "orange";
+                    line3.innerHTML = `EM: ${data.data.SrcId}`;
+
+                    setTimeout(() => {
+                        line3.style.color = "black";
+                        line3.style.backgroundColor = '';
+                        if (!isInRange) {
+                            setUiOOR(isInRange);
+                        } else if (isInSiteTrunking) {
+                            setUiSiteTrunking(isInSiteTrunking);
+                        } else {
+                            line3.innerHTML = '';
+                        }
+                    }, 5000);
                 }
             } else {
                 //console.debug(event.data);
@@ -293,6 +462,23 @@ function setUiOOR(inRange) {
         line3.innerHTML = 'Out of range';
         line3.style.color = 'white';
         line3.style.backgroundColor = 'red';
+    }
+}
+
+function setUiSiteTrunking(inSt) {
+    const line3 = document.getElementById('line3');
+
+    if (!isInRange) {
+        return;
+    }
+
+    if (inSt) {
+        line3.innerHTML = '';
+        line3.style.backgroundColor = '';
+    } else {
+        line3.innerHTML = 'Site trunking';
+        line3.style.color = 'black';
+        line3.style.backgroundColor = '';
     }
 }
 
@@ -438,7 +624,6 @@ function playSoundEffect(audioPath) {
 }
 
 
-
 function buttonBonk() {
     playSoundEffect('buttonbonk.wav');
 }
@@ -460,5 +645,14 @@ function loadRadioModelAssets(model) {
         rssiIcon.src = `models/${model}/icons/rssi${currentRssiLevel}.png`;
     } else {
         rssiIcon.src = `models/${model}/icons/rssi4.png`;
+    }
+
+    console.debug("CURRENT CPG: " + JSON.stringify(currentCodeplug));
+
+    const modelConfig = currentCodeplug.currentModelConfig;
+    console.log("MODEL CONFIG: " + modelConfig.defaultLocation.right + " " + modelConfig.defaultLocation.bottom);
+    if (modelConfig) {
+        radioContainer.style.right = modelConfig.defaultLocation.right;
+        radioContainer.style.bottom = modelConfig.defaultLocation.bottom;
     }
 }

@@ -24,6 +24,20 @@ function SendDeRegistrationRequest() {
     socket.send(JSON.stringify(request));
 }
 
+function SendGroupAffiliationRequest() {
+    if (!socketOpen) { return; }
+
+    const request = {
+        type: packetToNumber("GRP_AFF_REQ"),
+        data: {
+            SrcId: myRid,
+            DstId: currentTg
+        }
+    }
+
+    socket.send(JSON.stringify(request));
+}
+
 function SendGroupVoiceRequest() {
     if (!socketOpen) { return; }
 
@@ -47,6 +61,20 @@ function SendGroupVoiceRelease() {
             SrcId: myRid,
             DstId: currentTg,
             Channel: currentFrequncyChannel
+        }
+    }
+
+    socket.send(JSON.stringify(request));
+}
+
+function SendEmergencyAlarmRequest() {
+    if (!socketOpen) { return; }
+
+    const request = {
+        type: packetToNumber("EMRG_ALRM_REQ"),
+        data: {
+            SrcId: myRid,
+            DstId: currentTg
         }
     }
 
