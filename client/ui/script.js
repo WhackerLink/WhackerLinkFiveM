@@ -115,7 +115,7 @@ function startCheckLoop() {
                     }
                 }, 3000);
             }
-        }, 200);
+        }, 400);
 
         if (isVoiceGranted && isTxing && !isVoiceGrantHandled) {
             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
@@ -127,7 +127,7 @@ function startCheckLoop() {
             }, 250);
             isVoiceGrantHandled = true;
         }
-    }, 200);
+    }, 100);
 }
 
 function stopCheckLoop() {
