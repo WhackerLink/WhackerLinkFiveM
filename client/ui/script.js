@@ -95,27 +95,25 @@ function startCheckLoop() {
     }, 5000);
 
     groupGrantCheckInterval = setInterval(() => {
-        setTimeout(() => {
-            if (isVoiceRequested && !isVoiceGranted && !isVoiceGrantHandled) {
-                document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
-                SendGroupVoiceRequest();
+        if (isVoiceRequested && !isVoiceGranted && !isVoiceGrantHandled) {
+            document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
+            SendGroupVoiceRequest();
 
-                if (!isVoiceGranted && isVoiceRequested) {
-                    setTimeout(() => {
-                        document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
-                    }, 400);
-                }
-
+            if (!isVoiceGranted && isVoiceRequested) {
                 setTimeout(() => {
-                    if (!isVoiceGranted && !isTxing && isVoiceRequested) {
-                        isVoiceRequested = false;
-                        isVoiceGranted = false;
-                        isTxing = false;
-                        bonk();
-                    }
-                }, 3000);
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                }, 400);
             }
-        }, 600);
+
+            setTimeout(() => {
+                if (!isVoiceGranted && !isTxing && isVoiceRequested) {
+                    isVoiceRequested = false;
+                    isVoiceGranted = false;
+                    isTxing = false;
+                    bonk();
+                }
+            }, 3000);
+        }
 
         if (isVoiceGranted && isTxing && !isVoiceGrantHandled) {
             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
