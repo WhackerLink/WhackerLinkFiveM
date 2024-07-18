@@ -469,6 +469,7 @@ function connectWebSocket() {
         isVoiceGranted = false;
         isVoiceRequested = false;
         isVoiceGrantHandled = false;
+        isTxing = false;
         // console.debug("Codeplug: " + currentCodeplug);
         startCheckLoop();
     };
@@ -479,6 +480,7 @@ function connectWebSocket() {
         isVoiceGranted = false;
         isVoiceRequested = false;
         isVoiceGrantHandled = false;
+        isTxing = false;
         console.debug('WebSocket connection closed');
     }
 
@@ -488,6 +490,7 @@ function connectWebSocket() {
         isVoiceGranted = false;
         isVoiceRequested = false;
         isVoiceGrantHandled = false;
+        isTxing = false;
         console.error('WebSocket error:', error);
     }
 
