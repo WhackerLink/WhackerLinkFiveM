@@ -6,9 +6,25 @@
     display: inline-block;
     cursor: move;
     z-index: 1000;
-    border: 2px solid black;
+    overflow: hidden; 
 
 }
+#power-btn {
+    left: 5.5%;
+    width: 5%;
+    height: 15%;
+
+
+}
+
+
+body {
+  overflow-y: hidden; /* Hide vertical scrollbar */
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+    border: 2px solid black;
+}
+
+
 
 #radio-image {
     display: block;
@@ -62,11 +78,12 @@
 
 }
 #btn-emer {
-	  left: 94%;
+left: 94%;
+height: 15%;
 
 }
 
-#btn-emer {
+#btn-emer{
     position: absolute;
     transform: translateX(-50%);
     top: 4%;
@@ -79,6 +96,24 @@
     border: none;
     cursor: pointer;
 }
+
+
+#power-btn{
+    position: absolute;
+    transform: translateX(-50%);
+    top: 5%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+   background-color: transparent;
+	color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+
+
 
 
 

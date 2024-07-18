@@ -8,6 +8,14 @@
     z-index: 1000;
 }
 
+
+body {
+  overflow-y: hidden; /* Hide vertical scrollbar */
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+
+
+
 #radio-image {
     display: block;
     width: 100%;
