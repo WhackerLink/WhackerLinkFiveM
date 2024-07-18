@@ -2,8 +2,28 @@
     position: fixed;
     bottom: 5px;
     right: 10px;
+    width: 500px;
     display: inline-block;
+    cursor: move;
+    z-index: 1000;
+    overflow: hidden; 
+
 }
+#power-btn {
+    left: 5.5%;
+    width: 5%;
+    height: 15%;
+
+
+}
+
+
+body {
+  overflow-y: hidden; /* Hide vertical scrollbar */
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+
+
 
 #radio-image {
     display: block;
@@ -11,6 +31,7 @@
     height: auto;
     position: relative;
 }
+
 #rssi-icon {
    position: absolute;
     top: 13.2%;
@@ -56,11 +77,12 @@
 
 }
 #btn-emer {
-	  left: 94%;
+left: 94%;
+height: 15%;
 
 }
 
-#btn-emer {
+#btn-emer{
     position: absolute;
     transform: translateX(-50%);
     top: 4%;
@@ -73,6 +95,24 @@
     border: none;
     cursor: pointer;
 }
+
+
+#power-btn{
+    position: absolute;
+    transform: translateX(-50%);
+    top: 5%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+   background-color: transparent;
+	color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+
+
 
 
 
