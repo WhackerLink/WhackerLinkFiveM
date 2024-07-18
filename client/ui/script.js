@@ -404,6 +404,7 @@ function changeChannel(direction) {
     const currentChannel = currentZone.channels[currentChannelIndex];
 
     responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
+    sendAffiliation().then(r => {});
     updateDisplay();
     reconnectIfSystemChanged();
 }
@@ -444,6 +445,7 @@ function reconnectIfSystemChanged() {
     if (socket && socket.url !== `ws://${currentSystem.address}:${currentSystem.port}/client`) {
         disconnectWebSocket();
         connectWebSocket();
+        sendRegistration().then(() => {});
     }
 }
 
