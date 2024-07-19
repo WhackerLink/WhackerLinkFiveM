@@ -41,6 +41,7 @@ function loadCodeplugs() {
         console.error('Error loading codeplugs:', e);
     }
 }
+
 function loadSitesConfig() {
     try {
         const fileContents = fs.readFileSync( GetResourcePath(GetCurrentResourceName()) + '/sites.yml', 'utf8');

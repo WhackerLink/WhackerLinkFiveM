@@ -94,38 +94,38 @@ function startCheckLoop() {
         }
     }, 5000);
 
-    groupGrantCheckInterval = setInterval(() => {
-        // if (isVoiceRequested && !isVoiceGranted && !isVoiceGrantHandled) {
-        //     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
-        //     SendGroupVoiceRequest();
-        //
-        //     if (!isVoiceGranted && isVoiceRequested) {
-        //         setTimeout(() => {
-        //             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
-        //         }, 400);
-        //     }
-        //
-        //     setTimeout(() => {
-        //         if (!isVoiceGranted && !isTxing && isVoiceRequested) {
-        //             isVoiceRequested = false;
-        //             isVoiceGranted = false;
-        //             isTxing = false;
-        //             bonk();
-        //         }
-        //     }, 3000);
-        // }
+    /*    groupGrantCheckInterval = setInterval(() => {
+            // if (isVoiceRequested && !isVoiceGranted && !isVoiceGrantHandled) {
+            //     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
+            //     SendGroupVoiceRequest();
+            //
+            //     if (!isVoiceGranted && isVoiceRequested) {
+            //         setTimeout(() => {
+            //             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+            //         }, 400);
+            //     }
+            //
+            //     setTimeout(() => {
+            //         if (!isVoiceGranted && !isTxing && isVoiceRequested) {
+            //             isVoiceRequested = false;
+            //             isVoiceGranted = false;
+            //             isTxing = false;
+            //             bonk();
+            //         }
+            //     }, 3000);
+            // }
 
-        if (isVoiceGranted && isTxing && !isVoiceGrantHandled) {
-            document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
-            isVoiceRequested = false;
-            isVoiceGranted = true;
-            setTimeout(() => {
-                tpt_generate();
-                document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
-            }, 250);
-            isVoiceGrantHandled = true;
-        }
-    }, 300);
+            if (isVoiceGranted && isTxing && !isVoiceGrantHandled) {
+                document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                isVoiceRequested = false;
+                isVoiceGranted = true;
+                setTimeout(() => {
+                    tpt_generate();
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
+                }, 250);
+                isVoiceGrantHandled = true;
+            }
+        }, 300);*/
 }
 
 function stopCheckLoop() {
@@ -567,15 +567,23 @@ function connectWebSocket() {
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status === 0) {
-                    if (!isVoiceGranted && isVoiceRequested) {
-                        currentFrequncyChannel = data.data.Channel;
-                        isTxing = true;
-                        isVoiceGranted = true;
-                        isVoiceRequested = false;
-                    } else {
-                        isTxing = false;
-                        isVoiceGranted = false;
-                    }
+                    //if (!isVoiceGranted && isVoiceRequested) {
+                    currentFrequncyChannel = data.data.Channel;
+                    isTxing = true;
+                    isVoiceGranted = true;
+                    isVoiceRequested = false;
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                    isVoiceRequested = false;
+                    isVoiceGranted = true;
+                    setTimeout(() => {
+                        tpt_generate();
+                        document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
+                    }, 200);
+                    isVoiceGrantHandled = true;
+                    /*                    } else {
+                                            isTxing = false;
+                                            isVoiceGranted = false;
+                                        }*/
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status !== 0) {
                     bonk();
                 }

@@ -1,27 +1,23 @@
 #radio-container {
-    position: relative;
+    position: fixed;
     bottom: 5px;
     right: 10px;
-    width: 300px;
-    border: 2px solid black;
     display: inline-block;
-    cursor: move;
-    z-index: 1000;
 }
 
 #radio-image {
     display: block;
     width: 300px;
     height: auto;
+    position: relative;
 }
 
 #rssi-icon {
-   position: absolute;
+    position: absolute;
     top: 70.8%;
     left: 32.5%;
     display: block;
 }
-
 
 #channel-up, #zone-up, #rssi-btn {
     position: absolute;
@@ -49,19 +45,16 @@
     left: 50%;
 }
 
-
-
-
 #channel-knbu {
-	  left: 60%;
+    left: 60%;
 
 }
 #channel-knbd {
-	  left: 46%;
+    left: 46%;
 
 }
 #btn-emer {
-	  left: 38%;
+    left: 38%;
 
 }
 
@@ -74,17 +67,12 @@
     margin: 10px auto;
     padding: 7px;
     background-color: transparent;
-	color: transparent;
+    color: transparent;
     border: none;
     cursor: pointer;
 }
 
-
-
-
-
-
-#channel-knbu, #channel-knbd {
+#channel-knbu, #channel-knbd, #power-btn {
     position: absolute;
     transform: translateX(-50%);
     top: 38%;
@@ -92,15 +80,18 @@
     display: block;
     margin: 10px auto;
     padding: 10px;
-padding-top: 20px;
+    padding-top: 20px;
     background-color: transparent;
-	color: transparent;
+    color: transparent;
     border: none;
     cursor: pointer;
 }
 
-
-
+#power-btn {
+    left: 86%;
+    top: 43%;
+    width: 50px;
+}
 
 #line1, #line2, #line3 {
     position: absolute;
@@ -129,8 +120,6 @@ padding-top: 20px;
     width: 90%;
 }
 
-
-
 #softText1 {
     font-size: 12px;
     top: 90.2%;
@@ -139,13 +128,13 @@ padding-top: 20px;
 
 #softText2 {
     font-size: 12px;
-     top: 90.2%;
+    top: 90.2%;
     left: 51%;
 }
 
 #softText3 {
     font-size: 12px;
-     top: 90.2%;
+    top: 90.2%;
     left: 64.2%;
 }
 
@@ -154,7 +143,7 @@ padding-top: 20px;
 }
 
 #line2 {
-   top: 78%;
+    top: 78%;
     font-size: 15px;
 }
 
