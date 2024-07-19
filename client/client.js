@@ -23,13 +23,33 @@ function displayStartupMessage() {
 
 on('onClientResourceStart', (resourceName) => {
     if (GetCurrentResourceName() !== resourceName) {
+        console.log('Resource name mismatch:', GetCurrentResourceName(), resourceName);
         return;
     }
+    console.log('Client resource started:', resourceName);
+    emitNet('getSitesConfig');
     displayStartupMessage();
 });
 
 onNet('receiveSitesConfig', (receivedSites) => {
     sites = receivedSites;
+
+    RemoveAllBlips();
+
+    sites.forEach(site => {
+        console.log(`Adding blip for site: ${site.name} at coordinates (${site.location.X}, ${site.location.Y}, ${site.location.Z})`);
+        let blip = AddBlipForCoord(site.location.X, site.location.Y, site.location.Z);
+
+        SetBlipSprite(blip, 767);
+        SetBlipDisplay(blip, 4);
+        SetBlipScale(blip, 1.0);
+        SetBlipColour(blip, 3);
+        SetBlipAsShortRange(blip, true);
+
+        BeginTextCommandSetBlipName("STRING");
+        AddTextComponentString(site.name);
+        EndTextCommandSetBlipName(blip);
+    });
     // console.debug('Received sites config:', sites);
 });
 
@@ -277,4 +297,12 @@ function setRid(newRid) {
     myRid = newRid;
     SetResourceKvp('myRid', myRid);
     SendNuiMessage(JSON.stringify({ type: 'setRid', rid: GetResourceKvpString('myRid') }));
+}
+
+function RemoveAllBlips() {
+    let blipHandle = GetFirstBlipInfoId(1);
+    while (DoesBlipExist(blipHandle)) {
+        RemoveBlip(blipHandle);
+        blipHandle = GetNextBlipInfoId(1);
+    }
 }

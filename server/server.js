@@ -11,6 +11,7 @@ loadSitesConfig();
 
 on('playerConnecting', (name, setKickReason, deferrals) => {
     // console.debug(`${name} is connecting to the server.`);
+    emitNet('receiveSitesConfig', source, sites);
 });
 
 on('playerDropped', (reason) => {
