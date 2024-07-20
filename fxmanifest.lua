@@ -7,6 +7,7 @@ server_script 'server/server.js'
 ui_page 'client/ui/index.html'
 
 files {
+    'configs/*.yml',
     'client/ui/models/**/radio.png',
     'client/ui/models/**/icons/*.png',
     'client/ui/models/**/style.css',

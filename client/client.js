@@ -32,24 +32,31 @@ on('onClientResourceStart', (resourceName) => {
 });
 
 onNet('receiveSitesConfig', (receivedSites) => {
-    sites = receivedSites;
+    sites = receivedSites.sites;
 
-    RemoveAllBlips();
+    console.log('Received sites config:', sites);
 
-    sites.forEach(site => {
-        console.log(`Adding blip for site: ${site.name} at coordinates (${site.location.X}, ${site.location.Y}, ${site.location.Z})`);
-        let blip = AddBlipForCoord(site.location.X, site.location.Y, site.location.Z);
+    if (receivedSites.config.siteBlips) {
+        console.warn("BLIPS ENABLED!");
+        RemoveAllBlips();
 
-        SetBlipSprite(blip, 767);
-        SetBlipDisplay(blip, 4);
-        SetBlipScale(blip, 1.0);
-        SetBlipColour(blip, 3);
-        SetBlipAsShortRange(blip, true);
+        sites.forEach(site => {
+            console.log(`Adding blip for site: ${site.name} at coordinates (${site.location.X}, ${site.location.Y}, ${site.location.Z})`);
+            let blip = AddBlipForCoord(site.location.X, site.location.Y, site.location.Z);
 
-        BeginTextCommandSetBlipName("STRING");
-        AddTextComponentString(site.name);
-        EndTextCommandSetBlipName(blip);
-    });
+            SetBlipSprite(blip, 767);
+            SetBlipDisplay(blip, 4);
+            SetBlipScale(blip, 1.0);
+            SetBlipColour(blip, 3);
+            SetBlipAsShortRange(blip, true);
+
+            BeginTextCommandSetBlipName("STRING");
+            AddTextComponentString(site.name);
+            EndTextCommandSetBlipName(blip);
+        });
+    } else {
+        console.warn("BLIPS DISABLED!");
+    }
     // console.debug('Received sites config:', sites);
 });
 

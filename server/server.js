@@ -2,16 +2,21 @@ const { Server } = require('@citizenfx/server');
 const fs = require('fs');
 const yaml = require('js-yaml');
 
+let config;
 let codeplugs = {};
 let sites;
 
+loadConfig();
 displayStartupMessage();
 loadCodeplugs();
 loadSitesConfig();
 
 on('playerConnecting', (name, setKickReason, deferrals) => {
     // console.debug(`${name} is connecting to the server.`);
-    emitNet('receiveSitesConfig', source, sites);
+    let wholeConfig;
+    wholeConfig.config = config;
+    wholeConfig.sites = sites;
+    emitNet('receiveSitesConfig', source, wholeConfig);
 });
 
 on('playerDropped', (reason) => {
@@ -20,8 +25,22 @@ on('playerDropped', (reason) => {
 
 onNet('getSitesConfig', () => {
     console.debug(`Player ${source} requested sites config.`);
-    emitNet('receiveSitesConfig', source, sites);
+
+    let wholeConfig = {};
+    wholeConfig.config = config;
+    wholeConfig.sites = sites;
+    emitNet('receiveSitesConfig', source, wholeConfig);
 });
+
+function loadConfig() {
+    try {
+        const fileContents = fs.readFileSync( GetResourcePath(GetCurrentResourceName()) + '/configs/config.yml', 'utf8');
+        config = yaml.load(fileContents);
+        // console.debug('config loaded:', config);
+    } catch (e) {
+        console.error('Error loading sites config:', e);
+    }
+}
 
 function loadCodeplugs() {
     try {
@@ -45,7 +64,7 @@ function loadCodeplugs() {
 
 function loadSitesConfig() {
     try {
-        const fileContents = fs.readFileSync( GetResourcePath(GetCurrentResourceName()) + '/sites.yml', 'utf8');
+        const fileContents = fs.readFileSync( GetResourcePath(GetCurrentResourceName()) + '/configs/sites.yml', 'utf8');
         sites = yaml.load(fileContents).sites;
         // console.debug('Sites config loaded:', sites);
     } catch (e) {
