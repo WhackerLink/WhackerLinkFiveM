@@ -238,6 +238,10 @@ window.addEventListener('message', async function (event) {
             return;
         }
 
+        if (currentSite == null) {
+            currentSite = event.data.site;
+        }
+
         if (event.data.site !== currentSite){
             console.debug("Changed from site " + currentSite.name + " to " + event.data.site.name)
             siteChanged = true;
