@@ -24,6 +24,7 @@ let isRegistered = false;
 let isVoiceGranted = false;
 let isVoiceRequested = false;
 let isVoiceGrantHandled = false;
+let isReceiving = false;
 
 let affiliationCheckInterval;
 let registrationCheckInterval;
@@ -36,6 +37,7 @@ let radioModel;
 let currentRssiLevel = "0";
 let currentDbLevel;
 let currentSite;
+let initialized = false;
 
 function socketOpen() {
     return socket && socket.readyState === WebSocket.OPEN;
@@ -191,6 +193,12 @@ window.addEventListener('message', async function (event) {
             return;
         }
 
+        if (isReceiving) {
+            console.debug("Receiving, not txing");
+            bonk();
+            return;
+        }
+
         if (!isInSiteTrunking) {
             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
             setTimeout(() => {
@@ -253,9 +261,11 @@ async function powerOn() {
     const currentZone = currentCodeplug.zones[currentZoneIndex];
     const currentChannel = currentZone.channels[currentChannelIndex];
 
-    micCapture.captureMicrophone(() => {
-        console.log('Microphone captured');
-    });
+    if (!initialized) {
+        micCapture.captureMicrophone(() => {
+            console.log('Microphone captured');
+        });
+    }
 
     const bootScreenMessages = [
         {text: "", duration: 0, line: "line1"},
@@ -281,6 +291,7 @@ async function powerOn() {
     document.getElementById("line2").style.display = 'block';
     document.getElementById("line3").style.display = 'block';
     radioOn = true;
+    initialized = true;
     rssiIcon.style.display = 'block';
     connectWebSocket();
 }
@@ -296,8 +307,6 @@ async function powerOff() {
     isInSiteTrunking = false;
     isTxing = false;
     radioOn = false;
-    micCapture.stopCapture();
-    console.debug('Recording stopped');
     document.getElementById("line1").innerHTML = '';
     document.getElementById("line2").innerHTML = '';
     document.getElementById("line3").innerHTML = '';
@@ -561,6 +570,7 @@ function connectWebSocket() {
                 }
             } else if (data.type == packetToNumber("GRP_VCH_RSP")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg && data.data.Status === 0) {
+                    isReceiving = true;
                     currentFrequncyChannel = data.data.Channel;
                     isTxing = false;
                     document.getElementById("line3").style.color = "black";
@@ -572,6 +582,7 @@ function connectWebSocket() {
                     isTxing = true;
                     isVoiceGranted = true;
                     isVoiceRequested = false;
+                    isReceiving = false;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                     isVoiceRequested = false;
                     isVoiceGranted = true;
@@ -596,6 +607,7 @@ function connectWebSocket() {
                     } else {
                         document.getElementById("line3").innerHTML = '';
                     }
+                    isReceiving = false;
                     currentFrequncyChannel = null;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
