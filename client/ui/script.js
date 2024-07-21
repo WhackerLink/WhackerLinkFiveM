@@ -778,6 +778,7 @@ function onAudioFrameReady(buffer, rms) {
                     DstId: currentTg,
                     Frequency: currentFrequncyChannel
                 },
+                site: currentSite,
                 data: fullFrame
             };
 
