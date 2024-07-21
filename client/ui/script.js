@@ -242,7 +242,7 @@ window.addEventListener('message', async function (event) {
             currentSite = event.data.site;
         }
 
-        if (event.data.site !== currentSite){
+        if (event.data.site.siteID !== currentSite.siteID){
             console.debug("Changed from site " + currentSite.name + " to " + event.data.site.name)
             siteChanged = true;
         }
