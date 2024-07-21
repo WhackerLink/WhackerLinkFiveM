@@ -262,10 +262,6 @@ window.addEventListener('message', async function (event) {
             return;
         }
 
-        console.debug(siteChanged)
-        console.debug(isRegistered)
-        console.debug(isInSiteTrunking)
-
         if (siteChanged && isRegistered && !isInSiteTrunking) {
             sendAffiliation().then(r => {});
         }
