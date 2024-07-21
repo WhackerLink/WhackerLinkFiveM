@@ -232,11 +232,18 @@ window.addEventListener('message', async function (event) {
         loadRadioModelAssets(event.data.model);
         radioModel = event.data.model;
     } else if (event.data.type === 'setRssiLevel') {
-        currentSite = event.data.site;
+        let siteChanged = false;
 
         if (!radioOn) {
             return;
         }
+
+        if (event.data.site !== currentSite){
+            console.debug("Changed from site " + currentSite + " to " + event.data.site)
+            siteChanged = true;
+        }
+
+        currentSite = event.data.site;
 
         if (event.data.level === 0) {
             isInRange = false;
@@ -249,6 +256,10 @@ window.addEventListener('message', async function (event) {
         if (currentRssiLevel !== null && currentRssiLevel === parseInt(event.data.level)) {
             // console.debug("RSSI Level not changed")
             return;
+        }
+
+        if (siteChanged && isRegistered && !isInSiteTrunking) {
+            sendAffiliation().then(r => {});
         }
 
         currentRssiLevel = event.data.level;
