@@ -19,6 +19,15 @@
     display: block;
 }
 
+#battery-icon {
+    position: absolute;
+    top: 69%;
+    left: 65.5%;
+    height: 3.5%;
+    width: auto;
+    display: none;
+}
+
 #channel-up, #zone-up, #rssi-btn {
     position: absolute;
     transform: translateX(-50%);

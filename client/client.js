@@ -34,14 +34,14 @@ on('onClientResourceStart', (resourceName) => {
 onNet('receiveSitesConfig', (receivedSites) => {
     sites = receivedSites.sites;
 
-    console.log('Received sites config:', sites);
+    // console.log('Received sites config:', sites);
 
     if (receivedSites.config.siteBlips) {
-        console.warn("BLIPS ENABLED!");
+        // console.warn("BLIPS ENABLED!");
         RemoveAllBlips();
 
         sites.forEach(site => {
-            console.log(`Adding blip for site: ${site.name} at coordinates (${site.location.X}, ${site.location.Y}, ${site.location.Z})`);
+            // console.log(`Adding blip for site: ${site.name} at coordinates (${site.location.X}, ${site.location.Y}, ${site.location.Z})`);
             let blip = AddBlipForCoord(site.location.X, site.location.Y, site.location.Z);
 
             SetBlipSprite(blip, 767);
@@ -55,7 +55,7 @@ onNet('receiveSitesConfig', (receivedSites) => {
             EndTextCommandSetBlipName(blip);
         });
     } else {
-        console.warn("BLIPS DISABLED!");
+        // console.warn("BLIPS DISABLED!");
     }
     // console.debug('Received sites config:', sites);
 });
@@ -70,6 +70,10 @@ RegisterCommand('set_rid', (source, args) => {
     } else {
         console.log('Usage: /set_rid <RID>');
     }
+}, false);
+
+RegisterCommand('change_battery', (source, args) => {
+    resetBatteryLevel();
 }, false);
 
 onNet('open_radio', () => {
@@ -126,6 +130,10 @@ RegisterCommand('toggle_radio_focus', () => {
         SetNuiFocus(false, false);
     }
 }, false);
+
+function resetBatteryLevel() {
+    SendNuiMessage(JSON.stringify({ type: 'resetBatteryLevel' }));
+}
 
 function ToggleRadio() {
     if (isRadioOpen) {

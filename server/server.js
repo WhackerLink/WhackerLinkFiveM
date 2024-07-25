@@ -74,7 +74,7 @@ function loadSitesConfig() {
 
 RegisterCommand('set_codeplug', (source, args, rawCommand) => {
     const codeplugName = args[0];
-    console.debug(codeplugs[codeplugName])
+    // console.debug(codeplugs[codeplugName])
     if (codeplugs[codeplugName]) {
         // console.debug(`Setting codeplug for player ${source}: ${codeplugName}`);
         emitNet('receiveCodeplug', source, codeplugs[codeplugName]);

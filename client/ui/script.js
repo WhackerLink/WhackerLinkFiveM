@@ -1,7 +1,7 @@
 const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 8000});
 const EXPECTED_PCM_LENGTH = 1600;
 const CHUNK_SIZE = 320;
-const HOST_VERSION = "R1.0.0";
+const HOST_VERSION = "R01.02.00";
 
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -29,6 +29,7 @@ let isReceiving = false;
 let affiliationCheckInterval;
 let registrationCheckInterval;
 let groupGrantCheckInterval;
+let batteryLevelInterval;
 let reconnectInterval;
 
 let myRid = "1234";
@@ -36,6 +37,7 @@ let currentTg = "2001";
 let radioModel;
 let currentRssiLevel = "0";
 let currentDbLevel;
+let batteryLevel = 4;
 let currentSite;
 let initialized = false;
 
@@ -48,6 +50,20 @@ reconnectInterval = setInterval(() => {
         connectWebSocket();
     }
 }, 2000);
+
+batteryLevelInterval = setInterval(() => {
+    if (!radioOn) {
+        return;
+    }
+
+    if (batteryLevel > 0) {
+        batteryLevel--;
+        document.getElementById("battery-icon").src = `models/${radioModel}/icons/battery${batteryLevel}.png`;
+    } else {
+        powerOff().then(r => {});
+    }
+    // console.log(`Battery level: ${batteryLevel}`);
+}, 5000);
 
 function startCheckLoop() {
     if (!socketOpen() || !isInRange || !radioOn) {
@@ -161,7 +177,9 @@ async function sendRegistration() {
 }
 
 window.addEventListener('message', async function (event) {
-    if (event.data.type === 'openRadio') {
+    if (event.data.type === 'resetBatteryLevel'){
+        batteryLevel = 4;
+    } else if (event.data.type === 'openRadio') {
         currentCodeplug = event.data.codeplug;
 
         if (!radioOn) {
@@ -305,6 +323,8 @@ async function powerOn() {
     document.getElementById("line1").style.display = 'block';
     document.getElementById("line2").style.display = 'block';
     document.getElementById("line3").style.display = 'block';
+    document.getElementById("battery-icon").style.display = 'block';
+    document.getElementById("battery-icon").src = `models/${radioModel}/icons/battery${batteryLevel}.png`;
     radioOn = true;
     initialized = true;
     rssiIcon.style.display = 'block';
@@ -329,6 +349,7 @@ async function powerOff() {
     document.getElementById("line2").style.display = 'none';
     document.getElementById("line3").style.display = 'none';
     document.getElementById("rssi-icon").style.display = 'none';
+    document.getElementById("battery-icon").style.display = 'none';
     document.getElementById("softText1").innerHTML = '';
     document.getElementById("softText2").innerHTML = '';
     document.getElementById("softText3").innerHTML = '';
@@ -542,7 +563,7 @@ function connectWebSocket() {
         const data = JSON.parse(event.data);
 
         if (typeof event.data === 'string') {
-            console.debug(`Received master message: ${event.data}`);
+            // console.debug(`Received master message: ${event.data}`);
 
             if (!isInRange || !radioOn) {
                 console.debug("Not in range or powered off, not processing message");
