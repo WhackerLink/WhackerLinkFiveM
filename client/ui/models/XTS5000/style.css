@@ -16,7 +16,7 @@
 }
 
 #rssi-icon {
-   position: absolute;
+    position: absolute;
     top: 82.5%;
     left: 28%;
     display: block;
@@ -49,14 +49,14 @@
 }
 
 #channel-knbu {
-	  left: 58%;
+    left: 58%;
 }
 #channel-knbd {
-	  left: 44%;
+    left: 44%;
 
 }
 #btn-emer {
-	  left: 67%;
+    left: 67%;
 }
 
 #btn-emer {
@@ -68,12 +68,12 @@
     margin: 10px auto;
     padding: 5px;
     background-color: transparent;
-	color: transparent;
+    color: transparent;
     border: none;
     cursor: pointer;
 }
 
-#channel-knbu, #channel-knbd {
+#channel-knbu, #channel-knbd, #power-btn {
     position: absolute;
     transform: translateX(-50%);
     top: 40%;
@@ -82,9 +82,15 @@
     margin: 10px auto;
     padding: 7px;
     background-color: transparent;
-	color: transparent;
+    color: transparent;
     border: none;
     cursor: pointer;
+}
+
+#power-btn {
+    left: 18%;
+    top: 44%;
+    width: 40px;
 }
 
 #line1, #line2, #line3 {
@@ -127,7 +133,7 @@
 
 #softText3 {
     font-size: 12px;
-   top: 89.2%;
+    top: 89.2%;
     left: 68%;
 }
 

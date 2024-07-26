@@ -4,7 +4,8 @@ function SendRegistrationRequest() {
     const request = {
         type: packetToNumber("U_REG_REQ"),
         data: {
-            SrcId: myRid
+            SrcId: myRid,
+            Site: currentSite
         }
     }
 
@@ -17,7 +18,8 @@ function SendDeRegistrationRequest() {
     const request = {
         type: packetToNumber("U_DE_REG_REQ"),
         data: {
-            SrcId: myRid
+            SrcId: myRid,
+            Site: currentSite
         }
     }
 
@@ -31,7 +33,8 @@ function SendGroupAffiliationRequest() {
         type: packetToNumber("GRP_AFF_REQ"),
         data: {
             SrcId: myRid,
-            DstId: currentTg
+            DstId: currentTg,
+            Site: currentSite
         }
     }
 
@@ -45,7 +48,8 @@ function SendGroupVoiceRequest() {
         type: packetToNumber("GRP_VCH_REQ"),
         data: {
             SrcId: myRid,
-            DstId: currentTg
+            DstId: currentTg,
+            Site: currentSite
         }
     }
 
@@ -60,7 +64,8 @@ function SendGroupVoiceRelease() {
         data: {
             SrcId: myRid,
             DstId: currentTg,
-            Channel: currentFrequncyChannel
+            Channel: currentFrequncyChannel,
+            Site: currentSite
         }
     }
 
@@ -74,7 +79,8 @@ function SendEmergencyAlarmRequest() {
         type: packetToNumber("EMRG_ALRM_REQ"),
         data: {
             SrcId: myRid,
-            DstId: currentTg
+            DstId: currentTg,
+            Site: currentSite
         }
     }
 

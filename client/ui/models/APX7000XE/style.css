@@ -19,7 +19,6 @@
     display: block;
 }
 
-
 #battery-icon {
     position: absolute;
     top: 70.6%;
@@ -28,11 +27,6 @@
     width: auto;
     display: none;
 }
-
-
-
-
-
 
 #channel-up, #zone-up, #rssi-btn {
     position: absolute;

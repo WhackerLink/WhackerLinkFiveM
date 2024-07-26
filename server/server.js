@@ -2,15 +2,21 @@ const { Server } = require('@citizenfx/server');
 const fs = require('fs');
 const yaml = require('js-yaml');
 
+let config;
 let codeplugs = {};
 let sites;
 
+loadConfig();
 displayStartupMessage();
 loadCodeplugs();
 loadSitesConfig();
 
 on('playerConnecting', (name, setKickReason, deferrals) => {
     // console.debug(`${name} is connecting to the server.`);
+    let wholeConfig;
+    wholeConfig.config = config;
+    wholeConfig.sites = sites;
+    emitNet('receiveSitesConfig', source, wholeConfig);
 });
 
 on('playerDropped', (reason) => {
@@ -19,8 +25,22 @@ on('playerDropped', (reason) => {
 
 onNet('getSitesConfig', () => {
     console.debug(`Player ${source} requested sites config.`);
-    emitNet('receiveSitesConfig', source, sites);
+
+    let wholeConfig = {};
+    wholeConfig.config = config;
+    wholeConfig.sites = sites;
+    emitNet('receiveSitesConfig', source, wholeConfig);
 });
+
+function loadConfig() {
+    try {
+        const fileContents = fs.readFileSync( GetResourcePath(GetCurrentResourceName()) + '/configs/config.yml', 'utf8');
+        config = yaml.load(fileContents);
+        // console.debug('config loaded:', config);
+    } catch (e) {
+        console.error('Error loading sites config:', e);
+    }
+}
 
 function loadCodeplugs() {
     try {
@@ -33,22 +53,6 @@ function loadCodeplugs() {
                 const fileContents = fs.readFileSync(codeplugDir + file, 'utf8');
                 const codeplug = yaml.load(fileContents);
 
-                const modelConfigPath = `${modelsDir}${codeplug.radioWide.model}/config.yml`;
-                console.log('Model config path:', modelConfigPath)
-                const modelConfigPathVehicle = `${modelsDir}${codeplug.radioWide.inCarMode}/config.yml`;
-                console.log('Model config path:', modelConfigPathVehicle)
-                if (fs.existsSync(modelConfigPath)) {
-                    const modelConfigContents = fs.readFileSync(modelConfigPath, 'utf8');
-                    codeplug.modelConfig = yaml.load(modelConfigContents);
-                    // console.log('Model config loaded:', codeplug.modelConfig);
-                }
-
-                if (fs.existsSync(modelConfigPathVehicle)) {
-                    const modelConfigContents = fs.readFileSync(modelConfigPathVehicle, 'utf8');
-                    codeplug.inCarModeConfig = yaml.load(modelConfigContents);
-                    console.log('Model config loaded:', codeplug.inCarModeConfig);
-                }
-
                 codeplugs[codeplugName] = codeplug;
             }
         });
@@ -57,9 +61,10 @@ function loadCodeplugs() {
         console.error('Error loading codeplugs:', e);
     }
 }
+
 function loadSitesConfig() {
     try {
-        const fileContents = fs.readFileSync( GetResourcePath(GetCurrentResourceName()) + '/sites.yml', 'utf8');
+        const fileContents = fs.readFileSync( GetResourcePath(GetCurrentResourceName()) + '/configs/sites.yml', 'utf8');
         sites = yaml.load(fileContents).sites;
         // console.debug('Sites config loaded:', sites);
     } catch (e) {
@@ -69,7 +74,7 @@ function loadSitesConfig() {
 
 RegisterCommand('set_codeplug', (source, args, rawCommand) => {
     const codeplugName = args[0];
-    console.debug(codeplugs[codeplugName])
+    // console.debug(codeplugs[codeplugName])
     if (codeplugs[codeplugName]) {
         // console.debug(`Setting codeplug for player ${source}: ${codeplugName}`);
         emitNet('receiveCodeplug', source, codeplugs[codeplugName]);

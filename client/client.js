@@ -7,7 +7,7 @@ let currentCodeplug = {};
 let inVehicle = false;
 let sites = [];
 
-const PTT_COOLDOWN_MS = 1500;
+const PTT_COOLDOWN_MS = 1000;
 const MIN_PTT_DURATION_MS = 500;
 
 function displayStartupMessage() {
@@ -23,13 +23,40 @@ function displayStartupMessage() {
 
 on('onClientResourceStart', (resourceName) => {
     if (GetCurrentResourceName() !== resourceName) {
+        console.log('Resource name mismatch:', GetCurrentResourceName(), resourceName);
         return;
     }
+    console.log('Client resource started:', resourceName);
+    emitNet('getSitesConfig');
     displayStartupMessage();
 });
 
 onNet('receiveSitesConfig', (receivedSites) => {
-    sites = receivedSites;
+    sites = receivedSites.sites;
+
+    // console.log('Received sites config:', sites);
+
+    if (receivedSites.config.siteBlips) {
+        // console.warn("BLIPS ENABLED!");
+        RemoveAllBlips();
+
+        sites.forEach(site => {
+            // console.log(`Adding blip for site: ${site.name} at coordinates (${site.location.X}, ${site.location.Y}, ${site.location.Z})`);
+            let blip = AddBlipForCoord(site.location.X, site.location.Y, site.location.Z);
+
+            SetBlipSprite(blip, 767);
+            SetBlipDisplay(blip, 4);
+            SetBlipScale(blip, 1.0);
+            SetBlipColour(blip, 3);
+            SetBlipAsShortRange(blip, true);
+
+            BeginTextCommandSetBlipName("STRING");
+            AddTextComponentString(site.name);
+            EndTextCommandSetBlipName(blip);
+        });
+    } else {
+        // console.warn("BLIPS DISABLED!");
+    }
     // console.debug('Received sites config:', sites);
 });
 
@@ -43,6 +70,10 @@ RegisterCommand('set_rid', (source, args) => {
     } else {
         console.log('Usage: /set_rid <RID>');
     }
+}, false);
+
+RegisterCommand('change_battery', (source, args) => {
+    resetBatteryLevel();
 }, false);
 
 onNet('open_radio', () => {
@@ -99,6 +130,10 @@ RegisterCommand('toggle_radio_focus', () => {
         SetNuiFocus(false, false);
     }
 }, false);
+
+function resetBatteryLevel() {
+    SendNuiMessage(JSON.stringify({ type: 'resetBatteryLevel' }));
+}
 
 function ToggleRadio() {
     if (isRadioOpen) {
@@ -277,4 +312,12 @@ function setRid(newRid) {
     myRid = newRid;
     SetResourceKvp('myRid', myRid);
     SendNuiMessage(JSON.stringify({ type: 'setRid', rid: GetResourceKvpString('myRid') }));
+}
+
+function RemoveAllBlips() {
+    let blipHandle = GetFirstBlipInfoId(1);
+    while (DoesBlipExist(blipHandle)) {
+        RemoveBlip(blipHandle);
+        blipHandle = GetNextBlipInfoId(1);
+    }
 }
