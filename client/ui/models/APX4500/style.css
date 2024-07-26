@@ -4,7 +4,16 @@
     right: 10px;
     display: inline-block;
 }
+#battery-icon {
+    position: absolute;
+    top: 69%;
+    left: 60.5%;
+    height: 10%;
+    width: auto;
+    display: none;
+   visibility: hidden;
 
+}
 #radio-image {
     display: block;
     width: auto;
