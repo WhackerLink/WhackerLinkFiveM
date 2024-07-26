@@ -63,7 +63,7 @@ batteryLevelInterval = setInterval(() => {
         powerOff().then(r => {});
     }
     // console.log(`Battery level: ${batteryLevel}`);
-}, 5000);
+}, 3600000);
 
 function startCheckLoop() {
     if (!socketOpen() || !isInRange || !radioOn) {
