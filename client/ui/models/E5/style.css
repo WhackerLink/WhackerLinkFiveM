@@ -17,11 +17,23 @@
 
 }
 
+#battery-icon {
+    position: absolute;
+    top: 69%;
+    left: 60.5%;
+    height: 10%;
+    width: auto;
+    display: none;
+   visibility: hidden;
+
+}
+
+
+
 
 body {
   overflow-y: hidden; /* Hide vertical scrollbar */
   overflow-x: hidden; /* Hide horizontal scrollbar */
-    border: 2px solid black;
 }
 
 
