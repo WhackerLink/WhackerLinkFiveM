@@ -1,4 +1,4 @@
 # WhackerLinkFiveM
 Bring the Whackerism right into your game
 
-## No where near ready but it "works" to play with
+## NOTE: Must connect to a whackerlink_v4 server instance to operate.
