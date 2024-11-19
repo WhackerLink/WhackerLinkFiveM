@@ -6,63 +6,120 @@
     <title>Radio</title>
     <link rel="stylesheet" href="style.css" id="radio-stylesheet">
     <style>
-        #notification {
+        #drag-toggle, #scale-toggle {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(255, 0, 0, 0.8);
+            top: 10px;
+            right: 10px;
+            margin: 5px;
+            padding: 5px 10px;
+            font-size: 12px;
+            background-color: #444;
             color: white;
-            padding: 20px;
-            border-radius: 10px;
-            font-size: 24px;
-            text-align: center;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
             z-index: 1000;
-            display: none;
         }
 
-        #startup-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: black;
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            font-size: 24px;
-            text-align: center;
-            z-index: 1000;
-            display: none;
+        #scale-toggle {
+            top: 40px;
         }
     </style>
 </head>
 <body>
-<div id="notification"></div>
-<div id="startup-message">WhackerLinkFiveM, https://github.com/whackerlink</div>
-<div id="radio-container" style="display: none;">
-    <img src="" id="radio-image" alt="Radio">
-    <img src="" id="rssi-icon" alt="rssi">
-    <img src="" id="battery-icon" alt="battery">
-    <div id="line1"></div>
-    <div id="line2"></div>
-    <div id="line3"></div>
-    <div id="softText1"></div>
-    <div id="softText2"></div>
-    <div id="softText3"></div>
-    <button id="power-btn">P</button>
-    <button onclick="buttonBeep()" id="channel-up">C</button>
-    <button onclick="knobClick()" id="channel-knbu">U</button>
-    <button onclick="knobClick()" id="channel-knbd">D</button>
-    <button onclick="buttonBeep()" id="btn-emer">E</button>
-    <button onclick="buttonBeep()" id="zone-up">Z</button>
-    <button onclick="buttonBeep()" id="rssi-btn">r</button>
-</div>
-<script src="PacketType.js"></script>
+    <div id="notification"></div>
+    <div id="startup-message">WhackerLinkFiveM, https://github.com/whackerlink</div>
+    <div id="radio-container" tabindex="0">
+        <img src="radio.png" id="radio-image" alt="Radio">
+        <img src="rssi.png" id="rssi-icon" alt="RSSI">
+        <img src="battery.png" id="battery-icon" alt="Battery">
+        <div id="line1"></div>
+        <div id="line2"></div>
+        <div id="line3"></div>
+        <div id="softText1"></div>
+        <div id="softText2"></div>
+        <div id="softText3"></div>
+        <button id="power-btn">P</button>
+        <button onclick="buttonBeep()" id="channel-up">C</button>
+        <button onclick="knobClick()" id="channel-knbu">U</button>
+        <button onclick="knobClick()" id="channel-knbd">D</button>
+        <button onclick="buttonBeep()" id="btn-emer">E</button>
+        <button onclick="buttonBeep()" id="zone-up">Z</button>
+        <button onclick="buttonBeep()" id="rssi-btn">r</button>
+		
+    </div>
+	<script src="PacketType.js"></script>
 <script src="masterUtils.js"></script>
 <script src="PcmPlayer.js"></script>
 <script src="PcmRecorder.js"></script>
 <script src="script.js"></script>
 <script src="https://code.responsivevoice.org/responsivevoice.js?key=PekkZld1"></script>
+    <button id="drag-toggle">Enable Drag</button>
+    <button id="scale-toggle">Enable Scale</button>
+
+    <script>
+        let isDragging = false;
+        let isScaling = false;
+        let scaleFactor = 1;
+
+        const radioContainer = document.getElementById('radio-container');
+
+        // Enable dragging functionality
+        radioContainer.addEventListener('mousedown', (e) => {
+            if (!isDragging) return;
+
+            const rect = radioContainer.getBoundingClientRect();
+            const offsetX = e.clientX - rect.left;
+            const offsetY = e.clientY - rect.top;
+
+            const onMouseMove = (e) => {
+                radioContainer.style.left = `${e.clientX - offsetX}px`;
+                radioContainer.style.top = `${e.clientY - offsetY}px`;
+                radioContainer.style.right = 'auto';
+                radioContainer.style.bottom = 'auto';
+                radioContainer.style.position = 'absolute';
+            };
+
+            const onMouseUp = () => {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            };
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        });
+
+        // Enable scaling functionality
+        radioContainer.addEventListener('wheel', (e) => {
+            if (!isScaling) return;
+
+            e.preventDefault();
+            scaleFactor += e.deltaY > 0 ? -0.05 : 0.05;
+            scaleFactor = Math.min(Math.max(scaleFactor, 0.5), 2);
+            radioContainer.style.transform = `scale(${scaleFactor})`;
+        });
+
+        // Toggling drag and scale functionality
+        document.getElementById('drag-toggle').addEventListener('click', () => {
+            isDragging = !isDragging;
+            document.getElementById('drag-toggle').textContent = 
+                isDragging ? 'Disable Drag' : 'Enable Drag';
+        });
+
+        document.getElementById('scale-toggle').addEventListener('click', () => {
+            isScaling = !isScaling;
+            document.getElementById('scale-toggle').textContent = 
+                isScaling ? 'Disable Scale' : 'Enable Scale';
+        });
+
+        // Focus handling for the container
+        radioContainer.addEventListener('focus', () => {
+            radioContainer.classList.add('focus-visible');
+        });
+
+        radioContainer.addEventListener('blur', () => {
+            radioContainer.classList.remove('focus-visible');
+        });
+    </script>
 </body>
 </html>
