@@ -48,6 +48,7 @@
             border-radius: 5px;
             cursor: pointer;
             z-index: 1000;
+			display: block;
         }
 
         #scale-toggle {
@@ -75,9 +76,12 @@
         <button onclick="buttonBeep()" id="btn-emer">E</button>
         <button onclick="buttonBeep()" id="zone-up">Z</button>
         <button onclick="buttonBeep()" id="rssi-btn">r</button>
-		    <button id="drag-toggle">Enable Drag</button>
-    <button id="scale-toggle">Enable Scale</button>
+
     </div>
+	<div id="scalemove" style="display: block; tabindex="0>
+			<button id="drag-toggle">Enable Drag</button>
+        <button id="scale-toggle">Enable Scale</button>
+	</div>
 	<script src="PacketType.js"></script>
 <script src="masterUtils.js"></script>
 <script src="PcmPlayer.js"></script>
