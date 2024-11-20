@@ -78,7 +78,7 @@
         <button onclick="buttonBeep()" id="rssi-btn">r</button>
 
     </div>
-	<div id="scalemove" style="display: block; tabindex="0>
+	<div id="scalemove" style="display: b; tabindex="0>
 			<button id="drag-toggle">Enable Drag</button>
         <button id="scale-toggle">Enable Scale</button>
 	</div>
@@ -91,68 +91,96 @@
 
 
     <script>
-        let isDragging = false;
-        let isScaling = false;
-        let scaleFactor = 1;
+let isDragging = false;
+let isScaling = false;
+let scaleFactor = 1;
 
-        const radioContainer = document.getElementById('radio-container');
+const radioContainer = document.getElementById('radio-container');
 
-        // Enable dragging functionality
-        radioContainer.addEventListener('mousedown', (e) => {
-            if (!isDragging) return;
+// Load saved position and scale from localStorage
+function loadSettings() {
+    const savedSettings = JSON.parse(localStorage.getItem('radioSettings'));
+    if (savedSettings) {
+        const { left, top, scale } = savedSettings;
 
-            const rect = radioContainer.getBoundingClientRect();
-            const offsetX = e.clientX - rect.left;
-            const offsetY = e.clientY - rect.top;
-
-            const onMouseMove = (e) => {
-                radioContainer.style.left = `${e.clientX - offsetX}px`;
-                radioContainer.style.top = `${e.clientY - offsetY}px`;
-                radioContainer.style.right = 'auto';
-                radioContainer.style.bottom = 'auto';
-                radioContainer.style.position = 'absolute';
-            };
-
-            const onMouseUp = () => {
-                document.removeEventListener('mousemove', onMouseMove);
-                document.removeEventListener('mouseup', onMouseUp);
-            };
-
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onMouseUp);
-        });
-
-        // Enable scaling functionality
-        radioContainer.addEventListener('wheel', (e) => {
-            if (!isScaling) return;
-
-            e.preventDefault();
-            scaleFactor += e.deltaY > 0 ? -0.05 : 0.05;
-            scaleFactor = Math.min(Math.max(scaleFactor, 0.5), 2);
+        if (left && top) {
+            radioContainer.style.left = left;
+            radioContainer.style.top = top;
+            radioContainer.style.position = 'absolute'; // Ensure it's positioned
+        }
+        if (scale) {
+            scaleFactor = scale;
             radioContainer.style.transform = `scale(${scaleFactor})`;
-        });
+        }
+    }
+}
 
-        // Toggling drag and scale functionality
-        document.getElementById('drag-toggle').addEventListener('click', () => {
-            isDragging = !isDragging;
-            document.getElementById('drag-toggle').textContent = 
-                isDragging ? 'Disable Drag' : 'Enable Drag';
-        });
+// Save position and scale to localStorage
+function saveSettings() {
+    const settings = {
+        left: radioContainer.style.left,
+        top: radioContainer.style.top,
+        scale: scaleFactor,
+    };
+    localStorage.setItem('radioSettings', JSON.stringify(settings));
+}
 
-        document.getElementById('scale-toggle').addEventListener('click', () => {
-            isScaling = !isScaling;
-            document.getElementById('scale-toggle').textContent = 
-                isScaling ? 'Disable Scale' : 'Enable Scale';
-        });
+// Enable dragging functionality
+radioContainer.addEventListener('mousedown', (e) => {
+    if (!isDragging) return;
 
-        // Focus handling for the container
-        radioContainer.addEventListener('focus', () => {
-            radioContainer.classList.add('focus-visible');
-        });
+    const rect = radioContainer.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
 
-        radioContainer.addEventListener('blur', () => {
-            radioContainer.classList.remove('focus-visible');
-        });
+    const onMouseMove = (e) => {
+        radioContainer.style.left = `${e.clientX - offsetX}px`;
+        radioContainer.style.top = `${e.clientY - offsetY}px`;
+        radioContainer.style.right = 'auto';
+        radioContainer.style.bottom = 'auto';
+        radioContainer.style.position = 'absolute';
+    };
+
+    const onMouseUp = () => {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        saveSettings(); // Save position after drag
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+});
+
+// Enable scaling functionality
+radioContainer.addEventListener('wheel', (e) => {
+    if (!isScaling) return;
+
+    e.preventDefault();
+    scaleFactor += e.deltaY > 0 ? -0.05 : 0.05;
+    scaleFactor = Math.min(Math.max(scaleFactor, 0.5), 2);
+    radioContainer.style.transform = `scale(${scaleFactor})`;
+    saveSettings(); // Save scale after adjustment
+});
+
+// Toggling drag and scale functionality
+document.getElementById('drag-toggle').addEventListener('click', () => {
+    isDragging = !isDragging;
+    document.getElementById('drag-toggle').textContent =
+        isDragging ? 'Disable Drag' : 'Enable Drag';
+});
+
+document.getElementById('scale-toggle').addEventListener('click', () => {
+    isScaling = !isScaling;
+    document.getElementById('scale-toggle').textContent =
+        isScaling ? 'Disable Scale' : 'Enable Scale';
+});
+
+// Load settings on page load
+window.onload = loadSettings;
+
+// Save settings before the page unloads
+window.onbeforeunload = saveSettings;
+
     </script>
 </body>
 </html>
