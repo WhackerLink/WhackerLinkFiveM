@@ -53,16 +53,15 @@
         });
 
       
-  document.getElementById('reset-position').addEventListener('click', () => {
-
-    radioContainer.style.left = null;
-    radioContainer.style.top = null;
-    radioContainer.style.right = null;
-    radioContainer.style.bottom = null;
-    radioContainer.style.transform = null; 
-    radioContainer.style.position = null; 
-    scaleFactor = 1; 
-});
+        document.getElementById('reset-position').addEventListener('click', () => {
+            radioContainer.style.left = null;
+            radioContainer.style.top = null;
+            radioContainer.style.right = null;
+            radioContainer.style.bottom = null;
+            radioContainer.style.transform = null; 
+            radioContainer.style.position = null; 
+            scaleFactor = 1; 
+        });
         
         radioContainer.addEventListener('focus', () => {
             radioContainer.classList.add('focus-visible');
