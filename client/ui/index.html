@@ -29,10 +29,10 @@
 <body>
     <div id="notification"></div>
     <div id="startup-message">WhackerLinkFiveM, https://github.com/whackerlink</div>
-    <div id="radio-container" tabindex="0">
+    <div id="radio-container" style="display: none; tabindex="0">
         <img src="radio.png" id="radio-image" alt="Radio">
         <img src="rssi.png" id="rssi-icon" alt="RSSI">
-       <img src="" id="battery-icon" alt="battery">
+        <img src="" id="battery-icon" alt="battery">
         <div id="line1"></div>
         <div id="line2"></div>
         <div id="line3"></div>
@@ -46,7 +46,8 @@
         <button onclick="buttonBeep()" id="btn-emer">E</button>
         <button onclick="buttonBeep()" id="zone-up">Z</button>
         <button onclick="buttonBeep()" id="rssi-btn">r</button>
-		
+		    <button id="drag-toggle">Enable Drag</button>
+    <button id="scale-toggle">Enable Scale</button>
     </div>
 	<script src="PacketType.js"></script>
 <script src="masterUtils.js"></script>
@@ -54,8 +55,7 @@
 <script src="PcmRecorder.js"></script>
 <script src="script.js"></script>
 <script src="https://code.responsivevoice.org/responsivevoice.js?key=PekkZld1"></script>
-    <button id="drag-toggle">Enable Drag</button>
-    <button id="scale-toggle">Enable Scale</button>
+
 
     <script>
         let isDragging = false;
