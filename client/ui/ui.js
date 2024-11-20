@@ -4,7 +4,7 @@
 
         const radioContainer = document.getElementById('radio-container');
 
-        // Enable dragging functionality
+     
         radioContainer.addEventListener('mousedown', (e) => {
             if (!isDragging) return;
 
@@ -29,7 +29,7 @@
             document.addEventListener('mouseup', onMouseUp);
         });
 
-        // Enable scaling functionality
+     
         radioContainer.addEventListener('wheel', (e) => {
             if (!isScaling) return;
 
@@ -39,7 +39,7 @@
             radioContainer.style.transform = `scale(${scaleFactor})`;
         });
 
-        // Toggling drag and scale functionality
+      
         document.getElementById('drag-toggle').addEventListener('click', () => {
             isDragging = !isDragging;
             document.getElementById('drag-toggle').textContent = 
@@ -52,18 +52,18 @@
                 isScaling ? 'Disable Scale' : 'Enable Scale';
         });
 
-        // Reset position and scale to default
+      
   document.getElementById('reset-position').addEventListener('click', () => {
-    // Remove all inline styles to let CSS defaults take over
+
     radioContainer.style.left = null;
     radioContainer.style.top = null;
     radioContainer.style.right = null;
     radioContainer.style.bottom = null;
-    radioContainer.style.transform = null; // Reset scaling
-    radioContainer.style.position = null; // Clear inline position if set
-    scaleFactor = 1; // Reset scale factor
+    radioContainer.style.transform = null; 
+    radioContainer.style.position = null; 
+    scaleFactor = 1; 
 });
-        // Focus handling for the container
+        
         radioContainer.addEventListener('focus', () => {
             radioContainer.classList.add('focus-visible');
         });
