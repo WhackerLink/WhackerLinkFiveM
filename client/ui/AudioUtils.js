@@ -58,11 +58,10 @@ function applyClipping(audioBuffer, threshold) {
 }
 
 function simulateFringeCoverage(audioBuffer, sampleRate) {
-    let buffer = audioBuffer;
-    buffer = simulatePacketLoss(buffer, 0.1);
-    buffer = addStaticNoise(buffer, 300);
-    buffer = insertDropouts(buffer, 100, 0.05);
-    buffer = modulateFrequency(buffer, sampleRate, 0.5, 0.2);
-    buffer = applyClipping(buffer, 20000);
+    let buffer = new Int16Array(audioBuffer);
+
+    buffer = new Int16Array(simulatePacketLoss(buffer.buffer, 0.60));
+    buffer = new Int16Array(insertDropouts(buffer.buffer, 200, 0.50));
+
     return buffer;
 }

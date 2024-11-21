@@ -22,6 +22,8 @@ files {
     'client/ui/PacketType.js',
     'client/ui/PcmPlayer.js',
     'client/ui/PcmRecorder.js',
+    'client/ui/ui.js',
+    'client/ui/AudioUtils.js',
     'client/ui/radio.png'
 }
 
