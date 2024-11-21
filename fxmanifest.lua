@@ -26,6 +26,6 @@ files {
 }
 
 
-author 'Caleb, KO4UYJ (_php_)'
+author 'Caleb, K4PHP (_php_)'
 version '1.0.0'
 description 'WhackerLink FiveM Plugin'
