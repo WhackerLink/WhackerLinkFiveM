@@ -142,6 +142,7 @@ RegisterCommand('toggle_radio_focus', () => {
     console.debug("Current NUI focus state:", nuiFocused);
     if (!nuiFocused) {
         console.debug("Setting NUI focus to true");
+        SendNuiMessage(JSON.stringify({type: 'radioFocused'}));
         nuiFocused = true;
         SetNuiFocus(true, true);
     } else {

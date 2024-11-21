@@ -270,6 +270,8 @@ window.addEventListener('message', async function (event) {
         currentCodeplug = event.data.currentCodeplug;
         loadRadioModelAssets(event.data.model);
         radioModel = event.data.model;
+    } else if (event.data.type === 'radioFocused') {
+        document.getElementById('scalemove').style.display = 'block';
     } else if (event.data.type === 'setRssiLevel') {
         let siteChanged = false;
 
@@ -406,7 +408,7 @@ function displayBootScreen(bootScreenMessages) {
 document.addEventListener('keydown', function (event) {
     console.log("Key event")
     if (event.key === 'Escape') {
-        console.log("Sending fetch" + `https://${GetParentResourceName()}/unFocus`);
+        document.getElementById('scalemove').style.display = 'none';
         fetch(`https://${GetParentResourceName()}/unFocus`, {
             method: 'POST',
             headers: {
