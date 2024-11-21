@@ -1,4 +1,3 @@
-const { Server } = require('@citizenfx/server');
 const fs = require('fs');
 const yaml = require('js-yaml');
 

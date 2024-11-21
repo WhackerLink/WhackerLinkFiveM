@@ -9,7 +9,7 @@ radioWide:
 systems:
   - name: "System 1"
     address: "localhost"
-    port: 3000
+    port: 3009
     rid: "123456"
 
   - name: "System 2"
