@@ -33,6 +33,7 @@ let currentZoneIndex = 0;
 let currentFrequncyChannel;
 let currentCodeplug;
 let isInRange = false;
+let fringVC = false;
 let isInSiteTrunking = false;
 let isTxing = false;
 let audioBuffer = [];
@@ -289,9 +290,11 @@ window.addEventListener('message', async function (event) {
 
         if (event.data.level === 0) {
             isInRange = false;
+            fringVC = true;
             setUiOOR(isInRange);
         } else if (event.data.level > 0 && !isInRange) {
             isInRange = true;
+            fringVC = false;
             setUiOOR(isInRange);
         }
 
@@ -359,6 +362,7 @@ async function powerOff() {
     isVoiceRequested = false;
     isVoiceGrantHandled = false;
     isInRange = false;
+    fringVC = false;
     isInSiteTrunking = false;
     isTxing = false;
     radioOn = false;
@@ -820,7 +824,13 @@ function bonk() {
 
 function onAudioFrameReady(buffer, rms) {
     if (isTxing && currentFrequncyChannel !== null) {
-        audioBuffer.push(...buffer);
+
+        if (fringVC) {
+            const degradedBuffer = simulateFringeCoverage(buffer, 8000);
+            audioBuffer.push(...degradedBuffer);
+        } else {
+            audioBuffer.push(...buffer);
+        }
 
         if (audioBuffer.length >= EXPECTED_PCM_LENGTH) {
             const fullFrame = audioBuffer.slice(0, EXPECTED_PCM_LENGTH);
