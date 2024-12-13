@@ -603,10 +603,10 @@ function connectWebSocket() {
 
                 if (data.data.Status === 0) {
                     isAffiliated = true;
-                    console.debug("Affiliation granted");
+                    // console.debug("Affiliation granted");
                 } else {
                     isAffiliated = false;
-                    console.debug("Affiliation denied");
+                    // console.debug("Affiliation denied");
                 }
             } else if (data.type == packetToNumber("U_REG_RSP")) {
                 if (data.data.SrcId !== myRid) {
@@ -615,10 +615,10 @@ function connectWebSocket() {
 
                 if (data.data.Status === 0) {
                     isRegistered = true;
-                    console.debug("Registration granted");
+                    // console.debug("Registration granted");
                 } else {
                     isRegistered = false;
-                    console.debug("Registration refused");
+                    // console.debug("Registration refused");
                 }
             } else if (data.type == packetToNumber("AUDIO_DATA")) {
                 if (data.voiceChannel.SrcId !== myRid && data.voiceChannel.DstId == currentTg && data.voiceChannel.Frequency == currentFrequncyChannel) {

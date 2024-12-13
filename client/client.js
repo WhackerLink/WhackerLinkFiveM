@@ -45,7 +45,7 @@ on('onClientResourceStart', (resourceName) => {
     if (GetCurrentResourceName() !== resourceName) {
         return;
     }
-    console.log('Client resource started:', resourceName);
+
     emitNet('getSitesConfig');
     displayStartupMessage();
 });
@@ -120,7 +120,6 @@ onNet('receiveCodeplug', (codeplug) => {
 RegisterNuiCallbackType('unFocus');
 
 on('__cfx_nui:unFocus', (data, cb) => {
-    console.debug("Set NUI focus to false");
     SetNuiFocus(false, false);
     cb({});
 });
@@ -138,14 +137,11 @@ RegisterCommand('-ptt', () => {
 }, false);
 
 RegisterCommand('toggle_radio_focus', () => {
-    console.debug("Current NUI focus state:", nuiFocused);
     if (!nuiFocused) {
-        console.debug("Setting NUI focus to true");
         SendNuiMessage(JSON.stringify({type: 'radioFocused'}));
         nuiFocused = true;
         SetNuiFocus(true, true);
     } else {
-        console.debug("Setting NUI focus to false");
         nuiFocused = false;
         SetNuiFocus(false, false);
     }
@@ -164,7 +160,6 @@ function ToggleRadio() {
 }
 
 function OpenRadio() {
-    console.debug('Open radio command received');
     const codeplug = JSON.parse(GetResourceKvpString('currentCodeplug'));
     // console.log('CURRENT OPEN RADIO Codeplug:', codeplug)
     currentCodeplug = codeplug;
@@ -192,13 +187,10 @@ function handlePTTDown() {
     const timeSinceLastPtt = currentTime - lastPttTime;
 
     if (!isPttPressed && timeSinceLastPtt > PTT_COOLDOWN_MS) {
-        console.debug('PTT press initiated');
         isPttPressed = true;
         pttPressStartTime = currentTime;
 
         setTimeout(() => {
-            console.log('Checking PTT press duration')
-
             if (isPttPressed && (Date.now() - pttPressStartTime) >= MIN_PTT_DURATION_MS) {
                 console.debug('PTT press confirmed');
                 SendNuiMessage(JSON.stringify({ type: 'pttPress' }));
@@ -218,7 +210,6 @@ function handlePTTUp() {
 
     if (isPttPressed) {
         if (pressDuration >= MIN_PTT_DURATION_MS) {
-            console.debug('PTT released');
             SendNuiMessage(JSON.stringify({ type: 'pttRelease' }));
             lastPttTime = currentTime;
             stopRadioAnimation();
