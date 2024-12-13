@@ -106,7 +106,7 @@ function displayStartupMessage() {
     console.log('============================================================');
     console.log('==                                                        ==');
     console.log('==                   WhackerLinkFiveM                     ==');
-    console.log('==             Author: Caleb, K4PHP (_php_)              ==');
+    console.log('==             Author: Caleb, K4PHP (_php_)               ==');
     console.log('==             GitHub: https://github.com/WhackerLink     ==');
     console.log('==                                                        ==');
     console.log('============================================================');

@@ -43,7 +43,6 @@ function displayStartupMessage() {
 
 on('onClientResourceStart', (resourceName) => {
     if (GetCurrentResourceName() !== resourceName) {
-        console.log('Resource name mismatch:', GetCurrentResourceName(), resourceName);
         return;
     }
     console.log('Client resource started:', resourceName);

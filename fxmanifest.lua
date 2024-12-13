@@ -13,20 +13,11 @@ files {
     'client/ui/models/**/style.css',
     'client/ui/models',
     'client/ui/index.html',
-	'client/ui/buttonbeep.wav',
-	'client/ui/buttonbonk.wav',
-	'client/ui/knob-click.wav',
-    'client/ui/style.css',
-    'client/ui/script.js',
-    'client/ui/masterUtils.js',
-    'client/ui/PacketType.js',
-    'client/ui/PcmPlayer.js',
-    'client/ui/PcmRecorder.js',
-    'client/ui/ui.js',
-    'client/ui/AudioUtils.js',
+	'client/ui/audio/*.wav',
+    'client/ui/style/*.css',
+    'client/ui/js/*.js',
     'client/ui/radio.png'
 }
-
 
 author 'Caleb, K4PHP (_php_)'
 version '1.0.0'
