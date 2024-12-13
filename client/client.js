@@ -192,7 +192,7 @@ function handlePTTDown() {
 
         setTimeout(() => {
             if (isPttPressed && (Date.now() - pttPressStartTime) >= MIN_PTT_DURATION_MS) {
-                console.debug('PTT press confirmed');
+                // console.debug('PTT press confirmed');
                 SendNuiMessage(JSON.stringify({ type: 'pttPress' }));
                 if (!inVehicle) {
                     playRadioAnimation();

@@ -406,7 +406,6 @@ function displayBootScreen(bootScreenMessages) {
 }
 
 document.addEventListener('keydown', function (event) {
-    console.log("Key event")
     if (event.key === 'Escape') {
         document.getElementById('scalemove').style.display = 'none';
         fetch(`https://${GetParentResourceName()}/unFocus`, {

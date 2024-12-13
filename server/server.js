@@ -33,7 +33,7 @@ loadSitesConfig();
 on('playerConnecting', (name, setKickReason, deferrals) => {
     // console.debug(`${name} is connecting to the server.`);
     let wholeConfig;
-    wholeConfig.config = config;
+    //wholeConfig.config = config;
     wholeConfig.sites = sites;
     emitNet('receiveSitesConfig', source, wholeConfig);
 });
@@ -43,7 +43,7 @@ on('playerDropped', (reason) => {
 });
 
 onNet('getSitesConfig', () => {
-    console.debug(`Player ${source} requested sites config.`);
+    // console.debug(`Player ${source} requested sites config.`);
 
     let wholeConfig = {};
     wholeConfig.config = config;
