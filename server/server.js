@@ -30,15 +30,13 @@ displayStartupMessage();
 loadCodeplugs();
 loadSitesConfig();
 
-on('playerConnecting', (name, setKickReason, deferrals) => {
-    // console.debug(`${name} is connecting to the server.`);
-    let wholeConfig;
-    //wholeConfig.config = config;
+on('playerConnecting', () => {
+    let wholeConfig = [];
     wholeConfig.sites = sites;
     emitNet('receiveSitesConfig', source, wholeConfig);
 });
 
-on('playerDropped', (reason) => {
+on('playerDropped', () => {
     // console.debug(`A player has left the server: ${reason}`);
 });
 
@@ -64,15 +62,13 @@ function loadConfig() {
 function loadCodeplugs() {
     try {
         const codeplugDir = GetResourcePath(GetCurrentResourceName()) + '/codeplugs/';
-        const modelsDir = GetResourcePath(GetCurrentResourceName()) + '/client/ui/models/';
+        // const modelsDir = GetResourcePath(GetCurrentResourceName()) + '/client/ui/models/';
 
         fs.readdirSync(codeplugDir).forEach(file => {
             if (file.endsWith('.yml')) {
                 const codeplugName = file.slice(0, -4);
                 const fileContents = fs.readFileSync(codeplugDir + file, 'utf8');
-                const codeplug = yaml.load(fileContents);
-
-                codeplugs[codeplugName] = codeplug;
+                codeplugs[codeplugName] = yaml.load(fileContents);
             }
         });
         // console.debug('Codeplugs loaded:', Object.keys(codeplugs));
@@ -91,7 +87,7 @@ function loadSitesConfig() {
     }
 }
 
-RegisterCommand('set_codeplug', (source, args, rawCommand) => {
+RegisterCommand('set_codeplug', (source, args) => {
     const codeplugName = args[0];
     // console.debug(codeplugs[codeplugName])
     if (codeplugs[codeplugName]) {
@@ -100,7 +96,7 @@ RegisterCommand('set_codeplug', (source, args, rawCommand) => {
     } else {
         console.debug(`Codeplug not found: ${codeplugName}`);
     }
-});
+}, false);
 
 function displayStartupMessage() {
     console.log('============================================================');

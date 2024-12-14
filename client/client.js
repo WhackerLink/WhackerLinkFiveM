@@ -31,13 +31,13 @@ const PTT_COOLDOWN_MS = 1000;
 const MIN_PTT_DURATION_MS = 500;
 
 function displayStartupMessage() {
-    SendNuiMessage({
+    SendNuiMessage(JSON.stringify({
         type: 'showStartupMessage'
-    });
+    }));
     setTimeout(() => {
-        SendNuiMessage({
+        SendNuiMessage(JSON.stringify({
             type: 'hideStartupMessage'
-        });
+        }));
     }, 5000);
 }
 
@@ -110,7 +110,7 @@ RegisterCommand('set_rid', (source, args) => {
     }
 }, false);
 
-RegisterCommand('change_battery', (source, args) => {
+RegisterCommand('change_battery', () => {
     resetBatteryLevel();
 }, false);
 

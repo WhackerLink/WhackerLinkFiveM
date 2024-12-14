@@ -20,7 +20,6 @@
 
 const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 8000});
 const EXPECTED_PCM_LENGTH = 1600;
-const CHUNK_SIZE = 320;
 const HOST_VERSION = "R01.02.00";
 
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -85,7 +84,7 @@ batteryLevelInterval = setInterval(() => {
         batteryLevel--;
         document.getElementById("battery-icon").src = `models/${radioModel}/icons/battery${batteryLevel}.png`;
     } else {
-        powerOff().then(r => {});
+        powerOff().then();
     }
     // console.log(`Battery level: ${batteryLevel}`);
 }, 3600000);
@@ -119,7 +118,7 @@ function startCheckLoop() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({})
-        });
+        }).then();
 
         if (currentLat !== null && currentLng !== null) {
             SendLocBcast();
@@ -143,8 +142,7 @@ function startCheckLoop() {
         }
 
         if (!isRegistered) {
-            sendRegistration().then(r => {
-            });
+            sendRegistration().then();
             setTimeout(() => {
                 if (!isRegistered) {
                     document.getElementById('line3').innerHTML = 'Sys reg refusd';
@@ -336,7 +334,7 @@ window.addEventListener('message', async function (event) {
         }
 
         if (siteChanged && isRegistered && !isInSiteTrunking) {
-            sendAffiliation().then(r => {});
+            sendAffiliation().then();
         }
 
         currentRssiLevel = event.data.level;
@@ -450,9 +448,9 @@ document.addEventListener('keydown', function (event) {
 
 document.getElementById('power-btn').addEventListener('click', () => {
     if (radioOn) {
-        powerOff().then(r => console.log("Radio off"));
+        powerOff().then();
     } else {
-        powerOn().then(r => console.log("Radio on"));
+        powerOn().then();
     }
 });
 
@@ -505,7 +503,7 @@ function StartEmergencyAlarm() {
         body: JSON.stringify({})
     })
         .then(response => response.json())
-        .then(data => {
+        .then(() => {
             SendEmergencyAlarmRequest();
         })
         .catch(error => {
@@ -530,8 +528,7 @@ function changeChannel(direction) {
 
     responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
     if (!isInSiteTrunking) {
-        sendAffiliation().then(r => {
-        });
+        sendAffiliation().then();
     } else {
         isAffiliated = false;
     }
@@ -643,32 +640,20 @@ function connectWebSocket() {
                 return;
             }
 
-            if (data.type == packetToNumber("GRP_AFF_RSP")) {
+            if (data.type === packetToNumber("GRP_AFF_RSP")) {
                 if (data.data.SrcId !== myRid || data.data.DstId !== currentTg) {
                     return;
                 }
 
-                if (data.data.Status === 0) {
-                    isAffiliated = true;
-                    // console.debug("Affiliation granted");
-                } else {
-                    isAffiliated = false;
-                    // console.debug("Affiliation denied");
-                }
-            } else if (data.type == packetToNumber("U_REG_RSP")) {
+                isAffiliated = data.data.Status === 0;
+            } else if (data.type === packetToNumber("U_REG_RSP")) {
                 if (data.data.SrcId !== myRid) {
                     return;
                 }
 
-                if (data.data.Status === 0) {
-                    isRegistered = true;
-                    // console.debug("Registration granted");
-                } else {
-                    isRegistered = false;
-                    // console.debug("Registration refused");
-                }
-            } else if (data.type == packetToNumber("AUDIO_DATA")) {
-                if (data.voiceChannel.SrcId !== myRid && data.voiceChannel.DstId == currentTg && data.voiceChannel.Frequency == currentFrequncyChannel) {
+                isRegistered = data.data.Status === 0;
+            } else if (data.type === packetToNumber("AUDIO_DATA")) {
+                if (data.voiceChannel.SrcId !== myRid && data.voiceChannel.DstId === currentTg && data.voiceChannel.Frequency === currentFrequncyChannel) {
                     const binaryString = atob(data.data);
                     const len = binaryString.length;
                     const bytes = new Uint8Array(len);
@@ -677,7 +662,7 @@ function connectWebSocket() {
                     }
                     handleAudioData(bytes.buffer);
                 }
-            } else if (data.type == packetToNumber("GRP_VCH_RSP")) {
+            } else if (data.type === packetToNumber("GRP_VCH_RSP")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg && data.data.Status === 0) {
                     isReceiving = true;
                     currentFrequncyChannel = data.data.Channel;
@@ -707,7 +692,7 @@ function connectWebSocket() {
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status !== 0) {
                     bonk();
                 }
-            } else if (data.type == packetToNumber("GRP_VCH_RLS")) {
+            } else if (data.type === packetToNumber("GRP_VCH_RLS")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
                     if (!isInRange) {
                         setUiOOR(isInRange);
@@ -724,8 +709,8 @@ function connectWebSocket() {
                     isVoiceRequested = false;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                 }
-            } else if (data.type == packetToNumber("EMRG_ALRM_RSP")) {
-                if (data.data.SrcId !== myRid && data.data.DstId == currentTg) {
+            } else if (data.type === packetToNumber("EMRG_ALRM_RSP")) {
+                if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
                     const line3 = document.getElementById("line3");
                     emergency_tone_generate();
                     line3.style.color = "white";
@@ -832,6 +817,7 @@ function tpt_generate() {
     }, 100);
 }
 
+/*
 function play_page_alert() {
     beep(910, 150, 30, 'sine');
     setTimeout(function () {
@@ -853,6 +839,7 @@ function play_page_alert() {
         beep(910, 150, 30, 'sine');
     }, 900);
 }
+*/
 
 function emergency_tone_generate() {
     beep(610, 500, 30, 'sine');
@@ -918,7 +905,7 @@ function buttonBeep() {
 
 
 function playSoundEffect(audioPath) {
-    var audio = new Audio(audioPath);
+    let audio = new Audio(audioPath);
     audio.play();
 }
 
@@ -927,22 +914,11 @@ function knobClick() {
     playSoundEffect('knob-click.wav');
 }
 
-
-function playSoundEffect(audioPath) {
-    var audio = new Audio(audioPath);
-    audio.play();
-}
-
-
+/*
 function buttonBonk() {
     playSoundEffect('buttonbonk.wav');
 }
-
-
-function playSoundEffect(audioPath) {
-    var audio = new Audio(audioPath);
-    audio.play();
-}
+*/
 
 function loadRadioModelAssets(model) {
     const radioImage = document.getElementById('radio-image');
