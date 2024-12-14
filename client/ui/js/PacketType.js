@@ -37,7 +37,9 @@
         CALL_ALRT: 0x14,
         CALL_ALRT_REQ: 0x15,
         AUTH_DEMAND: 0x16,
-        AUTH_REPLY: 0x17
+        AUTH_REPLY: 0x17,
+        REL_DEMAND: 0x18,
+        LOC_BCAST: 0x19
     };
 
     const PacketTypeReverse = Object.fromEntries(

@@ -52,6 +52,7 @@ let registrationCheckInterval;
 let groupGrantCheckInterval;
 let batteryLevelInterval;
 let reconnectInterval;
+let locationBroadcastInterval;
 
 let myRid = "1234";
 let currentTg = "2001";
@@ -61,6 +62,9 @@ let currentDbLevel;
 let batteryLevel = 4;
 let currentSite;
 let initialized = false;
+
+let currentLat = null;
+let currentLng = null;
 
 function socketOpen() {
     return socket && socket.readyState === WebSocket.OPEN;
@@ -102,7 +106,25 @@ function startCheckLoop() {
                 }
             }, 800);
         });
-    }, 200);
+    }, 2000);
+
+    locationBroadcastInterval = setInterval(() => {
+        if (!socketOpen() || !isInRange || !radioOn || !isRegistered) {
+            return;
+        }
+
+        fetch(`https://${GetParentResourceName()}/getPlayerLocation`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        });
+
+        if (currentLat !== null && currentLng !== null) {
+            SendLocBcast();
+        }
+    }, 1000);
 
     affiliationCheckInterval = setInterval(() => {
         if (!socketOpen() || !isInRange || !radioOn) {
@@ -171,6 +193,7 @@ function stopCheckLoop() {
     clearInterval(affiliationCheckInterval);
     clearInterval(registrationCheckInterval);
     clearInterval(groupGrantCheckInterval);
+    clearInterval(locationBroadcastInterval);
 }
 
 async function sendAffiliation() {
@@ -272,6 +295,11 @@ window.addEventListener('message', async function (event) {
         radioModel = event.data.model;
     } else if (event.data.type === 'radioFocused') {
         document.getElementById('scalemove').style.display = 'block';
+    } else if (event.data.type === 'playerLocation') {
+        const { latitude, longitude } = event.data;
+
+        currentLat = latitude;
+        currentLng = longitude;
     } else if (event.data.type === 'setRssiLevel') {
         let siteChanged = false;
 
@@ -427,8 +455,24 @@ document.getElementById('power-btn').addEventListener('click', () => {
 });
 
 document.getElementById('btn-emer').addEventListener('click', () => {
+    console.debug("Requesting location...");
+
+    fetch(`https://${GetParentResourceName()}/getPlayerLocation`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+    })
+        .then(response => response.json())
+        .then(data => {
+            SendEmergencyAlarmRequest();
+        })
+        .catch(error => {
+            console.error("Failed to get location:", error);
+        });
+
     emergency_tone_generate();
-    SendEmergencyAlarmRequest();
 });
 
 document.getElementById('channel-up').addEventListener('click', () => {

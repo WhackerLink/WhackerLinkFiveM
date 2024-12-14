@@ -100,6 +100,24 @@ function SendEmergencyAlarmRequest() {
         data: {
             SrcId: myRid,
             DstId: currentTg,
+            Lat: currentLat,
+            Long: currentLng,
+            Site: currentSite
+        }
+    }
+    
+    socket.send(JSON.stringify(request));
+}
+
+function SendLocBcast() {
+    if (!socketOpen) { return; }
+
+    const request = {
+        type: packetToNumber("LOC_BCAST"),
+        data: {
+            SrcId: myRid,
+            Lat: currentLat,
+            Long: currentLng,
             Site: currentSite
         }
     }

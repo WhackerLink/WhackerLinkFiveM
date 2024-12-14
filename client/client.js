@@ -50,6 +50,21 @@ on('onClientResourceStart', (resourceName) => {
     displayStartupMessage();
 });
 
+RegisterNuiCallbackType('getPlayerLocation');
+
+on('__cfx_nui:getPlayerLocation', (data, cb) => {
+    const playerPed = PlayerPedId();
+    const playerCoords = GetEntityCoords(playerPed);
+
+    SendNuiMessage(JSON.stringify({
+        type: 'playerLocation',
+        latitude: playerCoords[0],
+        longitude: playerCoords[1]
+    }));
+
+    cb({});
+});
+
 onNet('receiveSitesConfig', (receivedSites) => {
     sites = receivedSites.sites;
 
