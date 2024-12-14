@@ -353,15 +353,25 @@ async function powerOn() {
         });
     }
 
-    const bootScreenMessages = [
-        {text: "", duration: 0, line: "line1"},
-        {text: "", duration: 0, line: "line3"},
-        {text: HOST_VERSION, duration: 1500, line: "line2"},
-        {text: radioModel, duration: 1500, line: "line2"}
-    ];
+    if (radioModel === "APX900") {
+        const bootImage = document.getElementById('boot-image');
+        bootImage.src = `models/${radioModel}/boot.png`;
+        bootImage.style.display = 'block';
 
-    await displayBootScreen(bootScreenMessages);
-    currentMessageIndex = 0;
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        bootImage.style.display = 'none';
+    } else {
+        const bootScreenMessages = [
+            {text: "", duration: 0, line: "line1"},
+            {text: "", duration: 0, line: "line3"},
+            {text: HOST_VERSION, duration: 1500, line: "line2"},
+            {text: radioModel, duration: 1500, line: "line2"}
+        ];
+
+        await displayBootScreen(bootScreenMessages);
+        currentMessageIndex = 0;
+    }
 
     responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
     responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});

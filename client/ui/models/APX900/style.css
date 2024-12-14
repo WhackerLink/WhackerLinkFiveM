@@ -17,12 +17,22 @@
     left: 25.5%;
     display: block;
 }
+
 #battery-icon {
     position: absolute;
     top: 74.5%;
     left: 71%;
     height: 3.0%;
     width: auto;
+    display: none;
+}
+
+#boot-image {
+    position: absolute;
+    top: 74.2%;
+    left: 24.7%;
+    height: 13%;
+    width: 50.3%;
     display: none;
 }
 
