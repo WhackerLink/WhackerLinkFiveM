@@ -123,7 +123,7 @@ function startCheckLoop() {
         if (currentLat !== null && currentLng !== null) {
             SendLocBcast();
         }
-    }, 1000);
+    }, 2000);
 
     affiliationCheckInterval = setInterval(() => {
         if (!socketOpen() || !isInRange || !radioOn) {

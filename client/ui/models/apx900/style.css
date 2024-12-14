@@ -7,7 +7,7 @@
 
 #radio-image {
     display: block;
-    width: 250px;
+    width: 200px;
     height: auto;
 }
 
@@ -21,13 +21,10 @@
     position: absolute;
     top: 74.5%;
     left: 71%;
-    height: 2.0%;
+    height: 3.0%;
     width: auto;
     display: none;
 }
-
-
-
 
 #channel-up, #zone-up {
     position: absolute;
@@ -53,7 +50,7 @@
     left: 28%;
 }
 
- #rssi-btn {
+#rssi-btn {
     position: absolute;
     transform: translateX(-50%);
     top: 91%;
@@ -61,7 +58,7 @@
     display: block;
     margin: 10px auto;
     padding: 7px;
-     background-color: transparent;
+    background-color: transparent;
     color: transparent;
     border: none;
     cursor: pointer;
@@ -70,15 +67,12 @@
 
 #channel-knbu {
 	  left: 53%;
-
 }
 #channel-knbd {
 	  left: 43%;
-
 }
 #btn-emer {
 	  left: 59%;
-
 }
 
 #btn-emer {
@@ -97,7 +91,6 @@
 
 #power-btn {
 	  left: 23%;
-
 }
 
 #power-btn {
@@ -114,9 +107,6 @@
     cursor: pointer;
 }
 
-
-
-
 #channel-knbu, #channel-knbd {
     position: absolute;
     transform: translateX(-50%);
@@ -125,15 +115,12 @@
     display: block;
     margin: 10px auto;
     padding: 7px;
-padding-top: 35px;
+    padding-top: 35px;
     background-color: transparent;
 	color: transparent;
     border: none;
     cursor: pointer;
 }
-
-
-
 
 #line1, #line2, #line3 {
     position: absolute;
@@ -141,7 +128,7 @@ padding-top: 35px;
     transform: translateX(-50%);
     z-index: 1;
     color: black;
-    font-size: 17px;
+    font-size: 12px;
     font-family: Helvetica, serif;
     font-weight: bold;
     text-align: center;
@@ -161,8 +148,6 @@ padding-top: 35px;
     text-align: center;
     width: 90%;
 }
-
-
 
 #softText1 {
     font-size: 12px;
@@ -188,13 +173,13 @@ padding-top: 35px;
 }
 
 #line2 {
-     top: 79.5%;
-    font-size: 15px;
+    top: 79.5%;
+    font-size: 14px;
 }
 
 #line3 {
-      top: 81.5%;
-    font-size: 14px;
+    top: 81.5%;
+    font-size: 10px;
     left: 49.5%;
     width: 41%;
 }
