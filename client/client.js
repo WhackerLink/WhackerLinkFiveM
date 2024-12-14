@@ -98,6 +98,10 @@ RegisterCommand('toggle_radio', () => {
     ToggleRadio();
 }, false);
 
+RegisterCommand('emergency_toggle', () => {
+    ActivateEmergency();
+}, false);
+
 RegisterCommand('set_rid', (source, args) => {
     if (args.length > 0) {
         setRid(args[0]);
@@ -140,7 +144,8 @@ on('__cfx_nui:unFocus', (data, cb) => {
 });
 
 RegisterKeyMapping('toggle_radio', 'Toggle Radio', 'keyboard', 'Y');
-RegisterKeyMapping('toggle_radio_focus', 'Toggle Radio Focus', 'keyboard', ']');
+RegisterKeyMapping('emergency_toggle', 'Activate Emergency', 'keyboard', 'E');
+RegisterKeyMapping('toggle_radio_focus', 'Toggle Radio Focus', 'keyboard', 'F');
 RegisterKeyMapping('+ptt', 'Push-To-Talk', 'keyboard', 'N');
 
 RegisterCommand('+ptt', () => {
@@ -172,6 +177,10 @@ function ToggleRadio() {
     } else {
         OpenRadio();
     }
+}
+
+function ActivateEmergency() {
+    SendNuiMessage(JSON.stringify({ type: 'activate_emergency' }));
 }
 
 function OpenRadio() {

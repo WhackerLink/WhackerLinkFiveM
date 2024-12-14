@@ -295,6 +295,8 @@ window.addEventListener('message', async function (event) {
         radioModel = event.data.model;
     } else if (event.data.type === 'radioFocused') {
         document.getElementById('scalemove').style.display = 'block';
+    } else if (event.data.type === 'activate_emergency') {
+        StartEmergencyAlarm();
     } else if (event.data.type === 'playerLocation') {
         const { latitude, longitude } = event.data;
 
@@ -455,24 +457,7 @@ document.getElementById('power-btn').addEventListener('click', () => {
 });
 
 document.getElementById('btn-emer').addEventListener('click', () => {
-    console.debug("Requesting location...");
-
-    fetch(`https://${GetParentResourceName()}/getPlayerLocation`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({})
-    })
-        .then(response => response.json())
-        .then(data => {
-            SendEmergencyAlarmRequest();
-        })
-        .catch(error => {
-            console.error("Failed to get location:", error);
-        });
-
-    emergency_tone_generate();
+    StartEmergencyAlarm();
 });
 
 document.getElementById('channel-up').addEventListener('click', () => {
@@ -510,6 +495,25 @@ document.getElementById('rssi-btn').addEventListener('click', () => {
         }
     }, 4000);
 });
+
+function StartEmergencyAlarm() {
+    fetch(`https://${GetParentResourceName()}/getPlayerLocation`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+    })
+        .then(response => response.json())
+        .then(data => {
+            SendEmergencyAlarmRequest();
+        })
+        .catch(error => {
+            console.error("Failed to get location:", error);
+        });
+
+    emergency_tone_generate();
+}
 
 function changeChannel(direction) {
     currentChannelIndex += direction;
