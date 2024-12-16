@@ -686,8 +686,8 @@ function connectWebSocket() {
 
                 isRegistered = data.data.Status === 0;
             } else if (data.type === packetToNumber("AUDIO_DATA")) {
-                if (data.voiceChannel.SrcId !== myRid && data.voiceChannel.DstId === currentTg && data.voiceChannel.Frequency === currentFrequncyChannel) {
-                    const binaryString = atob(data.data);
+                if (data.data.VoiceChannel.SrcId !== myRid && data.data.VoiceChannel.DstId === currentTg && data.data.VoiceChannel.Frequency === currentFrequncyChannel) {
+                    const binaryString = atob(data.data.Data);
                     const len = binaryString.length;
                     const bytes = new Uint8Array(len);
                     for (let i = 0; i < len; i++) {
@@ -761,6 +761,17 @@ function connectWebSocket() {
                             line3.innerHTML = '';
                         }
                     }, 5000);
+                }
+            } else if (data.type === packetToNumber("CALL_ALRT")) {
+                if (data.data.SrcId !== myRid && data.data.DstId === myRid) {
+                    document.getElementById("line3").style.color = "black";
+                    document.getElementById("line3").innerHTML = `Page: ${data.data.SrcId}`;
+                    play_page_alert();
+
+                    setTimeout(() => {
+                        document.getElementById("line3").style.color = "black";
+                        document.getElementById("line3").innerHTML = '';
+                    }, 3000);
                 }
             } else {
                 //console.debug(event.data);
@@ -863,7 +874,6 @@ function tpt_generate() {
     }, 100);
 }
 
-/*
 function play_page_alert() {
     beep(910, 150, 30, 'sine');
     setTimeout(function () {
@@ -885,7 +895,6 @@ function play_page_alert() {
         beep(910, 150, 30, 'sine');
     }, 900);
 }
-*/
 
 function emergency_tone_generate() {
     beep(610, 500, 30, 'sine');
@@ -919,15 +928,17 @@ function onAudioFrameReady(buffer, rms) {
             audioBuffer = audioBuffer.slice(EXPECTED_PCM_LENGTH);
 
             const response = {
-                type: 1,
+                type: 0x01,
                 rms: rms * 30.0,
-                voiceChannel: {
-                    SrcId: myRid,
-                    DstId: currentTg,
-                    Frequency: currentFrequncyChannel
-                },
-                site: currentSite,
-                data: fullFrame
+                data: {
+                    VoiceChannel: {
+                        SrcId: myRid,
+                        DstId: currentTg,
+                        Frequency: currentFrequncyChannel
+                    },
+                    Site: currentSite,
+                    Data: fullFrame
+                }
             };
 
             const jsonString = JSON.stringify(response);
