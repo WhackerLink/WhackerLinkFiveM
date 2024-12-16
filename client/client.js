@@ -38,7 +38,7 @@ function displayStartupMessage() {
         SendNuiMessage(JSON.stringify({
             type: 'hideStartupMessage'
         }));
-    }, 5000);
+    }, 3000);
 }
 
 on('onClientResourceStart', (resourceName) => {
@@ -48,6 +48,22 @@ on('onClientResourceStart', (resourceName) => {
 
     emitNet('getSitesConfig');
     displayStartupMessage();
+
+    setTimeout(() => {
+        if (currentCodeplug === null || currentCodeplug === undefined) {
+            emit('chat:addMessage', {
+                args: ['ALERT!', 'Make sure you set your codeplug!!'],
+                color: [255, 0, 0]
+            });
+        }
+
+        if (GetResourceKvpString('myRid') === null || GetResourceKvpString('myRid') === undefined) {
+            emit('chat:addMessage', {
+                args: ['ALERT!', 'Make sure you set your radio id!!'],
+                color: [255, 0, 0]
+            });
+        }
+    }, 5000);
 });
 
 RegisterNuiCallbackType('getPlayerLocation');
@@ -75,6 +91,8 @@ onNet('receiveSitesConfig', (receivedSites) => {
         RemoveAllBlips();
 
         sites.forEach(site => {
+            site.State = 1;
+
             // console.log(`Adding blip for site: ${site.name} at coordinates (${site.location.X}, ${site.location.Y}, ${site.location.Z})`);
             let blip = AddBlipForCoord(site.location.X, site.location.Y, site.location.Z);
 
@@ -106,7 +124,21 @@ RegisterCommand('set_rid', (source, args) => {
     if (args.length > 0) {
         setRid(args[0]);
     } else {
-        console.log('Usage: /set_rid <RID>');
+        emit('chat:addMessage', {
+            args: ['Usage', '/set_rid <RID>'],
+            color: [255, 0, 0]
+        });
+    }
+}, false);
+
+RegisterCommand('site_status', (source, args) => {
+    if (args.length > 1) {
+        setSiteStatus(args[1], args[0]);
+    } else {
+        emit('chat:addMessage', {
+            args: ['Usage', '/site_status site_index status(up = 1, down = 0, failsoft = 2)'],
+            color: [255, 0, 0]
+        });
     }
 }, false);
 
@@ -286,6 +318,10 @@ function checkPlayerRSSI() {
     let minDistance = Infinity;
 
     sites.forEach(site => {
+        if (site.State === 0) {
+            return;
+        }
+
         const siteCoords = site.location;
         const distance = Vdist(playerCoords[0], playerCoords[1], playerCoords[2], siteCoords.X, siteCoords.Y, siteCoords.Z);
         const distanceInMiles = distance / 1609.34;
@@ -314,12 +350,14 @@ function checkPlayerRSSI() {
 
         const distanceInMeters = minDistance * 1609.34;
         const dbRssiLevel = calculateDbRssiLevel(distanceInMeters, 0.8549625);
-        updateRSSIIcon(rssiLevel, closestSite, dbRssiLevel);
+        const failsoft = closestSite.State === 2;
+
+        updateRSSIIcon(rssiLevel, closestSite, dbRssiLevel, failsoft);
     }
 }
 
-function updateRSSIIcon(level, site, dbRssi) {
-    SendNuiMessage(JSON.stringify({type: 'setRssiLevel', level: level, site: site, dbRssi}));
+function updateRSSIIcon(level, site, dbRssi, failsoft) {
+    SendNuiMessage(JSON.stringify({type: 'setRssiLevel', level: level, site: site, dbRssi, failsoft}));
     // console.debug('RSSI level:', level);
 }
 
@@ -347,6 +385,11 @@ function setRid(newRid) {
     myRid = newRid;
     SetResourceKvp('myRid', myRid);
     SendNuiMessage(JSON.stringify({ type: 'setRid', rid: GetResourceKvpString('myRid') }));
+}
+
+function setSiteStatus(status, sid) {
+    sites[sid].State = Number(status);
+    SendNuiMessage(JSON.stringify({ type: 'setSiteStatus', sid, status, sites }));
 }
 
 function RemoveAllBlips() {

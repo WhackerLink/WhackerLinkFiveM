@@ -295,6 +295,8 @@ window.addEventListener('message', async function (event) {
         document.getElementById('scalemove').style.display = 'block';
     } else if (event.data.type === 'activate_emergency') {
         StartEmergencyAlarm();
+    } else if (event.data.type === 'setSiteStatus') {
+        SetSiteStatus(event.data.sid, event.data.status, event.data.sites)
     } else if (event.data.type === 'playerLocation') {
         const { latitude, longitude } = event.data;
 
@@ -327,6 +329,12 @@ window.addEventListener('message', async function (event) {
             fringVC = false;
             setUiOOR(isInRange);
         }
+
+        if (isInRange && event.data.failsoft)
+            setUiFailsoft(true);
+
+        if (isInRange && !event.data.failsoft)
+            setUiFailsoft(false);
 
         if (currentRssiLevel !== null && currentRssiLevel === parseInt(event.data.level)) {
             // console.debug("RSSI Level not changed")
@@ -504,7 +512,22 @@ document.getElementById('rssi-btn').addEventListener('click', () => {
     }, 4000);
 });
 
+function SetSiteStatus(sid, status, sites) {
+    const site = sites[sid];
+
+    if (site !== undefined && site !== null) {
+        console.log(`Set site status: ${sid}, site: ${status}, site name: ${sites[sid].name}`);
+
+        SendStsBcast(site, status);
+    } else {
+        console.log("Ermmm site doesnt exist? Valid numbers are 0 - " + sites.length);
+    }
+}
+
 function StartEmergencyAlarm() {
+    if (!isRegistered || !isInRange || isInSiteTrunking)
+        return;
+
     fetch(`https://${GetParentResourceName()}/getPlayerLocation`, {
         method: 'POST',
         headers: {
@@ -758,6 +781,19 @@ function setUiOOR(inRange) {
         line3.style.backgroundColor = '';
     } else {
         line3.innerHTML = 'Out of range';
+        line3.style.color = 'white';
+        line3.style.backgroundColor = 'red';
+    }
+}
+
+function setUiFailsoft(inFailsoft) {
+    const line3 = document.getElementById('line3');
+
+    if (!inFailsoft) {
+        line3.innerHTML = '';
+        line3.style.backgroundColor = '';
+    } else {
+        line3.innerHTML = 'Failsoft';
         line3.style.color = 'white';
         line3.style.backgroundColor = 'red';
     }

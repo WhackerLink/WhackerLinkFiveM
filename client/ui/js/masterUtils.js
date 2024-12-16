@@ -124,3 +124,17 @@ function SendLocBcast() {
 
     socket.send(JSON.stringify(request));
 }
+
+function SendStsBcast(site, status) {
+    if (!socketOpen) { return; }
+
+    const request = {
+        type: packetToNumber("STS_BCAST"),
+        data: {
+            Site: site,
+            Status: status
+        }
+    }
+
+    socket.send(JSON.stringify(request));
+}
