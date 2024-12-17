@@ -61,6 +61,7 @@ let currentDbLevel;
 let batteryLevel = 4;
 let currentSite;
 let initialized = false;
+let haltAllLine3Messages = false;
 
 let currentLat = null;
 let currentLng = null;
@@ -136,6 +137,8 @@ function startCheckLoop() {
         }
     }, 5000);
 
+    let clearedDisplay = false;
+
     registrationCheckInterval = setInterval(() => {
         if (!socketOpen() || !isInRange || !radioOn) {
             return;
@@ -149,7 +152,10 @@ function startCheckLoop() {
                 }
             }, 800);
         } else {
-            document.getElementById('line3').innerHTML = '';
+            if (!clearedDisplay) {
+                clearedDisplay = true;
+                document.getElementById('line3').innerHTML = '';
+            }
         }
     }, 5000);
 
@@ -493,6 +499,7 @@ document.getElementById('zone-up').addEventListener('click', () => {
 });
 
 document.getElementById('rssi-btn').addEventListener('click', () => {
+    haltAllLine3Messages = true;
     buttonBeep();
     const line3 = document.getElementById('line3');
     line3.style.backgroundColor = '';
@@ -502,6 +509,7 @@ document.getElementById('rssi-btn').addEventListener('click', () => {
         line3.innerHTML = `RSSI: ${Math.round(currentDbLevel)} dBm`;
     }, 2000);
     setTimeout(() => {
+        haltAllLine3Messages = false;
         if (!isInRange) {
             setUiOOR(isInRange);
         } else if (isInSiteTrunking) {
@@ -666,10 +674,12 @@ function connectWebSocket() {
         const data = JSON.parse(event.data);
 
         if (typeof event.data === 'string') {
-            // console.debug(`Received master message: ${event.data}`);
+            // console.debug(`Received WlinkPacket from master: ${event.data}`);
 
-            if (!isInRange || !radioOn) {
-                console.debug("Not in range or powered off, not processing message");
+            // allow sts bcast so we know to turn a site back on (Fail rp ikr! chris would NOT approve)
+            // 0x21 = WlinkPacket STS_BCAST
+            if ((!isInRange || !radioOn) && data.type !== 0x21) {
+                console.debug("Not in range or powered off, not processing message from master");
                 return;
             }
 
@@ -773,6 +783,14 @@ function connectWebSocket() {
                         document.getElementById("line3").innerHTML = '';
                     }, 3000);
                 }
+            } else if (data.type === packetToNumber("STS_BCAST")) {
+                fetch(`https://${GetParentResourceName()}/receivedStsBcast`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({site: data.data.Site, status: data.data.Status})
+                }).then();
             } else {
                 //console.debug(event.data);
             }
@@ -800,13 +818,15 @@ function setUiOOR(inRange) {
 function setUiFailsoft(inFailsoft) {
     const line3 = document.getElementById('line3');
 
-    if (!inFailsoft) {
-        line3.innerHTML = '';
-        line3.style.backgroundColor = '';
-    } else {
-        line3.innerHTML = 'Failsoft';
-        line3.style.color = 'white';
-        line3.style.backgroundColor = 'red';
+    if (!haltAllLine3Messages) {
+        if (!inFailsoft) {
+            line3.innerHTML = '';
+            line3.style.backgroundColor = '';
+        } else {
+            line3.innerHTML = 'Failsoft';
+            line3.style.color = 'white';
+            line3.style.backgroundColor = 'red';
+        }
     }
 }
 
@@ -817,13 +837,15 @@ function setUiSiteTrunking(inSt) {
         return;
     }
 
-    if (!inSt) {
-        line3.innerHTML = '';
-        line3.style.backgroundColor = '';
-    } else {
-        line3.innerHTML = 'Site trunking';
-        line3.style.color = 'black';
-        line3.style.backgroundColor = '';
+    if (!haltAllLine3Messages) {
+        if (!inSt) {
+            line3.innerHTML = '';
+            line3.style.backgroundColor = '';
+        } else {
+            line3.innerHTML = 'Site trunking';
+            line3.style.color = 'black';
+            line3.style.backgroundColor = '';
+        }
     }
 }
 

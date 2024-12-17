@@ -81,6 +81,12 @@ on('__cfx_nui:getPlayerLocation', (data, cb) => {
     cb({});
 });
 
+RegisterNuiCallbackType('receivedStsBcast');
+
+on('__cfx_nui:receivedStsBcast', (data, cb) => {
+    setSiteStatusByName(data.status, data.site.Name);
+});
+
 onNet('receiveSitesConfig', (receivedSites) => {
     sites = receivedSites.sites;
 
@@ -390,6 +396,16 @@ function setRid(newRid) {
 function setSiteStatus(status, sid) {
     sites[sid].State = Number(status);
     SendNuiMessage(JSON.stringify({ type: 'setSiteStatus', sid, status, sites }));
+}
+
+function setSiteStatusByName(status, name) {
+    const site = Object.values(sites).find(site => site && site.name === name);
+
+    if (site) {
+        site.State = Number(status);
+    } else {
+        console.error(`Site with name "${name}" not found.`);
+    }
 }
 
 function RemoveAllBlips() {
