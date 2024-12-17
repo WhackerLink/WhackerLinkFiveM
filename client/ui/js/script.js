@@ -420,6 +420,7 @@ async function powerOff() {
     isInSiteTrunking = false;
     isTxing = false;
     radioOn = false;
+    haltAllLine3Messages = false;
     document.getElementById("line1").innerHTML = '';
     document.getElementById("line2").innerHTML = '';
     document.getElementById("line3").innerHTML = '';
