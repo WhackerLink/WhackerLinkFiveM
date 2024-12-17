@@ -57,7 +57,7 @@ on('onClientResourceStart', (resourceName) => {
             });
         }
 
-        if (GetResourceKvpString('myRid') === null || GetResourceKvpString('myRid') === undefined) {
+        if (GetResourceKvpString(getKeyWithResourcePrefix('myRid')) === null || GetResourceKvpString(getKeyWithResourcePrefix('myRid')) === undefined) {
             emit('chat:addMessage', {
                 args: ['ALERT!', 'Make sure you set your radio id!!'],
                 color: [255, 0, 0]
@@ -83,7 +83,7 @@ on('__cfx_nui:getPlayerLocation', (data, cb) => {
 
 RegisterNuiCallbackType('receivedStsBcast');
 
-on('__cfx_nui:receivedStsBcast', (data, cb) => {
+on('__cfx_nui:receivedStsBcast', (data) => {
     setSiteStatusByName(data.status, data.site.Name);
 });
 
@@ -137,6 +137,11 @@ RegisterCommand('set_rid', (source, args) => {
     }
 }, false);
 
+RegisterCommand('clear_codeplug', (source, args) => {
+    currentCodeplug = null;
+    SetResourceKvp(getKeyWithResourcePrefix('currentCodeplug'), JSON.stringify(currentCodeplug));
+}, false);
+
 RegisterCommand('site_status', (source, args) => {
     if (args.length > 1) {
         setSiteStatus(args[1], args[0]);
@@ -168,7 +173,7 @@ onNet('receiveCodeplug', (codeplug) => {
         SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model, currentCodeplug}));
     }
 
-    SetResourceKvp('currentCodeplug', JSON.stringify(currentCodeplug));
+    SetResourceKvp(getKeyWithResourcePrefix('currentCodeplug'), JSON.stringify(currentCodeplug));
 
     CloseRadio();
     OpenRadio();
@@ -222,16 +227,18 @@ function ActivateEmergency() {
 }
 
 function OpenRadio() {
-    const codeplug = JSON.parse(GetResourceKvpString('currentCodeplug'));
+    const codeplug = JSON.parse(GetResourceKvpString(getKeyWithResourcePrefix('currentCodeplug')));
     // console.log('CURRENT OPEN RADIO Codeplug:', codeplug)
     currentCodeplug = codeplug;
     if (codeplug === undefined || codeplug === null) {
         console.debug('No codeplug loaded');
+        SendNuiMessage(JSON.stringify({type: 'FL_01/82'}));
         return;
     }
 
+    SendNuiMessage(JSON.stringify({type: 'CLEAR_ERROR'}));
     SendNuiMessage(JSON.stringify({ type: 'openRadio', codeplug }));
-    SendNuiMessage(JSON.stringify({ type: 'setRid', rid: GetResourceKvpString('myRid') }));
+    SendNuiMessage(JSON.stringify({ type: 'setRid', rid: GetResourceKvpString(getKeyWithResourcePrefix('myRid')) }));
     SetNuiFocus(false, false);
     isRadioOpen = true;
 
@@ -389,8 +396,8 @@ function stopRadioAnimation() {
 
 function setRid(newRid) {
     myRid = newRid;
-    SetResourceKvp('myRid', myRid);
-    SendNuiMessage(JSON.stringify({ type: 'setRid', rid: GetResourceKvpString('myRid') }));
+    SetResourceKvp(getKeyWithResourcePrefix('myRid'), myRid);
+    SendNuiMessage(JSON.stringify({ type: 'setRid', rid: GetResourceKvpString(getKeyWithResourcePrefix('myRid')) }));
 }
 
 function setSiteStatus(status, sid) {
@@ -414,4 +421,9 @@ function RemoveAllBlips() {
         RemoveBlip(blipHandle);
         blipHandle = GetNextBlipInfoId(1);
     }
+}
+
+function getKeyWithResourcePrefix(key) {
+    const resourceName = GetCurrentResourceName();
+    return `${resourceName}_${key}`;
 }

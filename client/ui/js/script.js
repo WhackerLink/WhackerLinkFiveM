@@ -20,7 +20,7 @@
 
 const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 8000});
 const EXPECTED_PCM_LENGTH = 1600;
-const HOST_VERSION = "R01.02.00";
+const HOST_VERSION = "R02.02.00";
 
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -62,6 +62,7 @@ let batteryLevel = 4;
 let currentSite;
 let initialized = false;
 let haltAllLine3Messages = false;
+let error = null;
 
 let currentLat = null;
 let currentLng = null;
@@ -304,10 +305,15 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === 'setSiteStatus') {
         SetSiteStatus(event.data.sid, event.data.status, event.data.sites)
     } else if (event.data.type === 'playerLocation') {
-        const { latitude, longitude } = event.data;
+        const {latitude, longitude} = event.data;
 
         currentLat = latitude;
         currentLng = longitude;
+    } else if (event.data.type === 'FL_01/82') {
+        error = "FL_01/82";
+        loadRadioModelAssets("APX6000");
+        document.getElementById("rssi-icon").style.display = 'none';
+        document.getElementById('radio-container').style.display = 'block';
     } else if (event.data.type === 'setRssiLevel') {
         let siteChanged = false;
 
@@ -358,6 +364,24 @@ window.addEventListener('message', async function (event) {
 });
 
 async function powerOn() {
+    if (error === "FL_01/82") {
+        document.getElementById('line2').style.display = 'block';
+        document.getElementById('line2').innerHTML = `Fail 01/82`;
+        return;
+    }
+
+    if (myRid == null) {
+        document.getElementById('line2').style.display = 'block';
+        document.getElementById('line2').innerHTML = `Fail 01/83`;
+        return;
+    }
+
+    if (error !== null) {
+        document.getElementById('line2').style.display = 'block';
+        document.getElementById('line2').innerHTML = `Fail 01/00`;
+        return;
+    }
+
     const currentZone = currentCodeplug.zones[currentZoneIndex];
     const currentChannel = currentZone.channels[currentChannelIndex];
 
@@ -421,6 +445,7 @@ async function powerOff() {
     isTxing = false;
     radioOn = false;
     haltAllLine3Messages = false;
+    error = null;
     document.getElementById("line1").innerHTML = '';
     document.getElementById("line2").innerHTML = '';
     document.getElementById("line3").innerHTML = '';
