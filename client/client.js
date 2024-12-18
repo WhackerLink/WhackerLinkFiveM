@@ -63,6 +63,12 @@ on('onClientResourceStart', (resourceName) => {
                 color: [255, 0, 0]
             });
         }
+
+        console.log("WhackerLinkFiveM - FiveM client/interface for WhackerLinkServer\n" +
+            "Copyright (C) 2024 Caleb, K4PHP and WhackerLink contributors\n" +
+            "This program comes with ABSOLUTELY NO WARRANTY\n" +
+            "This is free software, and you are welcome to redistribute it\n" +
+            "under certain conditions; Check the included LICENSE file for more details.\n");
     }, 5000);
 });
 
