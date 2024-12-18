@@ -136,4 +136,4 @@ dist
 .yarn/install-state.gz
 .pnp.*
 ./yarn.lock
-./yarn.installed
+./.yarn.installed
