@@ -126,6 +126,7 @@ PCMPlayer.prototype.destroy = function() {
 
 PCMPlayer.prototype.flush = function() {
     if (!this.samples.length) return;
+
     var bufferSource = this.audioCtx.createBufferSource(),
         length = this.samples.length / this.option.channels,
         audioBuffer = this.audioCtx.createBuffer(this.option.channels, length, this.option.sampleRate),
@@ -153,13 +154,25 @@ PCMPlayer.prototype.flush = function() {
         }
     }
 
+    // Adjust startTime to prevent overlap
     if (this.startTime < this.audioCtx.currentTime) {
+        console.warn(`Adjusting startTime: ${this.startTime} -> ${this.audioCtx.currentTime}`);
         this.startTime = this.audioCtx.currentTime;
     }
-    console.log('start vs current '+this.startTime+' vs '+this.audioCtx.currentTime+' duration: '+audioBuffer.duration);
+
     bufferSource.buffer = audioBuffer;
     bufferSource.connect(this.gainNode);
     bufferSource.start(this.startTime);
     this.startTime += audioBuffer.duration;
+
+    // Reset the samples buffer
     this.samples = new Float32Array();
+};
+
+PCMPlayer.prototype.clear = function() {
+    console.log("Clearing audio buffer and resetting state...");
+    this.samples = new Float32Array();
+    if (this.audioCtx) {
+        this.startTime = this.audioCtx.currentTime;
+    }
 };

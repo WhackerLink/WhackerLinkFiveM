@@ -20,7 +20,7 @@
 
 const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 8000});
 const EXPECTED_PCM_LENGTH = 1600;
-const HOST_VERSION = "R02.02.00";
+const HOST_VERSION = "R02.03.00";
 
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -364,6 +364,8 @@ window.addEventListener('message', async function (event) {
 });
 
 async function powerOn() {
+    pcmPlayer.clear();
+
     if (error === "FL_01/82") {
         document.getElementById('line2').style.display = 'block';
         document.getElementById('line2').innerHTML = `Fail 01/82`;
@@ -433,6 +435,7 @@ async function powerOn() {
 }
 
 async function powerOff() {
+    pcmPlayer.clear();
     stopCheckLoop();
     isAffiliated = false;
     isRegistered = false;
@@ -775,10 +778,12 @@ function connectWebSocket() {
                     isReceiving = false;
                     currentFrequncyChannel = null;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                    pcmPlayer.clear();
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
                     isVoiceGranted = false;
                     isVoiceRequested = false;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                    pcmPlayer.clear();
                 }
             } else if (data.type === packetToNumber("EMRG_ALRM_RSP")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
