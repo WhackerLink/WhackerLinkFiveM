@@ -112,7 +112,12 @@ PCMPlayer.prototype.getFormatedValue = function(data) {
 };
 
 PCMPlayer.prototype.volume = function(volume) {
+    if (volume < 0 || volume > 1) {
+        console.warn("Volume should be between 0 and 1. Clamping value.");
+        volume = Math.max(0, Math.min(1, volume));
+    }
     this.gainNode.gain.value = volume;
+    console.log("Volume set to:", volume);
 };
 
 PCMPlayer.prototype.destroy = function() {
@@ -128,33 +133,22 @@ PCMPlayer.prototype.flush = function() {
     if (!this.samples.length) return;
 
     var bufferSource = this.audioCtx.createBufferSource(),
-        length = this.samples.length / this.option.channels,
+        length = Math.floor(this.samples.length / this.option.channels),
         audioBuffer = this.audioCtx.createBuffer(this.option.channels, length, this.option.sampleRate),
         audioData,
         channel,
         offset,
-        i,
-        decrement;
+        i;
 
     for (channel = 0; channel < this.option.channels; channel++) {
         audioData = audioBuffer.getChannelData(channel);
         offset = channel;
-        decrement = 50;
         for (i = 0; i < length; i++) {
             audioData[i] = this.samples[offset];
-            /* fadein */
-            if (i < 50) {
-                audioData[i] =  (audioData[i] * i) / 50;
-            }
-            /* fadeout*/
-            if (i >= (length - 51)) {
-                audioData[i] =  (audioData[i] * decrement--) / 50;
-            }
             offset += this.option.channels;
         }
     }
 
-    // Adjust startTime to prevent overlap
     if (this.startTime < this.audioCtx.currentTime) {
         console.warn(`Adjusting startTime: ${this.startTime} -> ${this.audioCtx.currentTime}`);
         this.startTime = this.audioCtx.currentTime;
@@ -165,8 +159,10 @@ PCMPlayer.prototype.flush = function() {
     bufferSource.start(this.startTime);
     this.startTime += audioBuffer.duration;
 
-    // Reset the samples buffer
-    this.samples = new Float32Array();
+    // Carry over excess samples
+    const excessSamples = this.samples.slice(length * this.option.channels);
+    this.samples = new Float32Array(excessSamples.length);
+    this.samples.set(excessSamples);
 };
 
 PCMPlayer.prototype.clear = function() {
