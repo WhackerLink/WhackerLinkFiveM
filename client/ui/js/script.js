@@ -807,6 +807,7 @@ function connectWebSocket() {
                 }
             } else if (data.type === packetToNumber("CALL_ALRT")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === myRid) {
+                    haltAllLine3Messages = true;
                     document.getElementById("line3").style.color = "black";
                     document.getElementById("line3").innerHTML = `Page: ${data.data.SrcId}`;
                     play_page_alert();
@@ -814,6 +815,7 @@ function connectWebSocket() {
                     setTimeout(() => {
                         document.getElementById("line3").style.color = "black";
                         document.getElementById("line3").innerHTML = '';
+                        haltAllLine3Messages = false;
                     }, 3000);
                 }
             } else if (data.type === packetToNumber("STS_BCAST")) {
