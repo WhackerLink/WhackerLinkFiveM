@@ -167,9 +167,6 @@ PCMPlayer.prototype.flush = function() {
 
 PCMPlayer.prototype.clear = function() {
     console.log("Clearing audio buffer and resetting state...");
-    if (this.interval) {
-        clearInterval(this.interval);
-    }
     this.samples = new Float32Array();
     if (this.audioCtx) {
         this.startTime = this.audioCtx.currentTime;
