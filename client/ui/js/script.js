@@ -639,6 +639,8 @@ function reconnectIfSystemChanged() {
     const currentChannel = currentZone.channels[currentChannelIndex];
     const currentSystem = currentCodeplug.systems.find(system => system.name === currentChannel.system);
 
+    pcmPlayer.clear();
+
     if (socket && socket.url !== `ws://${currentSystem.address}:${currentSystem.port}/client`) {
         disconnectWebSocket();
         connectWebSocket();
@@ -656,6 +658,8 @@ function connectWebSocket() {
     const currentZone = currentCodeplug.zones[currentZoneIndex];
     const currentChannel = currentZone.channels[currentChannelIndex];
     const currentSystem = currentCodeplug.systems.find(system => system.name === currentChannel.system);
+
+    pcmPlayer.clear();
 
     console.debug("Connecting to master...");
     if (socket && socket.readyState === WebSocket.OPEN) {
@@ -1007,6 +1011,7 @@ function onAudioFrameReady(buffer, rms) {
 
 function disconnectWebSocket() {
     if (socket) {
+        pcmPlayer.clear();
         socket.close();
         socket = null;
     }
