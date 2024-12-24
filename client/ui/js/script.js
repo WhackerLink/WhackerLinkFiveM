@@ -736,6 +736,7 @@ function connectWebSocket() {
                     isReceiving = true;
                     currentFrequncyChannel = data.data.Channel;
                     isTxing = false;
+                    haltAllLine3Messages = true;
                     document.getElementById("line3").style.color = "black";
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
@@ -763,6 +764,7 @@ function connectWebSocket() {
                 }
             } else if (data.type === packetToNumber("GRP_VCH_RLS")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
+                    haltAllLine3Messages = false;
                     if (!isInRange) {
                         setUiOOR(isInRange);
                     } else if (isInSiteTrunking) {
@@ -963,7 +965,6 @@ function bonk() {
 
 function onAudioFrameReady(buffer, rms) {
     if (isTxing && currentFrequncyChannel !== null) {
-
         if (fringVC) {
             const degradedBuffer = simulateFringeCoverage(buffer, 8000);
             audioBuffer.push(...degradedBuffer);
@@ -1011,7 +1012,7 @@ function buttonBeep() {
 
 function playSoundEffect(audioPath) {
     let audio = new Audio(audioPath);
-    audio.play();
+    audio.play().then();
 }
 
 
