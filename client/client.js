@@ -192,6 +192,22 @@ on('__cfx_nui:unFocus', (data, cb) => {
     cb({});
 });
 
+RegisterNuiCallbackType('saveUIState');
+on('__cfx_nui:saveUIState', (data, cb) => {
+    const { uiState, model } = data;
+    const key = `${getKeyWithResourcePrefix()}_${model}_uiState`;
+    SetResourceKvp(key, JSON.stringify(uiState));
+    cb({ status: 'success' });
+});
+
+RegisterNuiCallbackType('loadUIState');
+on('__cfx_nui:loadUIState', (data, cb) => {
+    const { model } = data;
+    const key = `${getKeyWithResourcePrefix()}_${model}_uiState`;
+    const savedState = GetResourceKvpString(key);
+    cb({ uiState: savedState ? JSON.parse(savedState) : null });
+});
+
 RegisterKeyMapping('toggle_radio', 'Toggle Radio', 'keyboard', 'Y');
 RegisterKeyMapping('emergency_toggle', 'Activate Emergency', 'keyboard', 'E');
 RegisterKeyMapping('toggle_radio_focus', 'Toggle Radio Focus', 'keyboard', 'F');

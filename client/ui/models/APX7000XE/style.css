@@ -1,5 +1,5 @@
 #radio-container {
-    position: fixed;
+    position: absolute;
     bottom: 5px;
     right: 10px;
     display: inline-block;

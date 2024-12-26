@@ -255,6 +255,7 @@ window.addEventListener('message', async function (event) {
 
         if (radioModel == null) {
             radioModel = currentCodeplug.radioWide.model;
+            loadUIState();
         }
 
         loadRadioModelAssets(radioModel);
@@ -305,8 +306,9 @@ window.addEventListener('message', async function (event) {
         myRid = event.data.rid;
     } else if (event.data.type === 'setModel') {
         currentCodeplug = event.data.currentCodeplug;
-        loadRadioModelAssets(event.data.model);
         radioModel = event.data.model;
+        loadUIState();
+        loadRadioModelAssets(event.data.model);
     } else if (event.data.type === 'radioFocused') {
         document.getElementById('scalemove').style.display = 'block';
     } else if (event.data.type === 'activate_emergency') {
