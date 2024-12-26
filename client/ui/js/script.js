@@ -112,7 +112,7 @@ function startCheckLoop() {
                     sendAffiliation().then(() => {
                     });
                 } else {
-                    document.getElementById('line3').innerHTML = 'Sys reg refusd';
+                    setLine3('Sys reg refusd');
                 }
             }, 800);
         });
@@ -158,13 +158,13 @@ function startCheckLoop() {
             sendRegistration().then();
             setTimeout(() => {
                 if (!isRegistered) {
-                    document.getElementById('line3').innerHTML = 'Sys reg refusd';
+                    setLine3('Sys reg refusd');
                 }
             }, 800);
         } else {
             if (!clearedDisplay) {
                 clearedDisplay = true;
-                document.getElementById('line3').innerHTML = '';
+                setLine3();
             }
         }
     }, 5000);
@@ -377,19 +377,19 @@ async function powerOn() {
 
     if (error === "FL_01/82") {
         document.getElementById('line2').style.display = 'block';
-        document.getElementById('line2').innerHTML = `Fail 01/82`;
+        setLine2(`Fail 01/82`);
         return;
     }
 
     if (myRid == null) {
         document.getElementById('line2').style.display = 'block';
-        document.getElementById('line2').innerHTML = `Fail 01/83`;
+        setLine2(`Fail 01/83`);
         return;
     }
 
     if (error !== null) {
         document.getElementById('line2').style.display = 'block';
-        document.getElementById('line2').innerHTML = `Fail 01/00`;
+        setLine2(`Fail 01/00`);
         return;
     }
 
@@ -638,8 +638,8 @@ function updateDisplay() {
     const currentZone = currentCodeplug.zones[currentZoneIndex];
     const currentChannel = currentZone.channels[currentChannelIndex];
 
-    document.getElementById('line1').innerText = currentZone.name;
-    document.getElementById('line2').innerText = currentChannel.name;
+    setLine1(currentZone.name);
+    setLine2(currentChannel.name);
     currentTg = currentChannel.tgid;
 }
 
@@ -895,6 +895,18 @@ function setUiSiteTrunking(inSt) {
             line3.style.backgroundColor = '';
         }
     }
+}
+
+function setLine1(text) {
+    document.getElementById('line1').innerHTML = text;
+}
+
+function setLine2(text) {
+    document.getElementById('line2').innerHTML = text;
+}
+
+function setLine3(text) {
+    document.getElementById('line3').innerHTML = text;
 }
 
 function handleAudioData(data) {
