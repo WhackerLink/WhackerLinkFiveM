@@ -78,18 +78,27 @@ reconnectInterval = setInterval(() => {
 }, 2000);
 
 batteryLevelInterval = setInterval(() => {
-    if (!radioOn) {
+    if (!radioOn || isMobile()) {
         return;
     }
 
+    setBatteryLevel();
+
+    // console.log(`Battery level: ${batteryLevel}`);
+}, 3600000);
+
+function isMobile() {
+    return radioModel === "APX4500" || radioModel === "E5" || radioModel === "XTL2500";
+}
+
+function setBatteryLevel() {
     if (batteryLevel > 0) {
         batteryLevel--;
         document.getElementById("battery-icon").src = `models/${radioModel}/icons/battery${batteryLevel}.png`;
     } else {
         powerOff().then();
     }
-    // console.log(`Battery level: ${batteryLevel}`);
-}, 3600000);
+}
 
 function startCheckLoop() {
     if (!socketOpen() || !isInRange || !radioOn) {
