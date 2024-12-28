@@ -20,7 +20,7 @@
 
 const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 8000});
 const EXPECTED_PCM_LENGTH = 1600;
-const HOST_VERSION = "R02.03.00";
+const HOST_VERSION = "R02.05.00";
 
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -134,7 +134,7 @@ function startCheckLoop() {
         if (currentLat !== null && currentLng !== null) {
             SendLocBcast();
         }
-    }, 5000);
+    }, 8000);
 
     affiliationCheckInterval = setInterval(() => {
         if (!socketOpen() || !isInRange || !radioOn) {
@@ -156,14 +156,18 @@ function startCheckLoop() {
 
         if (!isRegistered) {
             sendRegistration().then();
-            setTimeout(() => {
-                if (!isRegistered) {
-                    setLine3('Sys reg refusd');
-                }
-            }, 800);
+            if (!haltAllLine3Messages) {
+                haltAllLine3Messages = true;
+                setTimeout(() => {
+                    if (!isRegistered) {
+                        setLine3('Sys reg refusd');
+                    }
+                }, 800);
+            }
         } else {
             if (!clearedDisplay) {
                 clearedDisplay = true;
+                haltAllLine3Messages = false;
                 setLine3();
             }
         }
@@ -255,17 +259,23 @@ window.addEventListener('message', async function (event) {
 
         if (radioModel == null) {
             radioModel = currentCodeplug.radioWide.model;
-            loadUIState();
         }
 
+        loadUIState();
         loadRadioModelAssets(radioModel);
 
         document.getElementById('radio-container').style.display = 'block';
     } else if (event.data.type === 'closeRadio') {
         document.getElementById('radio-container').style.display = 'none';
     } else if (event.data.type === "pttPress") {
-        if (!isInRange || !isRegistered) {
+        if (!isInRange) {
             console.debug("Not in range, not txing");
+            bonk();
+            return;
+        }
+
+        if (!isRegistered) {
+            console.log("Not registered, not txing");
             bonk();
             return;
         }
@@ -322,6 +332,7 @@ window.addEventListener('message', async function (event) {
         currentLng = longitude;
     } else if (event.data.type === 'FL_01/82') {
         error = "FL_01/82";
+        loadUIState();
         loadRadioModelAssets("APX6000");
         document.getElementById("rssi-icon").style.display = 'none';
         document.getElementById('radio-container').style.display = 'block';
@@ -642,7 +653,7 @@ function updateDisplay() {
 
     setLine1(currentZone.name);
     setLine2(currentChannel.name);
-    currentTg = currentChannel.tgid;
+    currentTg = currentChannel.tgid.toString();
 }
 
 function reconnectIfSystemChanged() {
@@ -728,10 +739,12 @@ function connectWebSocket() {
             }
 
             if (data.type === packetToNumber("GRP_AFF_RSP")) {
-                if (data.data.SrcId !== myRid || data.data.DstId !== currentTg) {
+                console.log(currentTg + " " + myRid);
+                if (data.data.SrcId.trim() !== myRid.trim() || data.data.DstId.trim() !== currentTg) {
                     return;
                 }
 
+                console.log("Affiliation accepted");
                 isAffiliated = data.data.Status === 0;
             } else if (data.type === packetToNumber("U_REG_RSP")) {
                 if (data.data.SrcId !== myRid) {
@@ -889,9 +902,11 @@ function setUiSiteTrunking(inSt) {
 
     if (!haltAllLine3Messages) {
         if (!inSt) {
+            haltAllLine3Messages = false;
             line3.innerHTML = '';
             line3.style.backgroundColor = '';
         } else {
+            haltAllLine3Messages = true;
             line3.innerHTML = 'Site trunking';
             line3.style.color = 'black';
             line3.style.backgroundColor = '';
@@ -1072,4 +1087,6 @@ function loadRadioModelAssets(model) {
     } else {
         rssiIcon.src = `models/${model}/icons/rssi${currentRssiLevel}.png`;
     }
+
+    console.log("Loaded model assets");
 }

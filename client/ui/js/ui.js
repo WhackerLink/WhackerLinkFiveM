@@ -26,8 +26,6 @@ const radioContainer = document.getElementById('radio-container');
 
 function saveUIState() {
     const uiState = {
-        left: radioContainer.style.left || null,
-        top: radioContainer.style.top || null,
         right: radioContainer.style.right || null,
         bottom: radioContainer.style.bottom || null,
         position: radioContainer.style.position || null,
@@ -57,8 +55,6 @@ function loadUIState() {
             const uiState = data.uiState;
 
             if (uiState) {
-                if (uiState.left) radioContainer.style.left = uiState.left;
-                if (uiState.top) radioContainer.style.top = uiState.top;
                 if (uiState.right) radioContainer.style.right = uiState.right;
                 if (uiState.bottom) radioContainer.style.bottom = uiState.bottom;
                 if (uiState.position) radioContainer.style.position = uiState.position;
@@ -75,23 +71,48 @@ function loadUIState() {
                 console.log("Used loaded UI state");
             } else {
                 console.log("No UI state set");
+                radioContainer.style.right = null;
+                radioContainer.style.bottom = null;
+                radioContainer.style.left = 'auto';
+                radioContainer.style.top = 'auto';
+                radioContainer.style.transform = null;
+                radioContainer.style.position = null;
+                scaleFactor = 1;
+                resetUI();
+                loadRadioModelAssets(radioModel);
             }
         })
-        .catch(err => console.error('Failed to load UI state:', err));
+        .catch(err => {
+            console.error('Failed to load UI state:', err);
+            resetUI();
+            loadRadioModelAssets(radioModel);
+        });
+}
+
+function resetUI() {
+    radioContainer.style.right = null;
+    radioContainer.style.bottom = null;
+    radioContainer.style.left = 'auto';
+    radioContainer.style.top = 'auto';
+    radioContainer.style.transform = null;
+    radioContainer.style.position = null;
+    scaleFactor = 1;
 }
 
 radioContainer.addEventListener('mousedown', (e) => {
     if (!isDragging) return;
 
     const rect = radioContainer.getBoundingClientRect();
-    const offsetX = e.clientX - rect.left;
-    const offsetY = e.clientY - rect.top;
+    const offsetX = e.clientX - rect.right + rect.width;
+    const offsetY = e.clientY - rect.bottom + rect.height;
 
     const onMouseMove = (e) => {
-        radioContainer.style.left = `${e.clientX - offsetX}px`;
-        radioContainer.style.top = `${e.clientY - offsetY}px`;
-        radioContainer.style.right = 'auto';
-        radioContainer.style.bottom = 'auto';
+        const newRight = window.innerWidth - e.clientX - offsetX;
+        const newBottom = window.innerHeight - e.clientY - offsetY;
+        radioContainer.style.right = `${Math.max(newRight, 0)}px`;
+        radioContainer.style.bottom = `${Math.max(newBottom, 0)}px`;
+        radioContainer.style.left = 'auto';
+        radioContainer.style.top = 'auto';
         radioContainer.style.position = 'absolute';
         saveUIState();
     };
@@ -118,14 +139,7 @@ radioContainer.addEventListener('wheel', (e) => {
 });
 
 document.getElementById('reset-position').addEventListener('click', () => {
-    radioContainer.style.left = null;
-    radioContainer.style.top = null;
-    radioContainer.style.right = null;
-    radioContainer.style.bottom = null;
-    radioContainer.style.transform = null;
-    radioContainer.style.position = null;
-    scaleFactor = 1;
-
+    resetUI();
     saveUIState();
 });
 
