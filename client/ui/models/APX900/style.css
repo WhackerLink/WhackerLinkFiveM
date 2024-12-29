@@ -1,6 +1,6 @@
 #radio-container {
     position: absolute;
-    bottom: 5px;
+    bottom: 2px;
     right: 10px;
     display: inline-block;
 }
@@ -13,15 +13,15 @@
 
 #rssi-icon {
     position: absolute;
-    top: 74.8%;
+    top: 72.5%;
     left: 25.5%;
     display: block;
 }
 
 #battery-icon {
     position: absolute;
-    top: 74.5%;
-    left: 70.5%;
+    top: 72.5%;
+    left: 70.3%;
     height: 3.0%;
     width: auto;
     display: none;
@@ -30,7 +30,7 @@
 
 #boot-image {
     position: absolute;
-    top: 74.2%;
+    top: 69.5%;
     left: 24.7%;
     height: 13%;
     width: 50.3%;
@@ -40,7 +40,7 @@
 #channel-up, #zone-up {
     position: absolute;
     transform: translateX(-50%);
-    top: 90%;
+    top: 83%;
     z-index: 1;
     display: block;
     margin: 10px auto;
@@ -60,6 +60,23 @@
 #zone-up {
     left: 28%;
 }
+
+#scan-btn {
+    left: 60%;
+    visibility: hidden;
+   
+}
+
+
+
+#scan-icon {
+    visibility: hidden;
+    display: block;
+}
+#softText4 {
+    visibility: hidden;
+}
+
 
 #rssi-btn {
     position: absolute;
@@ -89,7 +106,7 @@
 #btn-emer {
     position: absolute;
     transform: translateX(-50%);
-    top: 45%;
+    top: 40%;
     z-index: 1;
     display: block;
     margin: 10px auto;
@@ -107,12 +124,12 @@
 #power-btn {
     position: absolute;
     transform: translateX(-50%);
-    top: 39%;
+    top: 35%;
     z-index: 1;
     display: block;
     margin: 10px auto;
     padding: 20px;
-    background-color: transparent;;
+    background-color: transparent;
 	color: transparent;
     border: none;
     cursor: pointer;
@@ -121,7 +138,7 @@
 #channel-knbu, #channel-knbd {
     position: absolute;
     transform: translateX(-50%);
-    top: 35%;
+    top: 32%;
     z-index: 1;
     display: block;
     margin: 10px auto;
@@ -147,7 +164,7 @@
 }
 
 
-#softText1, #softText2, #softText3 {
+#softText1, #softText3 {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -162,34 +179,52 @@
 
 #softText1 {
     font-size: 12px;
-    top: 85.2%;
+    top: 81.5%;
     left: 36%;
 }
 
 #softText2 {
-    font-size: 12px;
-    top: 85.2%;
-    left: 36%;
-	visibility: hidden;
+    position: absolute;
+    left: 50%;
+    z-index: 1;
+    color: transparent;
+    font-size: 1px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+    visibility: hidden;
 }
 
 #softText3 {
     font-size: 12px;
-    top: 85.2%;
+    top: 81.5%;
     left: 63.5%;
 }
 
+#softText4{
+    position: absolute;
+    left: 50%;
+    z-index: 1;
+    color: transparent;
+    font-size: 1px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+    visibility: hidden;
+}
 #line1 {
-    top: 77.2%;
+    top: 74.2%;
 }
 
 #line2 {
-    top: 79.5%;
+    top: 76.2%;
     font-size: 14px;
 }
 
 #line3 {
-    top: 81.5%;
+    top: 78.5%;
     font-size: 10px;
     left: 49.5%;
     width: 41%;
