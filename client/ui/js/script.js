@@ -63,6 +63,7 @@ let batteryLevel = 4;
 let currentSite;
 let initialized = false;
 let haltAllLine3Messages = false;
+let scanEnabled = false;
 let error = null;
 
 let currentLat = null;
@@ -762,7 +763,7 @@ function connectWebSocket() {
 
                 isRegistered = data.data.Status === 0;
             } else if (data.type === packetToNumber("AUDIO_DATA")) {
-                if (data.data.VoiceChannel.SrcId !== myRid && (data.data.VoiceChannel.DstId === currentTg || scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.VoiceChannel.DstId)) && data.data.VoiceChannel.Frequency === currentFrequncyChannel) {
+                if (data.data.VoiceChannel.SrcId !== myRid && (data.data.VoiceChannel.DstId === currentTg || (scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.VoiceChannel.DstId) && scanEnabled)) && data.data.VoiceChannel.Frequency === currentFrequncyChannel) {
                     const binaryString = atob(data.data.Data);
                     const len = binaryString.length;
                     const bytes = new Uint8Array(len);
@@ -782,7 +783,7 @@ function connectWebSocket() {
                     document.getElementById("line3").style.color = "black";
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
-                } else if (scanManager !== null && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId))) {
+                } else if (scanManager !== null && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId)) && scanEnabled) {
                     console.log("Received GRP_VCH_RSP for TG in scan list");
                     isReceiving = true;
                     currentFrequncyChannel = data.data.Channel;
@@ -829,7 +830,7 @@ function connectWebSocket() {
                     currentFrequncyChannel = null;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                     pcmPlayer.clear();
-                } else if (scanManager !== null && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId))) {
+                } else if (scanManager !== null && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId)) && scanEnabled) {
                     haltAllLine3Messages = false;
                     if (!isInRange) {
                         setUiOOR(isInRange);
