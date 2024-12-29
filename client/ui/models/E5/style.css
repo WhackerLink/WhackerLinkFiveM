@@ -52,7 +52,7 @@ body {
     display: block;
 }
 
-#channel-up, #zone-up, #rssi-btn {
+#channel-up, #zone-up, #rssi-btn, #scan-btn {
     position: absolute;
     transform: translateX(-50%);
     top: 65%;
@@ -77,7 +77,21 @@ body {
 #rssi-btn {
     left: 50%;
 }
+#scan-btn {
+    left: 60%;
+   
+}
 
+
+
+#scan-icon {
+    position: absolute;
+    top: 13%;
+    left: 45%;
+    display: none;
+    width: 12px;
+    height: auto;
+}
 
 
 
@@ -164,7 +178,7 @@ height: 15%;
 }
 
 
-#softText1, #softText2, #softText3 {
+#softText1, #softText2, #softText3, #softText4 {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -197,8 +211,14 @@ height: 15%;
     left: 67.5%;
 }
 
+#softText4{
+font-size: 12px;
+top: 56%;
+left: 58.5%;
+}
+
 #line1 {
-    top: 19%;
+    top: 15%;
 }
 
 #line2 {
