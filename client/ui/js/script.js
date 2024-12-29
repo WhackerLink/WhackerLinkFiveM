@@ -323,6 +323,9 @@ window.addEventListener('message', async function (event) {
         scanManager = new ScanManager(currentCodeplug);
         // console.debug(JSON.stringify(scanManager.getScanListForChannel(), null, 2));
         radioModel = event.data.model;
+        if (!isMobile()) {
+            document.getElementById("battery-icon").src = `models/${radioModel}/icons/battery${batteryLevel}.png`;
+        }
         loadUIState();
         loadRadioModelAssets(event.data.model);
     } else if (event.data.type === 'radioFocused') {
