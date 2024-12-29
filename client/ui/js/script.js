@@ -467,6 +467,8 @@ async function powerOn() {
 async function powerOff() {
     pcmPlayer.clear();
     stopCheckLoop();
+    await SendDeRegistrationRequest();
+    await sleep(1000);
     isAffiliated = false;
     isRegistered = false;
     isVoiceGranted = false;
@@ -493,7 +495,6 @@ async function powerOff() {
     document.getElementById("softText1").style.display = 'none';
     document.getElementById("softText2").style.display = 'none';
     document.getElementById("softText3").style.display = 'none';
-    await SendDeRegistrationRequest();
     disconnectWebSocket();
 }
 
@@ -1017,6 +1018,10 @@ function emergency_tone_generate() {
 
 function bonk() {
     beep(310, 1000, 30, 'sine');
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function onAudioFrameReady(buffer, rms) {
