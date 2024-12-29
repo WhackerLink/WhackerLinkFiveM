@@ -27,6 +27,7 @@ const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 const rssiIcon = document.getElementById('rssi-icon');
 
 let socket;
+let scanManager;
 let currentChannelIndex = 0;
 let currentZoneIndex = 0;
 let currentFrequncyChannel;
@@ -244,6 +245,8 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === 'openRadio') {
         currentCodeplug = event.data.codeplug;
 
+        scanManager = new ScanManager(currentCodeplug);
+
         if (!radioOn) {
             rssiIcon.style.display = 'none';
         }
@@ -316,6 +319,8 @@ window.addEventListener('message', async function (event) {
         myRid = event.data.rid;
     } else if (event.data.type === 'setModel') {
         currentCodeplug = event.data.currentCodeplug;
+        scanManager = new ScanManager(currentCodeplug);
+        // console.debug(JSON.stringify(scanManager.getScanListForChannel(), null, 2));
         radioModel = event.data.model;
         loadUIState();
         loadRadioModelAssets(event.data.model);
@@ -408,6 +413,9 @@ async function powerOn() {
 
     const currentZone = currentCodeplug.zones[currentZoneIndex];
     const currentChannel = currentZone.channels[currentChannelIndex];
+
+    scanManager = new ScanManager(currentCodeplug);
+    // console.debug(JSON.stringify(scanManager.getScanListForChannel(currentZone.name, currentChannel.name), null, 2));
 
     if (!initialized) {
         micCapture.captureMicrophone(() => {
@@ -942,8 +950,7 @@ function beep(frequency, duration, volume, type) {
 
     oscillator.connect(gainNode);
     gainNode.connect(beepAudioCtx.destination);
-    vol = 1;
-    gainNode.gain.value = vol;
+    gainNode.gain.value = 1;
     oscillator.frequency.value = frequency;
     oscillator.type = type;
 

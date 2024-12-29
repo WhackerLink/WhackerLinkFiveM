@@ -18,6 +18,7 @@ zones:
       - name: "Channel 1"
         system: "System 1"
         tgid: "2001"
+        scanList: List 1
       - name: "Channel 2"
         system: "System 1"
         tgid: "15002"
@@ -36,3 +37,9 @@ zones:
       - name: "Channel C"
         system: "System 1"
         tgid: "16002"
+
+scanLists:
+  - name: List 1
+    channels:
+      - zone: Zone 1
+        channel: Channel 1
