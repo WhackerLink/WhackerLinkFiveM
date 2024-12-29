@@ -25,7 +25,7 @@ const HOST_VERSION = "R02.05.00";
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 const rssiIcon = document.getElementById('rssi-icon');
-
+const scanIcon = document.getElementById('scan-icon');
 let socket;
 let scanManager;
 let currentChannelIndex = 0;
@@ -454,14 +454,18 @@ async function powerOn() {
     document.getElementById("softText1").innerHTML = 'ZnUp';
     document.getElementById("softText2").innerHTML = 'RSSI';
     document.getElementById("softText3").innerHTML = 'ChUp';
+    document.getElementById("softText4").innerHTML = 'Scan';
     document.getElementById("softText1").style.display = 'block';
     document.getElementById("softText2").style.display = 'block';
     document.getElementById("softText3").style.display = 'block';
+    document.getElementById("softText4").style.display = 'block';
     document.getElementById("line1").style.display = 'block';
     document.getElementById("line2").style.display = 'block';
     document.getElementById("line3").style.display = 'block';
     document.getElementById("battery-icon").style.display = 'block';
     document.getElementById("battery-icon").src = `models/${radioModel}/icons/battery${batteryLevel}.png`;
+    document.getElementById("scan-icon").style.display = 'none';
+    document.getElementById("scan-icon").src = `models/${radioModel}/icons/scan.png`;
     radioOn = true;
     initialized = true;
     rssiIcon.style.display = 'block';
@@ -492,13 +496,16 @@ async function powerOff() {
     document.getElementById("line2").style.display = 'none';
     document.getElementById("line3").style.display = 'none';
     document.getElementById("rssi-icon").style.display = 'none';
+    document.getElementById("scan-icon").style.display = 'none';
     document.getElementById("battery-icon").style.display = 'none';
     document.getElementById("softText1").innerHTML = '';
     document.getElementById("softText2").innerHTML = '';
     document.getElementById("softText3").innerHTML = '';
+    document.getElementById("softText4").innerHTML = '';
     document.getElementById("softText1").style.display = 'none';
     document.getElementById("softText2").style.display = 'none';
     document.getElementById("softText3").style.display = 'none';
+    document.getElementById("softText4").style.display = 'none';
     disconnectWebSocket();
 }
 
@@ -1116,23 +1123,31 @@ function knobClick() {
     playSoundEffect('knob-click.wav');
 }
 
+
+
+
+
+
 function scanOn() {
     scanEnabled = true;
-
-    /* ***Placeholder for luke***
-     * Update scan icon to be on or off
-     * Call this on button click for on
-     */
+    scanIcon.src =  `models/${radioModel}/icons/scan.png`;
+    scanIcon.style.display= "block"; 
+  
 }
 
 function scanOff() {
     scanEnabled = false;
-
-    /* ***Placeholder for luke***
-     * Update scan icon to be on or off
-     * Call this on button click for off
-     */
+    scanIcon.src =  `models/${radioModel}/icons/scan.png`;
+    scanIcon.style.display= "none"; 
 }
+
+document.getElementById("scan-btn").addEventListener("click", function() {
+    if (scanEnabled) {
+        scanOff();
+    } else {
+        scanOn();
+    }
+});
 
 /*
 function buttonBonk() {
