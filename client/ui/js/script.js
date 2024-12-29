@@ -1113,6 +1113,24 @@ function knobClick() {
     playSoundEffect('knob-click.wav');
 }
 
+function scanOn() {
+    scanEnabled = true;
+
+    /* ***Placeholder for luke***
+     * Update scan icon to be on or off
+     * Call this on button click for on
+     */
+}
+
+function scanOff() {
+    scanEnabled = false;
+
+    /* ***Placeholder for luke***
+     * Update scan icon to be on or off
+     * Call this on button click for off
+     */
+}
+
 /*
 function buttonBonk() {
     playSoundEffect('buttonbonk.wav');
