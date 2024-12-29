@@ -762,7 +762,7 @@ function connectWebSocket() {
 
                 isRegistered = data.data.Status === 0;
             } else if (data.type === packetToNumber("AUDIO_DATA")) {
-                if (data.data.VoiceChannel.SrcId !== myRid && data.data.VoiceChannel.DstId === currentTg && data.data.VoiceChannel.Frequency === currentFrequncyChannel) {
+                if (data.data.VoiceChannel.SrcId !== myRid && (data.data.VoiceChannel.DstId === currentTg || scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.VoiceChannel.DstId)) && data.data.VoiceChannel.Frequency === currentFrequncyChannel) {
                     const binaryString = atob(data.data.Data);
                     const len = binaryString.length;
                     const bytes = new Uint8Array(len);
@@ -770,6 +770,8 @@ function connectWebSocket() {
                         bytes[i] = binaryString.charCodeAt(i);
                     }
                     handleAudioData(bytes.buffer);
+                } else {
+                    console.log("ingoring audio, not for us");
                 }
             } else if (data.type === packetToNumber("GRP_VCH_RSP")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg && data.data.Status === 0) {
@@ -777,6 +779,17 @@ function connectWebSocket() {
                     currentFrequncyChannel = data.data.Channel;
                     isTxing = false;
                     haltAllLine3Messages = true;
+                    document.getElementById("line3").style.color = "black";
+                    document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
+                } else if (scanManager !== null && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId))) {
+                    console.log("Received GRP_VCH_RSP for TG in scan list");
+                    isReceiving = true;
+                    currentFrequncyChannel = data.data.Channel;
+                    isTxing = false;
+                    haltAllLine3Messages = true;
+                    setLine1(scanManager.getChannelAndZoneForTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId).zone);
+                    setLine2(scanManager.getChannelAndZoneForTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId).channel);
                     document.getElementById("line3").style.color = "black";
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
@@ -814,6 +827,23 @@ function connectWebSocket() {
                     }
                     isReceiving = false;
                     currentFrequncyChannel = null;
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                    pcmPlayer.clear();
+                } else if (scanManager !== null && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId))) {
+                    haltAllLine3Messages = false;
+                    if (!isInRange) {
+                        setUiOOR(isInRange);
+                    } else if (isInSiteTrunking) {
+                        setUiSiteTrunking(isInSiteTrunking);
+                    } else {
+                        document.getElementById("line3").innerHTML = '';
+                    }
+
+                    isReceiving = false;
+                    currentFrequncyChannel = null;
+
+                    setLine1(currentZone.name);
+                    setLine2(currentChannel.name);
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                     pcmPlayer.clear();
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {

@@ -63,10 +63,55 @@ class ScanManager {
         );
     }
 
+    isTgInCurrentScanList(zoneName, channelName, tgid) {
+        const scanList = this.getScanListForChannel(zoneName, channelName);
+        if (!scanList) {
+            console.log("No scan list found for this channel");
+            return false;
+        }
+
+        // console.log(`TGID to match: ${tgid}`);
+        // console.log(`Scan list channels: ${JSON.stringify(scanList.channels)}`);
+
+        return scanList.channels.some(entry => {
+            const zone = this.getZoneByName(entry.zone);
+            if (!zone) {
+                console.log(`Zone "${entry.zone}" not found`);
+                return false;
+            }
+            const channel = zone.channels.find(ch => ch.name === entry.channel);
+            if (!channel) {
+                console.log(`Channel "${entry.channel}" not found in zone "${entry.zone}"`);
+                return false;
+            }
+
+            return channel.tgid.toString() === tgid.toString();
+        });
+    }
+
     getScanListForChannel(zoneName, channelName) {
         if (this.hasScanList(zoneName, channelName)) {
             const channel = this.getChannelByName(zoneName, channelName);
             return this.getScanListByName(channel.scanList);
+        }
+        return null;
+    }
+
+    getChannelAndZoneForTgInCurrentScanList(zoneName, channelName, tgid) {
+        const scanList = this.getScanListForChannel(zoneName, channelName);
+        if (!scanList) return null;
+
+        for (const entry of scanList.channels) {
+            const zone = this.getZoneByName(entry.zone);
+            if (zone) {
+                const channel = zone.channels.find(ch => ch.name === entry.channel && ch.tgid.toString() === tgid.toString());
+                if (channel) {
+                    return {
+                        zone: entry.zone,
+                        channel: channel.name,
+                    };
+                }
+            }
         }
         return null;
     }
