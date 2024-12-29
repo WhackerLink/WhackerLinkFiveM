@@ -363,7 +363,7 @@ function calculateDbRssiLevel(distance, frequency) {
 
     const fspl = 20 * Math.log10(distance) + 20 * Math.log10(frequency) + 20 * Math.log10(4 * Math.PI / speedOfLight);
 
-    const rssiAtOneMeter = -35;
+    const rssiAtOneMeter = -60;
 
     const rssi = rssiAtOneMeter - fspl;
     return Math.max(rssi, -120);
@@ -372,7 +372,9 @@ function calculateDbRssiLevel(distance, frequency) {
 function checkPlayerRSSI() {
     const playerPed = PlayerPedId();
     const playerCoords = GetEntityCoords(playerPed);
+    const interiorId = GetInteriorFromEntity(playerPed);
 
+    let isUnderground = isPlayerUnderground(playerCoords);
     let closestSite = null;
     let minDistance = Infinity;
 
@@ -392,23 +394,38 @@ function checkPlayerRSSI() {
     });
 
     if (closestSite) {
-        let rssiLevel;
-        if (minDistance < closestSite.range * 0.2) {
-            rssiLevel = 5;
-        } else if (minDistance < closestSite.range * 0.4) {
-            rssiLevel = 4;
-        } else if (minDistance < closestSite.range * 0.6) {
-            rssiLevel = 3;
-        } else if (minDistance < closestSite.range * 0.8) {
-            rssiLevel = 2;
-        } else if (minDistance < closestSite.range) {
-            rssiLevel = 1;
-        } else {
-            rssiLevel = 0;
+        const distanceInMeters = minDistance * 1609.34;
+        let dbRssiLevel = calculateDbRssiLevel(distanceInMeters, 0.8549625);
+
+        let environmentPenalty = 0;
+        if (interiorId !== 0) {
+            // console.debug('Player is inside a building, reducing signal');
+            environmentPenalty += 20;
+        }
+        if (isUnderground) {
+            // console.debug('Player is underground, further reducing signal');
+            environmentPenalty += 30;
         }
 
-        const distanceInMeters = minDistance * 1609.34;
-        const dbRssiLevel = calculateDbRssiLevel(distanceInMeters, 0.8549625);
+        dbRssiLevel -= environmentPenalty;
+
+        // console.log(`dbRssi: ${dbRssiLevel}; environmentPenalty: ${environmentPenalty}`);
+
+        let rssiLevel;
+        if (dbRssiLevel > -87) {
+            rssiLevel = 5; // Excellent signal
+        } else if (dbRssiLevel > -93) {
+            rssiLevel = 4; // Good signal
+        } else if (dbRssiLevel > -100) {
+            rssiLevel = 3; // Fair signal
+        } else if (dbRssiLevel > -108) {
+            rssiLevel = 2; // Poor signal
+        } else if (dbRssiLevel > -118) {
+            rssiLevel = 1; // Very weak signal
+        } else {
+            rssiLevel = 0; // No signal
+        }
+
         const failsoft = closestSite.State === 2;
 
         updateRSSIIcon(rssiLevel, closestSite, dbRssiLevel, failsoft);
@@ -418,6 +435,11 @@ function checkPlayerRSSI() {
 function updateRSSIIcon(level, site, dbRssi, failsoft) {
     SendNuiMessage(JSON.stringify({type: 'setRssiLevel', level: level, site: site, dbRssi, failsoft}));
     // console.debug('RSSI level:', level);
+}
+
+function isPlayerUnderground(playerCoords) {
+    const groundZ = GetGroundZFor_3dCoord(playerCoords[0], playerCoords[1], playerCoords[2] + 10, false);
+    return playerCoords[2] < groundZ - 2;
 }
 
 function playRadioAnimation() {
