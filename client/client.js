@@ -20,6 +20,8 @@
 
 let isRadioOpen = false;
 let isPttPressed = false;
+let pttTimeout = null;
+let isHandlingPtt = false;
 let nuiFocused = false;
 let lastPttTime = 0;
 let pttPressStartTime = 0;
@@ -27,8 +29,8 @@ let currentCodeplug = {};
 let inVehicle = false;
 let sites = [];
 
-const PTT_COOLDOWN_MS = 1000;
-const MIN_PTT_DURATION_MS = 500;
+const PTT_COOLDOWN_MS = 650;
+const MIN_PTT_DURATION_MS = 350;
 
 function displayStartupMessage() {
     SendNuiMessage(JSON.stringify({
@@ -277,39 +279,61 @@ function handlePTTDown() {
     const currentTime = Date.now();
     const timeSinceLastPtt = currentTime - lastPttTime;
 
-    if (!isPttPressed && timeSinceLastPtt > PTT_COOLDOWN_MS) {
-        isPttPressed = true;
-        pttPressStartTime = currentTime;
-
-        setTimeout(() => {
-            if (isPttPressed && (Date.now() - pttPressStartTime) >= MIN_PTT_DURATION_MS) {
-                // console.debug('PTT press confirmed');
-                SendNuiMessage(JSON.stringify({ type: 'pttPress' }));
-                if (!inVehicle) {
-                    playRadioAnimation();
-                }
-            }
-        }, MIN_PTT_DURATION_MS + 100);
-    } else {
-        console.debug('PTT press ignored due to cooldown');
+    if (isPttPressed || isHandlingPtt) {
+        console.debug('PTT press ignored: already pressed or handling');
+        return;
     }
+
+    if (timeSinceLastPtt <= PTT_COOLDOWN_MS) {
+        console.debug('PTT press ignored due to cooldown');
+        return;
+    }
+
+    isHandlingPtt = true;
+    isPttPressed = true;
+    pttPressStartTime = currentTime;
+
+    if (pttTimeout) {
+        clearTimeout(pttTimeout);
+        pttTimeout = null;
+    }
+
+    pttTimeout = setTimeout(() => {
+        if (isPttPressed) {
+            SendNuiMessage(JSON.stringify({ type: 'pttPress' }));
+            //console.debug('PTT press confirmed');
+
+            if (!inVehicle) {
+                playRadioAnimation();
+            }
+        }
+
+        isHandlingPtt = false;
+    }, MIN_PTT_DURATION_MS);
 }
 
 function handlePTTUp() {
     const currentTime = Date.now();
     const pressDuration = currentTime - pttPressStartTime;
 
-    if (isPttPressed) {
-        if (pressDuration >= MIN_PTT_DURATION_MS) {
-            SendNuiMessage(JSON.stringify({ type: 'pttRelease' }));
-            lastPttTime = currentTime;
-            stopRadioAnimation();
-        } else {
-            console.debug('PTT release ignored due to short press duration');
-        }
-
-        isPttPressed = false;
+    if (!isPttPressed && !isHandlingPtt) {
+        console.debug('PTT release ignored: not pressed or handling');
+        return;
     }
+
+    if (pttTimeout) {
+        clearTimeout(pttTimeout);
+        pttTimeout = null;
+    }
+
+    SendNuiMessage(JSON.stringify({ type: 'pttRelease' }));
+    //console.debug('PTT release confirmed');
+    lastPttTime = currentTime;
+
+    stopRadioAnimation();
+
+    isPttPressed = false;
+    isHandlingPtt = false;
 }
 
 setTick(async () => {
