@@ -772,7 +772,7 @@ function connectWebSocket() {
 
                 isRegistered = data.data.Status === 0;
             } else if (data.type === packetToNumber("AUDIO_DATA")) {
-                if (data.data.VoiceChannel.SrcId !== myRid && (data.data.VoiceChannel.DstId === currentTg || (scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.VoiceChannel.DstId) && scanEnabled)) && data.data.VoiceChannel.Frequency === currentFrequncyChannel) {
+                if (data.data.VoiceChannel.SrcId !== myRid && (data.data.VoiceChannel.DstId.toString() === currentTg || (scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.VoiceChannel.DstId) && scanEnabled)) && data.data.VoiceChannel.Frequency.toString() === currentFrequncyChannel.toString()) {
                     const binaryString = atob(data.data.Data);
                     const len = binaryString.length;
                     const bytes = new Uint8Array(len);
