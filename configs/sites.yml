@@ -26,7 +26,7 @@ sites:
       Z: 188.6
     systemID: 1
     siteID: 2
-    range: 2.0
+    range: 1.5
 
   - name: "City-FBI Site"
     controlChannel: "773.66875"
