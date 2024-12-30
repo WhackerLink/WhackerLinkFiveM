@@ -293,9 +293,14 @@ window.addEventListener('message', async function (event) {
         if (!isInSiteTrunking) {
             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
             setTimeout(() => {
-                SendGroupVoiceRequest();
-                isVoiceRequested = true;
-                isVoiceGranted = false;
+                if (!isVoiceRequested && !isVoiceRequested && !isVoiceGranted) {
+                    SendGroupVoiceRequest();
+                    isVoiceRequested = true;
+                    isVoiceGranted = false;
+                } else {
+                    isTxing = false;
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                }
             }, 200);
         } else {
             isVoiceGranted = false;
@@ -311,6 +316,7 @@ window.addEventListener('message', async function (event) {
             console.debug("not txing not releasing");
         }
 
+        document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
         isTxing = false;
     } else if (event.data.type === 'showStartupMessage') {
         document.getElementById('startup-message').style.display = 'block';
