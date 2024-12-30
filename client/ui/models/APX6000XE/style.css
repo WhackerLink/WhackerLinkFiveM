@@ -121,7 +121,7 @@
 
 #line1, #line2, #line3 {
     position: absolute;
-    left: 50%;
+    left: 48.5%;
     transform: translateX(-50%);
     z-index: 1;
     color: black;
@@ -195,6 +195,7 @@
 #startup-message {
     background-color: white;
     padding: 20px;
+    left: 48.5%;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
