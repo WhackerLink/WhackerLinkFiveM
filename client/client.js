@@ -420,7 +420,7 @@ function checkPlayerRSSI() {
         }
 
         if (!isMobile()) {
-            environmentPenalty += 10;
+            environmentPenalty += 5;
         }
 
         if (isMobile()) {
