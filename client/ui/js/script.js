@@ -290,6 +290,15 @@ window.addEventListener('message', async function (event) {
             return;
         }
 
+        if (isVoiceGrantHandled) {
+            console.debug("already handled, not txing");
+            document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+            bonk();
+            return;
+        }
+
+        isVoiceGrantHandled = true;
+
         if (!isInSiteTrunking) {
             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
 
@@ -305,7 +314,9 @@ window.addEventListener('message', async function (event) {
             }
         } else {
             isVoiceGranted = false;
+            isTxing = false;
             isVoiceRequested = true;
+            document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
         }
     } else if (event.data.type === "pttRelease") {
         isVoiceGrantHandled = false;
@@ -822,8 +833,19 @@ function connectWebSocket() {
                     isVoiceRequested = false;
                     isVoiceGranted = true;
                     setTimeout(() => {
-                        tpt_generate();
-                        document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
+                        if (isTxing) {
+                            tpt_generate();
+                            document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
+                        } else {
+                            console.log("After 2ms isTxing = false, boking");
+                            document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                            isTxing = false;
+                            isVoiceGranted = false;
+                            if (currentFrequncyChannel !== null) {
+                                SendGroupVoiceRelease();
+                            }
+                            bonk();
+                        }
                     }, 200);
                     isVoiceGrantHandled = true;
                     /*                    } else {
