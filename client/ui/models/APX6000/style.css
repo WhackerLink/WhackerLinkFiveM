@@ -18,6 +18,14 @@
     left: 30%;
     display: block;
 }
+#scan-icon {
+    position: absolute;
+    top: 69.5%;
+    left: 45%;
+    display: none;
+    width: 12px;
+    height: auto;
+}
 
 #battery-icon {
     position: absolute;
@@ -28,7 +36,7 @@
     display: none;
 }
 
-#channel-up, #zone-up, #rssi-btn {
+#zone-up, #rssi-btn, #scan-btn {
     position: absolute;
     transform: translateX(-50%);
     top: 91%;
@@ -44,11 +52,20 @@
 
 #channel-up {
     left: 63%;
+    visibility: hidden;
+    display: none;
 }
 
 #zone-up {
     left: 37%;
 }
+
+
+#scan-btn {
+    left: 63%;
+
+}
+
 
 #rssi-btn {
     left: 50%;
@@ -112,7 +129,7 @@
     width: 90%;
 }
 
-#softText1, #softText2, #softText3 {
+#softText1, #softText2, #softText4 {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -138,10 +155,23 @@
 }
 
 #softText3 {
+    position: absolute;
+    left: 50%;
+    z-index: 1;
+    color: white;
+    font-size: 1px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+    visibility: hidden;
+}
+#softText4 {
     font-size: 12px;
     top: 87.2%;
     left: 63.5%;
 }
+
 
 #line1 {
     top: 73%;

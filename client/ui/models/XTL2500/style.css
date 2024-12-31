@@ -24,15 +24,26 @@
 
 }
 
+#scan-icon {
+    position: absolute;
+    top: 18.5%;
+    left: 50.5%;
+    height: 7%;
+    width: auto;
+    display: none;
+  
+
+}
+
 
 #rssi-icon {
  position: fixed;
-    bottom: 130px;
-    right: 425px;
+    bottom: 127px;
+    right: 415px;
     display: inline-block;
 }
 
-#channel-up, #zone-up {
+#channel-up, #zone-up, #scan-btn {
     position: absolute;
     transform: translateX(-50%);
     top: 91%;
@@ -54,6 +65,22 @@
 #rssi-btn {
 	  left: 52%;
 
+}
+
+#scan-btn {
+background-color: transparent;
+position: absolute;
+transform: translateX(-50%);
+top: 75%;
+left: 50%;
+z-index: 1;
+display: block;
+margin: 10px auto;
+padding-top: 5px;
+padding-left: 30px;
+color: transparent;
+border: none;
+cursor: pointer;
 }
 #power-btn {
 	  left: 18%;
@@ -156,7 +183,7 @@
 }
 
 
-#softText1, #softText2, #softText3 {
+#softText1, #softText2, #softText3, #softText4 {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -188,7 +215,11 @@
     top: 54%;
     left: 69%;
 }
-
+#softText4 {
+    font-size: 12px;
+    top: 54%;
+    left: 50%;
+}
 #line1 {
     top: 25%;
 }
