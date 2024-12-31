@@ -411,7 +411,7 @@ function checkPlayerRSSI() {
 
         if (interiorId !== 0) {
             // console.debug('Player is inside a building, reducing signal');
-            environmentPenalty += 15;
+            environmentPenalty += 10;
         }
 
         if (isUnderground) {
