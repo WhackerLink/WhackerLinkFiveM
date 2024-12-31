@@ -29,6 +29,8 @@ let currentCodeplug = {};
 let inVehicle = false;
 let sites = [];
 
+let currentModel = "";
+
 const PTT_COOLDOWN_MS = 650;
 const MIN_PTT_DURATION_MS = 350;
 
@@ -175,9 +177,11 @@ onNet('receiveCodeplug', (codeplug) => {
 
     if (inVehicle) {
         currentCodeplug.currentModelConfig = currentCodeplug.inCarModeConfig;
+        currentModel = currentCodeplug.radioWide.inCarMode;
         SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode, currentCodeplug}));
     } else {
         currentCodeplug.currentModelConfig = currentCodeplug.modelConfig;
+        currentModel = currentCodeplug.radioWide.model;
         SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model, currentCodeplug}));
     }
 
@@ -342,12 +346,14 @@ setTick(async () => {
             if (!inVehicle) {
                 inVehicle = true;
                 currentCodeplug.currentModelConfig = currentCodeplug.inCarModeConfig;
+                currentModel = currentCodeplug.radioWide.inCarMode;
                 SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode, currentCodeplug}));
             }
         } else {
             if (inVehicle) {
                 inVehicle = false;
                 currentCodeplug.currentModelConfig = currentCodeplug.modelConfig;
+                currentModel = currentCodeplug.radioWide.model;
                 SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model, currentCodeplug}));
             }
         }
@@ -355,6 +361,10 @@ setTick(async () => {
     checkPlayerRSSI();
     await Wait(100);
 });
+
+function isMobile() {
+    return currentModel === "APX4500" || currentModel === "E5" || currentModel === "XTL2500";
+}
 
 function calculateDbRssiLevel(distance, frequency) {
     const speedOfLight = 3e8;
@@ -398,13 +408,23 @@ function checkPlayerRSSI() {
         let dbRssiLevel = calculateDbRssiLevel(distanceInMeters, 0.8549625);
 
         let environmentPenalty = 0;
+
         if (interiorId !== 0) {
             // console.debug('Player is inside a building, reducing signal');
-            environmentPenalty += 20;
+            environmentPenalty += 15;
         }
+
         if (isUnderground) {
             // console.debug('Player is underground, further reducing signal');
-            environmentPenalty += 30;
+            environmentPenalty += 25;
+        }
+
+        if (!isMobile()) {
+            environmentPenalty += 10;
+        }
+
+        if (isMobile()) {
+            dbRssiLevel += 2;
         }
 
         dbRssiLevel -= environmentPenalty;
