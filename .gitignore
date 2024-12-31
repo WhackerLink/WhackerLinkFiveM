@@ -1,3 +1,7 @@
+# Dev thing
+.dev
+configs/sites_rox.yml
+
 # Condeplugs
 codeplugs/*
 !codeplugs/codeplug.example.yml

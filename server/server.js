@@ -79,12 +79,23 @@ function loadCodeplugs() {
 
 function loadSitesConfig() {
     try {
-        const fileContents = fs.readFileSync( GetResourcePath(GetCurrentResourceName()) + '/configs/sites.yml', 'utf8');
+        let path = "/configs/sites.yml";
+
+        if (isDev() && fs.existsSync(GetResourcePath(GetCurrentResourceName()) + "/configs/sites_rox.yml")) {
+            path = "/configs/sites_rox.yml";
+            console.log("Used dev sites file!");
+        }
+
+        const fileContents = fs.readFileSync( GetResourcePath(GetCurrentResourceName()) + path, 'utf8');
         sites = yaml.load(fileContents).sites;
         // console.debug('Sites config loaded:', sites);
     } catch (e) {
         console.error('Error loading sites config:', e);
     }
+}
+
+function isDev() {
+    return fs.existsSync( GetResourcePath(GetCurrentResourceName()) + '/.dev');
 }
 
 RegisterCommand('set_codeplug', (source, args) => {
