@@ -872,6 +872,7 @@ function connectWebSocket() {
             } else if (data.type === packetToNumber("EMRG_ALRM_RSP")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
                     const line3 = document.getElementById("line3");
+                    haltAllLine3Messages = true;
                     emergency_tone_generate();
                     line3.style.color = "white";
                     line3.style.backgroundColor = "orange";
@@ -887,6 +888,8 @@ function connectWebSocket() {
                         } else {
                             line3.innerHTML = '';
                         }
+
+                        haltAllLine3Messages = false;
                     }, 5000);
                 }
             } else if (data.type === packetToNumber("CALL_ALRT")) {

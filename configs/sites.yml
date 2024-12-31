@@ -80,16 +80,16 @@ sites:
     # Uncomment the following if your FiveM server has Roxwood
     ###
 
-#  - name: "Roxwood West Site"
-#    controlChannel: "854.5125"
-#    voiceChannels:
-#        - "853.8625"
-#        - "853.3125"
-#        - "852.6125"
-#    location:
-#        X: -1707.05
-#        Y: 6824.27
-#        Z: 94.5
-#    systemID: 2
-#    siteID: 7
-#    range: 1.0
+  - name: "Roxwood West Site"
+    controlChannel: "854.5125"
+    voiceChannels:
+        - "853.8625"
+        - "853.3125"
+        - "852.6125"
+    location:
+        X: -1707.05
+        Y: 6824.27
+        Z: 94.5
+    systemID: 2
+    siteID: 7
+    range: 1.0
