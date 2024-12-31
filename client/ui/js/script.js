@@ -20,7 +20,7 @@
 
 const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 8000});
 const EXPECTED_PCM_LENGTH = 1600;
-const HOST_VERSION = "R02.05.00";
+const HOST_VERSION = "R02.06.00";
 
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -222,7 +222,7 @@ async function sendAffiliation() {
         await SendGroupAffiliationRequest();
         setTimeout(() => {
             rssiIcon.src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
-        }, 150);
+        }, 75);
     } catch (error) {
         console.error('Error sending affiliation:', error);
     }
@@ -234,7 +234,7 @@ async function sendRegistration() {
         await SendRegistrationRequest();
         setTimeout(() => {
             rssiIcon.src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
-        }, 150);
+        }, 75);
     } catch (error) {
         console.error('Error sending registration:', error);
     }
@@ -292,16 +292,17 @@ window.addEventListener('message', async function (event) {
 
         if (!isInSiteTrunking) {
             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
-            setTimeout(() => {
-                if (!isVoiceRequested && !isVoiceRequested && !isVoiceGranted) {
-                    SendGroupVoiceRequest();
-                    isVoiceRequested = true;
-                    isVoiceGranted = false;
-                } else {
-                    isTxing = false;
-                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
-                }
-            }, 200);
+
+            await sleep(50);
+
+            if (!isVoiceRequested && !isVoiceGranted) {
+                SendGroupVoiceRequest();
+                isVoiceRequested = true;
+                isVoiceGranted = false;
+            } else {
+                isTxing = false;
+                document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+            }
         } else {
             isVoiceGranted = false;
             isVoiceRequested = true;
