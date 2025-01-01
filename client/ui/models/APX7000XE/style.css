@@ -1,9 +1,13 @@
 #radio-container {
     position: absolute;
     bottom: 5px;
-    right: 10px;
     display: inline-block;
 }
+
+body {
+    overflow-y: hidden; 
+    overflow-x: hidden; 
+  }
 
 #radio-image {
     display: block;
