@@ -7,20 +7,20 @@
 
 #radio-image {
     display: block;
-    width: 300px;
+    width: 350px;
     height: auto;
     position: relative;
 }
 
 #rssi-icon {
     position: absolute;
-    top: 69.5%;
-    left: 30%;
+    top: 78.5%;
+    left: 32.5%;
     display: block;
 }
 #scan-icon {
     position: absolute;
-    top: 69.5%;
+    top: 78.5%;;
     left: 45%;
     display: none;
     width: 12px;
@@ -29,9 +29,9 @@
 
 #battery-icon {
     position: absolute;
-    top: 69%;
-    left: 65.5%;
-    height: 3%;
+    top: 78.5%;
+    left: 62.5%;
+    height: 2%;
     width: auto;
     display: none;
 }
@@ -39,7 +39,7 @@
 #zone-up, #rssi-btn, #scan-btn {
     position: absolute;
     transform: translateX(-50%);
-    top: 91%;
+    top: 95%;
     z-index: 1;
     display: block;
     margin: 10px auto;
@@ -51,7 +51,7 @@
 }
 
 #channel-up {
-    left: 63%;
+    left: 37%;
     visibility: hidden;
     display: none;
 }
@@ -72,27 +72,30 @@
 }
 
 #channel-knbu {
-    left: 52%;
-    top: 35%;
+    left: 55%;
+    top: 45%;
+    height: 55px;
 }
 #channel-knbd {
     left: 44%;
-    top: 35%;
+    top: 45%;
+    height: 55px;
 }
 #btn-emer {
-    left: 28%;
+    left: 32%;
 }
 
 #power-btn {
     left: 86%;
-    top: 41%;
+    top: 53.5%;
     width: 50px;
+    padding: 8px;
 }
 
 #btn-emer {
     position: absolute;
     transform: translateX(-50%);
-    top: 45%;
+    top: 54%;
     z-index: 1;
     display: block;
     margin: 10px auto;
@@ -109,7 +112,7 @@
     z-index: 1;
     display: block;
     margin: 10px auto;
-    padding: 7px;
+    padding: 8px;
     background-color: transparent;
     color: transparent;
     border: none;
@@ -118,7 +121,7 @@
 
 #line1, #line2, #line3 {
     position: absolute;
-    left: 50%;
+    left: 48.5%;
     transform: translateX(-50%);
     z-index: 1;
     color: black;
@@ -144,13 +147,13 @@
 
 #softText1 {
     font-size: 12px;
-    top: 87.2%;
-    left: 36%;
+    top: 90.5%;
+    left: 37.5%;
 }
 
 #softText2 {
     font-size: 12px;
-    top: 87.2%;
+    top: 90.5%;
     left: 49.5%;
 }
 
@@ -168,22 +171,22 @@
 }
 #softText4 {
     font-size: 12px;
-    top: 87.2%;
-    left: 63.5%;
+    top: 90.5%;
+    left: 60%;
 }
 
 
 #line1 {
-    top: 73%;
+    top: 81%;
 }
 
 #line2 {
-    top: 77%;
+    top: 82.6%;
     font-size: 15px;
 }
 
 #line3 {
-    top: 81.5%;
+    top: 84.5%;
     font-size: 14px;
     left: 49.5%;
     width: 41%;
@@ -192,6 +195,7 @@
 #startup-message {
     background-color: white;
     padding: 20px;
+    left: 48.5%;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
