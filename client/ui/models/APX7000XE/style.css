@@ -4,6 +4,11 @@
     display: inline-block;
 }
 
+body {
+    overflow-y: hidden; 
+    overflow-x: hidden; 
+  }
+
 #radio-image {
     display: block;
     width: 235px;
