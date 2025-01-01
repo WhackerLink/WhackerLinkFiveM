@@ -42,9 +42,10 @@
     transform: translateX(-50%);
     top: 94%;
     z-index: 1;
+    width: 20px;
     display: block;
     margin: 10px auto;
-    padding: 7px;
+    padding: 2px;
     background-color: transparent;
     color: transparent;
     border: none;
