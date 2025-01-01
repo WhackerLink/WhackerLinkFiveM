@@ -7,20 +7,20 @@
 
 #radio-image {
     display: block;
-    width: 350px;
+    width: 300px;
     height: auto;
     position: relative;
 }
 
 #rssi-icon {
     position: absolute;
-    top: 78.5%;
-    left: 32.5%;
+    top: 69.5%;
+    left: 30%;
     display: block;
 }
 #scan-icon {
     position: absolute;
-    top: 78.5%;;
+    top: 69.5%;
     left: 45%;
     display: none;
     width: 12px;
@@ -29,9 +29,9 @@
 
 #battery-icon {
     position: absolute;
-    top: 78.5%;
-    left: 62.5%;
-    height: 2%;
+    top: 69%;
+    left: 65.5%;
+    height: 3%;
     width: auto;
     display: none;
 }
@@ -39,7 +39,7 @@
 #zone-up, #rssi-btn, #scan-btn {
     position: absolute;
     transform: translateX(-50%);
-    top: 95%;
+    top: 91%;
     z-index: 1;
     display: block;
     margin: 10px auto;
@@ -72,30 +72,27 @@
 }
 
 #channel-knbu {
-    left: 55%;
-    top: 45%;
-    height: 55px;
+    left: 52%;
+    top: 35%;
 }
 #channel-knbd {
     left: 44%;
-    top: 45%;
-    height: 55px;
+    top: 35%;
 }
 #btn-emer {
-    left: 32%;
+    left: 28%;
 }
 
 #power-btn {
     left: 86%;
-    top: 53.5%;
+    top: 41%;
     width: 50px;
-    padding: 8px;
 }
 
 #btn-emer {
     position: absolute;
     transform: translateX(-50%);
-    top: 54%;
+    top: 45%;
     z-index: 1;
     display: block;
     margin: 10px auto;
@@ -112,7 +109,7 @@
     z-index: 1;
     display: block;
     margin: 10px auto;
-    padding: 8px;
+    padding: 7px;
     background-color: transparent;
     color: transparent;
     border: none;
@@ -121,7 +118,7 @@
 
 #line1, #line2, #line3 {
     position: absolute;
-    left: 48.5%;
+    left: 50%;
     transform: translateX(-50%);
     z-index: 1;
     color: black;
@@ -147,13 +144,13 @@
 
 #softText1 {
     font-size: 12px;
-    top: 90.5%;
-    left: 37.5%;
+    top: 87.2%;
+    left: 36%;
 }
 
 #softText2 {
     font-size: 12px;
-    top: 90.5%;
+    top: 87.2%;
     left: 49.5%;
 }
 
@@ -171,22 +168,22 @@
 }
 #softText4 {
     font-size: 12px;
-    top: 90.5%;
-    left: 60%;
+    top: 87.2%;
+    left: 63.5%;
 }
 
 
 #line1 {
-    top: 81%;
+    top: 73%;
 }
 
 #line2 {
-    top: 82.6%;
+    top: 77%;
     font-size: 15px;
 }
 
 #line3 {
-    top: 84.5%;
+    top: 81.5%;
     font-size: 14px;
     left: 49.5%;
     width: 41%;
@@ -195,7 +192,6 @@
 #startup-message {
     background-color: white;
     padding: 20px;
-    left: 48.5%;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
