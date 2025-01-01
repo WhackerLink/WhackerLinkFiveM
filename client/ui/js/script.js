@@ -1141,7 +1141,7 @@ function disconnectWebSocket() {
 }
 
 function buttonBeep() {
-    playSoundEffect('buttonbeep.wav');
+    playSoundEffect('audio/buttonbeep.wav');
 }
 
 
@@ -1152,13 +1152,8 @@ function playSoundEffect(audioPath) {
 
 
 function knobClick() {
-    playSoundEffect('knob-click.wav');
+    playSoundEffect('audio/knob-click.wav');
 }
-
-
-
-
-
 
 function scanOn() {
     scanEnabled = true;
