@@ -1,87 +1,103 @@
 #radio-container {
     position: absolute;
-    bottom: 2px;
+    bottom: 5px;
     right: 10px;
     display: inline-block;
 }
 
+body {
+    overflow-y: hidden; 
+    overflow-x: hidden; 
+  }
+
 #radio-image {
     display: block;
-    width: 200px;
+    width: 300px;
     height: auto;
+    position: relative;
 }
 
 #rssi-icon {
     position: absolute;
-    top: 72.5%;
-    left: 25.5%;
+    top: 74.5%;
+    left: 25%;
     display: block;
+}
+#scan-icon {
+    position: absolute;
+    top: 74.5%;
+    left: 45%;
+    display: none;
+    width: 12px;
+    height: auto;
 }
 
 #battery-icon {
     position: absolute;
-    top: 72.5%;
-    left: 70.3%;
-    height: 3.0%;
+    top: 74.5%;
+    left: 70.2%;
+    height: 3%;
     width: auto;
     display: none;
 }
 
-
-#boot-image {
-    position: absolute;
-    top: 69.5%;
-    left: 24.7%;
-    height: 13%;
-    width: 50.3%;
-    display: none;
-}
-
-#channel-up, #zone-up {
+#zone-up,  #scan-btn {
     position: absolute;
     transform: translateX(-50%);
-    top: 83%;
+    top: 89%;
     z-index: 1;
     display: block;
     margin: 10px auto;
-    padding-left: 7px;
-	padding-right: 7px;
+    padding: 7px;
     background-color: transparent;
     color: transparent;
     border: none;
     cursor: pointer;
 }
 
-#channel-up {
-    left: 72%;
-   
+#channel-up, #rssi-btn {
+    left: 37%;
+    visibility: hidden;
+    display: none;
 }
 
 #zone-up {
-    left: 28%;
+    left: 29%;
 }
+
 
 #scan-btn {
-    left: 60%;
-    visibility: hidden;
-   
-}
+    left: 72%;
 
-
-
-#scan-icon {
-    visibility: hidden;
-    display: block;
-}
-#softText4 {
-    visibility: hidden;
 }
 
 
 #rssi-btn {
+    left: 50%;
+}
+
+#channel-knbu {
+    left: 52%;
+    top: 35%;
+}
+#channel-knbd {
+    left: 44%;
+    top: 35%;
+}
+#btn-emer {
+    left: 59%;
+}
+
+#power-btn {
+    left: 23%;
+    top: 41%;
+    width: 50px;
+}
+
+#btn-emer {
     position: absolute;
     transform: translateX(-50%);
-    top: 91%;
+    top: 45%;
     z-index: 1;
     display: block;
     margin: 10px auto;
@@ -90,62 +106,17 @@
     color: transparent;
     border: none;
     cursor: pointer;
-	visibility: hidden;
 }
 
-#channel-knbu {
-	  left: 53%;
-}
-#channel-knbd {
-	  left: 43%;
-}
-#btn-emer {
-	  left: 59%;
-}
-
-#btn-emer {
+#channel-knbu, #channel-knbd, #power-btn {
     position: absolute;
     transform: translateX(-50%);
-    top: 40%;
     z-index: 1;
     display: block;
     margin: 10px auto;
     padding: 7px;
     background-color: transparent;
-	color: transparent;
-    border: none;
-    cursor: pointer;
-}
-
-#power-btn {
-	  left: 23%;
-}
-
-#power-btn {
-    position: absolute;
-    transform: translateX(-50%);
-    top: 35%;
-    z-index: 1;
-    display: block;
-    margin: 10px auto;
-    padding: 20px;
-    background-color: transparent;
-	color: transparent;
-    border: none;
-    cursor: pointer;
-}
-
-#channel-knbu, #channel-knbd {
-    position: absolute;
-    transform: translateX(-50%);
-    top: 32%;
-    z-index: 1;
-    display: block;
-    margin: 10px auto;
-    padding: 7px;
-    padding-top: 35px;
-    background-color: transparent;
-	color: transparent;
+    color: transparent;
     border: none;
     cursor: pointer;
 }
@@ -156,15 +127,14 @@
     transform: translateX(-50%);
     z-index: 1;
     color: black;
-    font-size: 12px;
+    font-size: 17px;
     font-family: Helvetica, serif;
     font-weight: bold;
     text-align: center;
     width: 90%;
 }
 
-
-#softText1, #softText3 {
+#softText1, #softText2, #softText4 {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -179,7 +149,7 @@
 
 #softText1 {
     font-size: 12px;
-    top: 81.5%;
+    top: 85.2%;
     left: 36%;
 }
 
@@ -187,7 +157,7 @@
     position: absolute;
     left: 50%;
     z-index: 1;
-    color: transparent;
+    color: white;
     font-size: 1px;
     font-family: Helvetica, serif;
     font-weight: bold;
@@ -197,16 +167,10 @@
 }
 
 #softText3 {
-    font-size: 12px;
-    top: 81.5%;
-    left: 63.5%;
-}
-
-#softText4{
     position: absolute;
     left: 50%;
     z-index: 1;
-    color: transparent;
+    color: white;
     font-size: 1px;
     font-family: Helvetica, serif;
     font-weight: bold;
@@ -214,18 +178,25 @@
     width: 90%;
     visibility: hidden;
 }
+#softText4 {
+    font-size: 12px;
+    top: 85.2%;
+    left: 63.5%;
+}
+
+
 #line1 {
-    top: 74.2%;
+    top: 77%;
 }
 
 #line2 {
-    top: 76.2%;
-    font-size: 14px;
+    top: 79%;
+    font-size: 15px;
 }
 
 #line3 {
-    top: 78.5%;
-    font-size: 10px;
+    top: 81.5%;
+    font-size: 14px;
     left: 49.5%;
     width: 41%;
 }
@@ -245,4 +216,12 @@
 
 #startup-message p {
     margin: 5px 0;
+}
+#boot-image {
+    position: absolute;
+    top: 74.5%;
+    left: 24.7%;
+    height: 13%;
+    width: 50.3%;
+    display: none;
 }
