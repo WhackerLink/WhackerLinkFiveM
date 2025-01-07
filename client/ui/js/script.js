@@ -747,8 +747,10 @@ function connectWebSocket() {
             // console.debug(`Received WlinkPacket from master: ${event.data}`);
 
             // allow sts bcast so we know to turn a site back on (Fail rp ikr! chris would NOT approve)
+            // allow SPEC_FUNC so we know to uninhibit the radio
             // 0x21 = WlinkPacket STS_BCAST
-            if ((!isInRange || !radioOn) && data.type !== 0x21) {
+            // 0x22 = WlinkPacket SPEC_FUNC
+            if ((!isInRange || !radioOn) && data.type !== 0x21 && data.type !== 0x22) {
                 console.debug("Not in range or powered off, not processing message from master");
                 return;
             }
@@ -924,6 +926,11 @@ function connectWebSocket() {
                     SendAckResponse(packetToNumber("SPEC_FUNC"));
                     inhibited = true;
                     powerOff().then();
+                } else if (data.data.DstId.toString() === myRid && data.data.Function === 0x01 && Number(data.data.SrcId) === FNE_ID) {
+                    console.log("Unit UNINHIBITED");
+                    SendAckResponse(packetToNumber("SPEC_FUNC"));
+                    inhibited = false;
+                    powerOn().then();
                 }
             } else {
                 //console.debug(event.data);
