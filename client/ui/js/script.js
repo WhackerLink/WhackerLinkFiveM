@@ -22,10 +22,13 @@ const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 
 const EXPECTED_PCM_LENGTH = 1600;
 const HOST_VERSION = "R02.06.00";
 
+const FNE_ID = 0xFFFFFF
+
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 const rssiIcon = document.getElementById('rssi-icon');
 const scanIcon = document.getElementById('scan-icon');
+
 let socket;
 let scanManager;
 let currentChannelIndex = 0;
@@ -69,6 +72,8 @@ let error = null;
 let currentLat = null;
 let currentLng = null;
 
+let inhibited = false;
+
 function socketOpen() {
     return socket && socket.readyState === WebSocket.OPEN;
 }
@@ -103,7 +108,7 @@ function setBatteryLevel() {
 }
 
 function startCheckLoop() {
-    if (!socketOpen() || !isInRange || !radioOn) {
+    if (!socketOpen() || !isInRange || !radioOn || inhibited) {
         return;
     }
 
@@ -397,6 +402,11 @@ async function powerOn() {
     if (error !== null) {
         document.getElementById('line2').style.display = 'block';
         setLine2(`Fail 01/00`);
+        return;
+    }
+
+    if (inhibited) {
+        console.log('Unit is INHIBITED');
         return;
     }
 
@@ -908,6 +918,12 @@ function connectWebSocket() {
                     },
                     body: JSON.stringify({site: data.data.Site, status: data.data.Status})
                 }).then();
+            } else if (data.type === packetToNumber("SPEC_FUNC")) {
+                if (data.data.DstId.toString() === myRid && data.data.Function === 0x01 && Number(data.data.SrcId) === FNE_ID) {
+                    console.log("Unit INHIBITED");
+                    inhibited = true;
+                    powerOff().then();
+                }
             } else {
                 //console.debug(event.data);
             }

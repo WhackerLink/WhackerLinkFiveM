@@ -41,6 +41,7 @@
         REL_DEMAND: 0x18,
         LOC_BCAST: 0x19,
         STS_BCAST: 0x21,
+        SPEC_FUNC: 0x22,
         ACK_RSP: 0x23
     };
 
