@@ -31,6 +31,8 @@ let sites = [];
 
 let currentModel = "";
 
+let disableAnimations = false;
+
 const PTT_COOLDOWN_MS = 650;
 const MIN_PTT_DURATION_MS = 350;
 
@@ -99,6 +101,8 @@ on('__cfx_nui:receivedStsBcast', (data) => {
 
 onNet('receiveSitesConfig', (receivedSites) => {
     sites = receivedSites.sites;
+
+    disableAnimations = receivedSites.config.disableAnimations;
 
     // console.log('Received sites config:', sites);
 
@@ -307,7 +311,7 @@ function handlePTTDown() {
             SendNuiMessage(JSON.stringify({ type: 'pttPress' }));
             //console.debug('PTT press confirmed');
 
-            if (!inVehicle) {
+            if (!inVehicle && !disableAnimations) {
                 playRadioAnimation();
             }
         }
@@ -334,7 +338,9 @@ function handlePTTUp() {
     //console.debug('PTT release confirmed');
     lastPttTime = currentTime;
 
-    stopRadioAnimation();
+    if (!disableAnimations) {
+        stopRadioAnimation();
+    }
 
     isPttPressed = false;
     isHandlingPtt = false;
