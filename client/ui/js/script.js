@@ -887,6 +887,11 @@ function connectWebSocket() {
                     haltAllLine3Messages = true;
                     document.getElementById("line3").style.color = "black";
                     document.getElementById("line3").innerHTML = `Page: ${data.data.SrcId}`;
+
+                    // send twice for future use (for loop is really not needed here smh)
+                    SendAckResponse(packetToNumber("CALL_ALRT"));
+                    SendAckResponse(packetToNumber("CALL_ALRT"));
+
                     play_page_alert();
 
                     setTimeout(() => {

@@ -40,7 +40,8 @@
         AUTH_REPLY: 0x17,
         REL_DEMAND: 0x18,
         LOC_BCAST: 0x19,
-        STS_BCAST: 0x21
+        STS_BCAST: 0x21,
+        ACK_RSP: 0x23
     };
 
     const PacketTypeReverse = Object.fromEntries(
