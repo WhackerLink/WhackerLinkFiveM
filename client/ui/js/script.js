@@ -921,6 +921,7 @@ function connectWebSocket() {
             } else if (data.type === packetToNumber("SPEC_FUNC")) {
                 if (data.data.DstId.toString() === myRid && data.data.Function === 0x01 && Number(data.data.SrcId) === FNE_ID) {
                     console.log("Unit INHIBITED");
+                    SendAckResponse(packetToNumber("SPEC_FUNC"));
                     inhibited = true;
                     powerOff().then();
                 }
