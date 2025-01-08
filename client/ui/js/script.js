@@ -384,7 +384,7 @@ window.addEventListener('message', async function (event) {
     }
 });
 
-async function powerOn() {
+async function powerOn(reReg) {
     pcmPlayer.clear();
 
     if (error === "FL_01/82") {
@@ -465,12 +465,18 @@ async function powerOn() {
     initialized = true;
     rssiIcon.style.display = 'block';
     connectWebSocket();
+
+    if (reReg) {
+        SendRegistrationRequest();
+        SendGroupAffiliationRequest();
+    }
 }
 
-async function powerOff() {
+async function powerOff(stayConnected) {
     pcmPlayer.clear();
     stopCheckLoop();
-    await SendDeRegistrationRequest();
+    if (!stayConnected)
+        await SendDeRegistrationRequest();
     await sleep(1000);
     isAffiliated = false;
     isRegistered = false;
@@ -501,7 +507,9 @@ async function powerOff() {
     document.getElementById("softText2").style.display = 'none';
     document.getElementById("softText3").style.display = 'none';
     document.getElementById("softText4").style.display = 'none';
-    disconnectWebSocket();
+    if (!stayConnected) {
+        disconnectWebSocket();
+    }
 }
 
 function displayBootScreen(bootScreenMessages) {
@@ -699,7 +707,7 @@ function connectWebSocket() {
     pcmPlayer.clear();
 
     console.debug("Connecting to master...");
-    if (socket && socket.readyState === WebSocket.OPEN) {
+    if (socket && socket.readyState !== WebSocket.OPEN) {
         isInSiteTrunking = false;
         console.log("Already connected?")
         return;
@@ -925,12 +933,12 @@ function connectWebSocket() {
                     console.log("Unit INHIBITED");
                     SendAckResponse(packetToNumber("SPEC_FUNC"));
                     inhibited = true;
-                    powerOff().then();
-                } else if (data.data.DstId.toString() === myRid && data.data.Function === 0x01 && Number(data.data.SrcId) === FNE_ID) {
+                    powerOff(true).then();
+                } else if (data.data.DstId.toString() === myRid && data.data.Function === 0x02 && Number(data.data.SrcId) === FNE_ID) {
                     console.log("Unit UNINHIBITED");
                     SendAckResponse(packetToNumber("SPEC_FUNC"));
                     inhibited = false;
-                    powerOn().then();
+                    powerOn(true).then();
                 }
             } else {
                 //console.debug(event.data);
