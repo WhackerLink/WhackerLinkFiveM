@@ -293,6 +293,8 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === "pttRelease") {
         isVoiceGrantHandled = false;
 
+        await sleep(100); // Temp fix to ensure all voice data makes it through before releasing; Is this correct?
+                              // Should we check if the audio buffer is empty instead? Now I am just talking to myself..
         if (isTxing && isRegistered) {
             SendGroupVoiceRelease();
             currentFrequncyChannel = null;
@@ -931,12 +933,12 @@ function connectWebSocket() {
             } else if (data.type === packetToNumber("SPEC_FUNC")) {
                 if (data.data.DstId.toString() === myRid && data.data.Function === 0x01 && Number(data.data.SrcId) === FNE_ID) {
                     console.log("Unit INHIBITED");
-                    SendAckResponse(packetToNumber("SPEC_FUNC"));
+                    SendAckResponse(packetToNumber("SPEC_FUNC"), 0x01); // inhibit = 0x01
                     inhibited = true;
                     powerOff(true).then();
                 } else if (data.data.DstId.toString() === myRid && data.data.Function === 0x02 && Number(data.data.SrcId) === FNE_ID) {
                     console.log("Unit UNINHIBITED");
-                    SendAckResponse(packetToNumber("SPEC_FUNC"));
+                    SendAckResponse(packetToNumber("SPEC_FUNC"), 0x02); // uninhibit = 0x01
                     inhibited = false;
                     powerOn(true).then();
                 }

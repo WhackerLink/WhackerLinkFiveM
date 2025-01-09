@@ -109,13 +109,14 @@ function SendEmergencyAlarmRequest() {
     socket.send(JSON.stringify(request));
 }
 
-function SendAckResponse(service) {
+function SendAckResponse(service, extended) {
     if (!socketOpen) { return; }
 
     const request = {
         type: packetToNumber("ACK_RSP"),
         data: {
             Service: service,
+            Extended: extended,
             SrcId: myRid,
             DstId: currentTg
         }
