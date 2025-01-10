@@ -710,10 +710,13 @@ function connectWebSocket() {
     pcmPlayer.clear();
 
     console.debug("Connecting to master...");
-    if (!socket || socket.readyState !== WebSocket.OPEN) {
-        isInSiteTrunking = false;
-        console.log("Already connected?")
-        return;
+
+    if (socket) {
+        if (socket.readyState === WebSocket.OPEN) {
+            isInSiteTrunking = false;
+            console.log("Already connected?")
+            return;
+        }
     }
 
     socket = new WebSocket(`ws://${currentSystem.address}:${currentSystem.port}/client`);
