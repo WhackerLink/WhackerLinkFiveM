@@ -710,7 +710,7 @@ function connectWebSocket() {
     pcmPlayer.clear();
 
     console.debug("Connecting to master...");
-    if (socket && socket.readyState !== WebSocket.OPEN) {
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
         isInSiteTrunking = false;
         console.log("Already connected?")
         return;
