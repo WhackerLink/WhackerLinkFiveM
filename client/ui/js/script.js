@@ -291,10 +291,11 @@ window.addEventListener('message', async function (event) {
             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
         }
     } else if (event.data.type === "pttRelease") {
+        await sleep(450); // Temp fix to ensure all voice data makes it through before releasing; Is this correct?
+                              // Should we check if the audio buffer is empty instead? Now I am just talking to myself..
+
         isVoiceGrantHandled = false;
 
-        await sleep(100); // Temp fix to ensure all voice data makes it through before releasing; Is this correct?
-                              // Should we check if the audio buffer is empty instead? Now I am just talking to myself..
         if (isTxing && isRegistered) {
             SendGroupVoiceRelease();
             currentFrequncyChannel = null;
