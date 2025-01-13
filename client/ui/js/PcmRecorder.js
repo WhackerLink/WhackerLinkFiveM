@@ -37,6 +37,8 @@ class MicCapture {
         this.noiseSource = null;
         this.noiseGainNode = null;
 
+        this.noiseSourceStarted = false;
+
         this.onAudioFrameReadyCallback = onAudioFrameReadyCallback || this.defaultOnAudioFrameReady;
     }
 
@@ -119,10 +121,6 @@ class MicCapture {
         this.noiseGainNode = this.audioContext.createGain();
         this.noiseGainNode.gain.value = 0.1;
 
-        this.noiseSource.connect(this.noiseGainNode);
-        this.noiseGainNode.connect(this.gainNode);
-        this.noiseSource.start();
-
         this.node = this.audioContext.createScriptProcessor(4096, 1, 1);
         const samplesPerFrame = 160;
         const frame = new ArrayBuffer(samplesPerFrame * 2);
@@ -151,9 +149,7 @@ class MicCapture {
         this.source.connect(this.gainNode);
 
         if (this.airCommsEffect) {
-            this.gainNode.connect(this.highPassFilter);
-            this.highPassFilter.connect(this.lowPassFilter);
-            this.lowPassFilter.connect(this.node);
+            this.enableAirCommsEffect();
         } else {
             this.gainNode.connect(this.node);
         }
@@ -162,7 +158,6 @@ class MicCapture {
 
         if (this.callbackOnComplete) this.callbackOnComplete();
     }
-
 
     createWhiteNoiseBuffer() {
         const bufferSize = this.audioContext.sampleRate * 2;
@@ -178,6 +173,21 @@ class MicCapture {
 
     enableAirCommsEffect() {
         this.airCommsEffect = true;
+
+        if (!this.noiseSource || !this.noiseSourceStarted) {
+            this.noiseSource = this.audioContext.createBufferSource();
+            this.noiseSource.buffer = this.createWhiteNoiseBuffer();
+            this.noiseSource.loop = true;
+
+            this.noiseGainNode = this.audioContext.createGain();
+            this.noiseGainNode.gain.value = 0.1;
+
+            this.noiseSource.connect(this.noiseGainNode);
+            this.noiseGainNode.connect(this.gainNode);
+            this.noiseSource.start();
+            this.noiseSourceStarted = true;
+        }
+
         if (this.gainNode && this.highPassFilter && this.lowPassFilter) {
             this.gainNode.disconnect();
             this.gainNode.connect(this.highPassFilter);
@@ -188,6 +198,14 @@ class MicCapture {
 
     disableAirCommsEffect() {
         this.airCommsEffect = false;
+
+        if (this.noiseSource && this.noiseSourceStarted) {
+            this.noiseSource.stop();
+            this.noiseSource.disconnect();
+            this.noiseSource = null;
+            this.noiseSourceStarted = false;
+        }
+
         if (this.gainNode) {
             this.gainNode.disconnect();
             this.highPassFilter.disconnect();

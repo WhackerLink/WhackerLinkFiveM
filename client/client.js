@@ -348,19 +348,21 @@ function handlePTTUp() {
 
 setTick(async () => {
     if (currentCodeplug && currentCodeplug.radioWide && currentCodeplug.radioWide.model) {
+        const flyingVehicle = IsPedInFlyingVehicle(PlayerPedId());
+
         if (IsPedInAnyVehicle(PlayerPedId(), false)) {
             if (!inVehicle) {
                 inVehicle = true;
                 currentCodeplug.currentModelConfig = currentCodeplug.inCarModeConfig;
                 currentModel = currentCodeplug.radioWide.inCarMode;
-                SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode, currentCodeplug}));
+                SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.inCarMode, currentCodeplug, flyingVehicle}));
             }
         } else {
             if (inVehicle) {
                 inVehicle = false;
                 currentCodeplug.currentModelConfig = currentCodeplug.modelConfig;
                 currentModel = currentCodeplug.radioWide.model;
-                SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model, currentCodeplug}));
+                SendNuiMessage(JSON.stringify({type: 'setModel', model: currentCodeplug.radioWide.model, currentCodeplug, flyingVehicle}));
             }
         }
     }

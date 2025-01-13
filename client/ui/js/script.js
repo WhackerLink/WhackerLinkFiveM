@@ -20,10 +20,9 @@
 
 const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 8000});
 const micCapture = new MicCapture(onAudioFrameReady);
-micCapture.enableHelmetMicFilter();
 
 const EXPECTED_PCM_LENGTH = 1600;
-const HOST_VERSION = "R02.06.00";
+const HOST_VERSION = "R02.07.00";
 
 const FNE_ID = 0xFFFFFF
 
@@ -319,9 +318,17 @@ window.addEventListener('message', async function (event) {
         scanManager = new ScanManager(currentCodeplug);
         // console.debug(JSON.stringify(scanManager.getScanListForChannel(), null, 2));
         radioModel = event.data.model;
+
+        if (event.data.flyingVehicle) {
+            micCapture.enableAirCommsEffect();
+        } else {
+            micCapture.disableAirCommsEffect();
+        }
+
         if (!isMobile()) {
             document.getElementById("battery-icon").src = `models/${radioModel}/icons/battery${batteryLevel}.png`;
         }
+
         loadUIState();
         loadRadioModelAssets(event.data.model);
     } else if (event.data.type === 'radioFocused') {
