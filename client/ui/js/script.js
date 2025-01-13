@@ -19,6 +19,9 @@
 */
 
 const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 8000});
+const micCapture = new MicCapture(onAudioFrameReady);
+micCapture.enableHelmetMicFilter();
+
 const EXPECTED_PCM_LENGTH = 1600;
 const HOST_VERSION = "R02.06.00";
 
@@ -420,9 +423,7 @@ async function powerOn(reReg) {
     // console.debug(JSON.stringify(scanManager.getScanListForChannel(currentZone.name, currentChannel.name), null, 2));
 
     if (!initialized) {
-        micCapture.captureMicrophone(() => {
-            console.log('Microphone captured');
-        });
+        await micCapture.captureMicrophone(() => console.log('Microphone capture started.'));
     }
 
     if (radioModel === "APX900") {

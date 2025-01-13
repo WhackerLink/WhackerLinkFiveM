@@ -14,142 +14,203 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
-* Derived from github
+* Copyright (C) 2025 Caleb, K4PHP
+*
+* Derived from github, majorly refactored
 *
 */
 
-function MicCapture() {
-    var source = null;
-    var node = null;
-    var gainNode = null;
-    var stream = null;
-    var gain = 1;
-    var callbackOnComplete = null;
+class MicCapture {
+    constructor(onAudioFrameReadyCallback) {
+        this.source = null;
+        this.node = null;
+        this.gainNode = null;
+        this.stream = null;
+        this.audioContext = null;
+        this.callbackOnComplete = null;
+        this.gain = 1;
 
-    this.captureMicrophone = function(cb) {
-        var constraints = {
+        this.airCommsEffect = false;
+        this.highPassFilter = null;
+        this.lowPassFilter = null;
+
+        this.noiseSource = null;
+        this.noiseGainNode = null;
+
+        this.onAudioFrameReadyCallback = onAudioFrameReadyCallback || this.defaultOnAudioFrameReady;
+    }
+
+    async captureMicrophone(cb) {
+        const constraints = {
             audio: {
                 sampleRate: 48000,
                 channelCount: 1,
                 volume: 1.0,
                 echoCancellation: false,
                 noiseSuppression: false,
-                autoGainControl: false
+                autoGainControl: false,
             },
-            video: false
+            video: false,
         };
-        callbackOnComplete = cb;
+        this.callbackOnComplete = cb;
+
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia(constraints).then(successCallback).catch(failureCallback);
-        } else {
-            alert('Microphone access denied (navigator.mediaDevices not supported). If you are on Chrome for iOS, try Safari');
-        }
-    };
-
-    this.stopCapture = function() {
-        if (source != null) {
-            source.disconnect();
-            source = null;
-        }
-        if (gainNode != null) {
-            gainNode.disconnect();
-            gainNode = null;
-        }
-        if (node != null) {
-            node.disconnect();
-            node = null;
-        }
-        if (stream != null) {
-            stream.getTracks()[0].stop();
-            stream = null;
-        }
-    };
-
-    function setSampleRate(mediaStream) {
-        let track = mediaStream.getTracks()[0];
-        let constraints = track.getConstraints();
-        constraints.sampleRate = 8000;
-        track.applyConstraints(constraints).catch(err => {
-            console.error('Failed to set sample rate:', err.message);
-        });
-    }
-
-    function failureCallback(err) {
-        alert('Failed to capture microphone. ' + err.message);
-    }
-
-    function successCallback(mediaStream) {
-        var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        stream = mediaStream;
-        setSampleRate(mediaStream);
-
-        source = audioContext.createMediaStreamSource(mediaStream);
-        gainNode = audioContext.createGain();
-        gainNode.gain.value = gain;
-        node = audioContext.createScriptProcessor(0, 1, 1);
-
-        const samplesPerFrame = 160;
-        var totalSamples = 0;
-        var outputSamples = 0;
-        var sample = 0;
-        var frame = new ArrayBuffer(samplesPerFrame * 2);
-        var view = new DataView(frame);
-        var sum = 0.0;
-
-        function downsampleBuffer(buffer, sampleRate, rate) {
-            if (rate == sampleRate) {
-                return buffer;
-            }
-            if (rate > sampleRate) {
-                throw 'rate should be less than sampleRate';
-            }
-            var sampleRateRatio = sampleRate / rate;
-            var newLength = Math.round(buffer.length / sampleRateRatio);
-            var result = new Float32Array(newLength);
-            var offsetResult = 0;
-            var offsetBuffer = 0;
-            while (offsetResult < result.length) {
-                var nextOffsetBuffer = Math.round((offsetResult + 1) * sampleRateRatio);
-                var accum = 0;
-                var count = 0;
-                for (var i = offsetBuffer; i < nextOffsetBuffer && i < buffer.length; i++) {
-                    accum += buffer[i];
-                    count++;
-                }
-                result[offsetResult] = accum / count;
-                offsetResult++;
-                offsetBuffer = nextOffsetBuffer;
-            }
-            return result;
-        }
-
-        node.onaudioprocess = function(data) {
             try {
-                var inBuffer = data.inputBuffer.getChannelData(0);
-                var downsampled = downsampleBuffer(inBuffer, data.inputBuffer.sampleRate, 8000);
-                for (var i = 0; i < downsampled.length; i++) {
-                    var downSample = downsampled[i];
-                    var sample16 = downSample < 0 ? downSample * 0x8000 : downSample * 0x7fff;
-                    view.setInt16(outputSamples * 2, sample16, true);
-                    outputSamples++;
-                    sum += (sample16 * sample16);
-                    if (outputSamples >= samplesPerFrame) {
-                        outputSamples = 0;
-                        var rms = Math.sqrt(sum / samplesPerFrame) / 32767.0;
-                        sum = 0.0;
-                        onAudioFrameReady(new Uint8Array(frame), rms * 30.0);
-                    }
-                }
-            } catch (error) {
-                console.error('Error processing audio:', error);
+                const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+                this.successCallback(mediaStream);
+            } catch (err) {
+                this.failureCallback(err);
             }
+        } else {
+            alert('Microphone access denied (navigator.mediaDevices not supported).');
+        }
+    }
+
+    stopCapture() {
+        if (this.source) this.source.disconnect();
+        if (this.gainNode) this.gainNode.disconnect();
+        if (this.node) this.node.disconnect();
+        if (this.highPassFilter) this.highPassFilter.disconnect();
+        if (this.lowPassFilter) this.lowPassFilter.disconnect();
+        if (this.noiseSource) this.noiseSource.disconnect();
+        if (this.noiseGainNode) this.noiseGainNode.disconnect();
+        if (this.stream) this.stream.getTracks().forEach(track => track.stop());
+
+        this.source = null;
+        this.gainNode = null;
+        this.node = null;
+        this.highPassFilter = null;
+        this.lowPassFilter = null;
+        this.noiseSource = null;
+        this.noiseGainNode = null;
+        this.stream = null;
+        if (this.audioContext) this.audioContext.close();
+        this.audioContext = null;
+    }
+
+    failureCallback(err) {
+        alert(`Failed to capture microphone: ${err.message}`);
+    }
+
+    successCallback(mediaStream) {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
+            latencyHint: 'interactive',
+        });
+
+        this.stream = mediaStream;
+        this.source = this.audioContext.createMediaStreamSource(mediaStream);
+        this.gainNode = this.audioContext.createGain();
+        this.gainNode.gain.value = this.gain;
+
+        this.highPassFilter = this.audioContext.createBiquadFilter();
+        this.highPassFilter.type = "highpass";
+        this.highPassFilter.frequency.value = 1000;
+        this.highPassFilter.Q.value = 1.5;
+
+        this.lowPassFilter = this.audioContext.createBiquadFilter();
+        this.lowPassFilter.type = "lowpass";
+        this.lowPassFilter.frequency.value = 1000;
+        this.lowPassFilter.Q.value = 1.5;
+
+        this.noiseSource = this.audioContext.createBufferSource();
+        this.noiseSource.buffer = this.createWhiteNoiseBuffer();
+        this.noiseSource.loop = true;
+
+        this.noiseGainNode = this.audioContext.createGain();
+        this.noiseGainNode.gain.value = 0.1;
+
+        this.noiseSource.connect(this.noiseGainNode);
+        this.noiseGainNode.connect(this.gainNode);
+        this.noiseSource.start();
+
+        this.node = this.audioContext.createScriptProcessor(4096, 1, 1);
+        const samplesPerFrame = 160;
+        const frame = new ArrayBuffer(samplesPerFrame * 2);
+        const view = new DataView(frame);
+        let outputSamples = 0;
+        let sum = 0.0;
+
+        this.node.onaudioprocess = event => {
+            const inBuffer = event.inputBuffer.getChannelData(0);
+            const downsampled = this.downsampleBuffer(inBuffer, event.inputBuffer.sampleRate, 8000);
+            downsampled.forEach(sample => {
+                const sample16 = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
+                view.setInt16(outputSamples * 2, sample16, true);
+                outputSamples++;
+                sum += sample16 * sample16;
+
+                if (outputSamples >= samplesPerFrame) {
+                    const rms = Math.sqrt(sum / samplesPerFrame) / 32767.0;
+                    this.onAudioFrameReadyCallback(new Uint8Array(frame), rms * 30.0);
+                    outputSamples = 0;
+                    sum = 0.0;
+                }
+            });
         };
 
-        source.connect(gainNode);
-        gainNode.connect(node);
-        node.connect(audioContext.destination);
-        callbackOnComplete();
+        this.source.connect(this.gainNode);
+
+        if (this.airCommsEffect) {
+            this.gainNode.connect(this.highPassFilter);
+            this.highPassFilter.connect(this.lowPassFilter);
+            this.lowPassFilter.connect(this.node);
+        } else {
+            this.gainNode.connect(this.node);
+        }
+
+        this.node.connect(this.audioContext.destination);
+
+        if (this.callbackOnComplete) this.callbackOnComplete();
+    }
+
+
+    createWhiteNoiseBuffer() {
+        const bufferSize = this.audioContext.sampleRate * 2;
+        const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+        const data = buffer.getChannelData(0);
+
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+
+        return buffer;
+    }
+
+    enableAirCommsEffect() {
+        this.airCommsEffect = true;
+        if (this.gainNode && this.highPassFilter && this.lowPassFilter) {
+            this.gainNode.disconnect();
+            this.gainNode.connect(this.highPassFilter);
+            this.highPassFilter.connect(this.lowPassFilter);
+            this.lowPassFilter.connect(this.node);
+        }
+    }
+
+    disableAirCommsEffect() {
+        this.airCommsEffect = false;
+        if (this.gainNode) {
+            this.gainNode.disconnect();
+            this.highPassFilter.disconnect();
+            this.lowPassFilter.disconnect();
+            this.gainNode.connect(this.node);
+        }
+    }
+
+    downsampleBuffer(buffer, inputSampleRate, targetSampleRate) {
+        if (targetSampleRate >= inputSampleRate) return buffer;
+        const ratio = inputSampleRate / targetSampleRate;
+        const newLength = Math.round(buffer.length / ratio);
+        const result = new Float32Array(newLength);
+
+        for (let i = 0; i < newLength; i++) {
+            const start = Math.round(i * ratio);
+            const end = Math.min(buffer.length, Math.round((i + 1) * ratio));
+            result[i] = buffer.subarray(start, end).reduce((sum, val) => sum + val, 0) / (end - start);
+        }
+        return result;
+    }
+
+    defaultOnAudioFrameReady(frame, rms) {
+        console.log('Audio frame ready:', frame, 'RMS:', rms);
     }
 }
-
-var micCapture = new MicCapture();
