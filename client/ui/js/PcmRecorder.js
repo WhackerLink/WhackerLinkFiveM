@@ -31,6 +31,8 @@ class MicCapture {
         this.gain = 1;
 
         this.airCommsEffect = false;
+        this.rotorSoundEnabled = false;
+
         this.highPassFilter = null;
         this.lowPassFilter = null;
 
@@ -213,6 +215,55 @@ class MicCapture {
             this.gainNode.connect(this.node);
         }
     }
+
+    async enableRotorSound(rotorSoundUrl) {
+        if (!this.audioContext) {
+            console.error("AudioContext is not initialized. Ensure microphone capture is started before enabling rotor sound.");
+            return;
+        }
+
+        this.rotorSoundEnabled = true;
+
+        if (!this.rotorSource) {
+            try {
+                const response = await fetch(rotorSoundUrl);
+                const arrayBuffer = await response.arrayBuffer();
+                const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+
+                this.rotorSource = this.audioContext.createBufferSource();
+                this.rotorSource.buffer = audioBuffer;
+                this.rotorSource.loop = true;
+
+                this.rotorGainNode = this.audioContext.createGain();
+                this.rotorGainNode.gain.value = 0.5;
+
+                this.rotorSource.connect(this.rotorGainNode);
+                this.rotorGainNode.connect(this.gainNode);
+
+                this.rotorSource.start();
+                console.log("Rotor sound enabled.");
+            } catch (error) {
+                console.error("Failed to enable rotor sound:", error.message);
+            }
+        }
+    }
+
+
+    disableRotorSound() {
+        this.rotorSoundEnabled = false;
+
+        if (this.rotorSource) {
+            this.rotorSource.stop();
+            this.rotorSource.disconnect();
+            this.rotorSource = null;
+        }
+
+        if (this.rotorGainNode) {
+            this.rotorGainNode.disconnect();
+            this.rotorGainNode = null;
+        }
+    }
+
 
     downsampleBuffer(buffer, inputSampleRate, targetSampleRate) {
         if (targetSampleRate >= inputSampleRate) return buffer;

@@ -321,8 +321,10 @@ window.addEventListener('message', async function (event) {
 
         if (event.data.flyingVehicle) {
             micCapture.enableAirCommsEffect();
+            //await micCapture.enableRotorSound('audio/heliblades.wav');
         } else {
             micCapture.disableAirCommsEffect();
+            //micCapture.disableRotorSound();
         }
 
         if (!isMobile()) {
