@@ -33,6 +33,10 @@ let currentModel = "";
 
 let disableAnimations = false;
 
+let lastEmergencyTime = 0;
+
+const EMERGENCY_COOLDOWN_MS = 2000;
+
 const PTT_COOLDOWN_MS = 650;
 const MIN_PTT_DURATION_MS = 350;
 
@@ -222,6 +226,21 @@ RegisterKeyMapping('toggle_radio', 'Toggle Radio', 'keyboard', 'Y');
 RegisterKeyMapping('emergency_toggle', 'Activate Emergency', 'keyboard', 'E');
 RegisterKeyMapping('toggle_radio_focus', 'Toggle Radio Focus', 'keyboard', 'F');
 RegisterKeyMapping('+ptt', 'Push-To-Talk', 'keyboard', 'N');
+RegisterKeyMapping('power_toggle', 'Radio power toggle', 'keyboard', 'P');
+RegisterKeyMapping('channel_up', 'Channel Up', 'keyboard', 'PAGEUP');
+RegisterKeyMapping('channel_down', 'Channel Down', 'keyboard', 'PAGEDOWN');
+
+RegisterCommand('power_toggle', () => {
+    SendNuiMessage(JSON.stringify({ type: 'powerToggle' }));
+}, false);
+
+RegisterCommand('channel_up', () => {
+    SendNuiMessage(JSON.stringify({ type: 'channelUp' }));
+}, false);
+
+RegisterCommand('channel_down', () => {
+    SendNuiMessage(JSON.stringify({ type: 'channelDown' }));
+}, false);
 
 RegisterCommand('+ptt', () => {
     handlePTTDown();
@@ -255,6 +274,16 @@ function ToggleRadio() {
 }
 
 function ActivateEmergency() {
+    const currentTime = Date.now();
+    const timeSinceLastEmergency = currentTime - lastEmergencyTime;
+
+    if (timeSinceLastEmergency < EMERGENCY_COOLDOWN_MS) {
+        console.debug('Emergency activation ignored due to cooldown');
+        return;
+    }
+
+    lastEmergencyTime = currentTime;
+
     SendNuiMessage(JSON.stringify({ type: 'activate_emergency' }));
 }
 

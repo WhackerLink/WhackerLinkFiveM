@@ -217,6 +217,16 @@ async function sendRegistration() {
 window.addEventListener('message', async function (event) {
     if (event.data.type === 'resetBatteryLevel'){
         batteryLevel = 4;
+    } else if (event.data.type === 'powerToggle') {
+        if (radioOn) {
+            powerOff().then();
+        } else {
+            powerOn().then();
+        }
+    } else if (event.data.type === 'channelUp') {
+        changeChannel(1);
+    } else if (event.data.type === 'channelDown') {
+        changeChannel(-1);
     } else if (event.data.type === 'openRadio') {
         currentCodeplug = event.data.codeplug;
 
@@ -402,6 +412,8 @@ window.addEventListener('message', async function (event) {
 async function powerOn(reReg) {
     pcmPlayer.clear();
 
+    currentMessageIndex = 0;
+
     if (error === "FL_01/82") {
         document.getElementById('line2').style.display = 'block';
         setLine2(`Fail 01/82`);
@@ -435,6 +447,10 @@ async function powerOn(reReg) {
         await micCapture.captureMicrophone(() => console.log('Microphone capture started.'));
     }
 
+    document.getElementById("line1").style.display = 'block';
+    document.getElementById("line2").style.display = 'block';
+    document.getElementById("line3").style.display = 'block';
+
     if (radioModel === "APX900") {
         const bootImage = document.getElementById('boot-image');
         bootImage.src = `models/${radioModel}/boot.png`;
@@ -452,7 +468,6 @@ async function powerOn(reReg) {
         ];
 
         await displayBootScreen(bootScreenMessages);
-        currentMessageIndex = 0;
     }
 
     responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
@@ -467,9 +482,6 @@ async function powerOn(reReg) {
     document.getElementById("softText2").style.display = 'block';
     document.getElementById("softText3").style.display = 'block';
     document.getElementById("softText4").style.display = 'block';
-    document.getElementById("line1").style.display = 'block';
-    document.getElementById("line2").style.display = 'block';
-    document.getElementById("line3").style.display = 'block';
     document.getElementById("battery-icon").style.display = 'block';
     document.getElementById("battery-icon").src = `models/${radioModel}/icons/battery${batteryLevel}.png`;
     document.getElementById("scan-icon").style.display = 'none';
@@ -528,7 +540,9 @@ async function powerOff(stayConnected) {
 function displayBootScreen(bootScreenMessages) {
     return new Promise((resolve) => {
         function showNextMessage() {
+            console.log("here1");
             if (currentMessageIndex < bootScreenMessages.length) {
+                console.log("here2");
                 const message = bootScreenMessages[currentMessageIndex];
                 document.getElementById(message.line).innerHTML = message.text;
                 setTimeout(() => {
