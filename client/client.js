@@ -229,6 +229,8 @@ RegisterKeyMapping('+ptt', 'Push-To-Talk', 'keyboard', 'N');
 RegisterKeyMapping('power_toggle', 'Radio power toggle', 'keyboard', 'P');
 RegisterKeyMapping('channel_up', 'Channel Up', 'keyboard', 'PAGEUP');
 RegisterKeyMapping('channel_down', 'Channel Down', 'keyboard', 'PAGEDOWN');
+RegisterKeyMapping('volume_up', 'Volume Up', 'keyboard', 'NUMPAD+');
+RegisterKeyMapping('volume_down', 'Volume Down', 'keyboard', 'NUMPAD-');
 
 RegisterCommand('power_toggle', () => {
     SendNuiMessage(JSON.stringify({ type: 'powerToggle' }));
@@ -240,6 +242,14 @@ RegisterCommand('channel_up', () => {
 
 RegisterCommand('channel_down', () => {
     SendNuiMessage(JSON.stringify({ type: 'channelDown' }));
+}, false);
+
+RegisterCommand('volume_up', () => {
+    SendNuiMessage(JSON.stringify({ type: 'volumeUp' }));
+}, false);
+
+RegisterCommand('volume_down', () => {
+    SendNuiMessage(JSON.stringify({ type: 'volumeDown' }));
 }, false);
 
 RegisterCommand('+ptt', () => {

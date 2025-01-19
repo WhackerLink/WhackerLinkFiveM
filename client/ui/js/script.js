@@ -70,6 +70,7 @@ let initialized = false;
 let haltAllLine3Messages = false;
 let scanEnabled = false;
 let error = null;
+let volumeLevel = 1.0;
 
 let currentLat = null;
 let currentLng = null;
@@ -223,6 +224,10 @@ window.addEventListener('message', async function (event) {
         } else {
             powerOn().then();
         }
+    } else if (event.data.type === 'volumeUp') {
+        volumeUp();
+    } else if (event.data.type === 'volumeDown') {
+        volumeDown();
     } else if (event.data.type === 'channelUp') {
         changeChannel(1);
     } else if (event.data.type === 'channelDown') {
@@ -1058,13 +1063,33 @@ function handleAudioData(data) {
     }
 }
 
+function volumeUp() {
+    if (volumeLevel < 1.0) {
+        volumeLevel += 0.1;
+        volumeLevel = Math.min(1.0, volumeLevel);
+        //beepAudioCtx.gainNode.gain.value = volumeLevel;
+        pcmPlayer.volume(volumeLevel);
+        console.log(`Volume increased: ${volumeLevel}`);
+    }
+}
+
+function volumeDown() {
+    if (volumeLevel > 0.0) {
+        volumeLevel -= 0.1;
+        volumeLevel = Math.max(0.1, volumeLevel);
+        //beepAudioCtx.gainNode.gain.value = volumeLevel;
+        pcmPlayer.volume(volumeLevel);
+        console.log(`Volume decreased: ${volumeLevel}`);
+    }
+}
+
 function beep(frequency, duration, volume, type) {
-    var oscillator = beepAudioCtx.createOscillator();
-    var gainNode = beepAudioCtx.createGain();
+    const oscillator = beepAudioCtx.createOscillator();
+    const gainNode = beepAudioCtx.createGain();
 
     oscillator.connect(gainNode);
     gainNode.connect(beepAudioCtx.destination);
-    gainNode.gain.value = 1;
+    gainNode.gain.value = Math.max(0.1, volumeLevel - 0.2);
     oscillator.frequency.value = frequency;
     oscillator.type = type;
 
