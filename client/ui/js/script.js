@@ -540,9 +540,7 @@ async function powerOff(stayConnected) {
 function displayBootScreen(bootScreenMessages) {
     return new Promise((resolve) => {
         function showNextMessage() {
-            console.log("here1");
             if (currentMessageIndex < bootScreenMessages.length) {
-                console.log("here2");
                 const message = bootScreenMessages[currentMessageIndex];
                 document.getElementById(message.line).innerHTML = message.text;
                 setTimeout(() => {
@@ -969,6 +967,14 @@ function connectWebSocket() {
                     SendAckResponse(packetToNumber("SPEC_FUNC"), 0x02); // uninhibit = 0x01
                     inhibited = false;
                     powerOn(true).then();
+                }
+            } else if (data.type === packetToNumber("REL_DEMAND")) {
+                if (data.data.DstId.toString() === myRid && Number(data.data.SrcId) === FNE_ID){
+                    isVoiceGranted = false;
+                    isVoiceRequested = false;
+                    isTxing = false;
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                    pcmPlayer.clear();
                 }
             } else {
                 //console.debug(event.data);
