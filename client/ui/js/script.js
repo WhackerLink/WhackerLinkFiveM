@@ -811,6 +811,9 @@ function connectWebSocket() {
 
                 isRegistered = data.data.Status === 0;
             } else if (data.type === packetToNumber("AUDIO_DATA")) {
+                if (currentFrequncyChannel == null)
+                    return;
+
                 if (data.data.VoiceChannel.SrcId !== myRid && (data.data.VoiceChannel.DstId.toString() === currentTg || (scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.VoiceChannel.DstId) && scanEnabled)) && data.data.VoiceChannel.Frequency.toString() === currentFrequncyChannel.toString()) {
                     const binaryString = atob(data.data.Data);
                     const len = binaryString.length;
@@ -974,12 +977,23 @@ function connectWebSocket() {
                     powerOn(true).then();
                 }
             } else if (data.type === packetToNumber("REL_DEMAND")) {
-                if (data.data.DstId.toString() === myRid && Number(data.data.SrcId) === FNE_ID){
+                if (data.data.DstId.toString() === myRid && Number(data.data.SrcId) === FNE_ID) {
                     isVoiceGranted = false;
                     isVoiceRequested = false;
                     isTxing = false;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                     pcmPlayer.clear();
+                }
+            } else if (data.type === packetToNumber("GRP_VCH_UPD")) {
+                if (data.data.VoiceChannel.SrcId.toString() !== myRid && data.data.VoiceChannel.DstId.toString() === currentTg
+                        && isAffiliated && isRegistered && isInRange && !isReceiving && !isTxing) {
+                    isReceiving = true;
+                    currentFrequncyChannel = data.data.VoiceChannel.Frequency;
+                    isTxing = false;
+                    haltAllLine3Messages = true;
+                    document.getElementById("line3").style.color = "black";
+                    document.getElementById("line3").innerHTML = `ID: ${data.data.VoiceChannel.SrcId}`;
+                    document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
                 }
             } else {
                 //console.debug(event.data);
