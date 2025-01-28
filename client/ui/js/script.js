@@ -1103,7 +1103,7 @@ function beep(frequency, duration, volume, type) {
 
     oscillator.connect(gainNode);
     gainNode.connect(beepAudioCtx.destination);
-    gainNode.gain.value = Math.max(0.1, volumeLevel - 0.2);
+    gainNode.gain.value = Math.max(0.1, volumeLevel - 0.3);
     oscillator.frequency.value = frequency;
     oscillator.type = type;
 
