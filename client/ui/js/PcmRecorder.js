@@ -123,7 +123,7 @@ class MicCapture {
         this.noiseGainNode = this.audioContext.createGain();
         this.noiseGainNode.gain.value = 0.1;
 
-        this.node = this.audioContext.createScriptProcessor(4096, 1, 1);
+        this.node = this.audioContext.createScriptProcessor(1024, 1, 1);
         const samplesPerFrame = 160;
         const frame = new ArrayBuffer(samplesPerFrame * 2);
         const view = new DataView(frame);

@@ -22,7 +22,9 @@ const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 
 const micCapture = new MicCapture(onAudioFrameReady);
 
 const EXPECTED_PCM_LENGTH = 1600;
-const HOST_VERSION = "R02.07.00";
+const MAX_BUFFER_SIZE = EXPECTED_PCM_LENGTH * 2;
+
+const HOST_VERSION = "R02.08.00";
 
 const FNE_ID = 0xFFFFFF
 
@@ -1185,6 +1187,11 @@ function onAudioFrameReady(buffer, rms) {
             audioBuffer.push(...buffer);
         }
 
+        if (audioBuffer.length > MAX_BUFFER_SIZE) {
+            console.warn("Audio buffer too large, dropping old frames");
+            audioBuffer = audioBuffer.slice(audioBuffer.length - MAX_BUFFER_SIZE);
+        }
+
         if (audioBuffer.length >= EXPECTED_PCM_LENGTH) {
             const fullFrame = audioBuffer.slice(0, EXPECTED_PCM_LENGTH);
             audioBuffer = audioBuffer.slice(EXPECTED_PCM_LENGTH);
@@ -1206,8 +1213,6 @@ function onAudioFrameReady(buffer, rms) {
             const jsonString = JSON.stringify(response);
             socket.send(jsonString);
         }
-    } else {
-        // console.debug("Skipping audio send; not permitted to send");
     }
 }
 
