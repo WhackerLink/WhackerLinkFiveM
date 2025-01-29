@@ -1211,7 +1211,7 @@ function onAudioFrameReady(buffer, rms) {
             };
 
             const jsonString = JSON.stringify(response);
-            socket.send(jsonString);
+            setTimeout(() => socket.send(jsonString), 0);
         }
     }
 }
