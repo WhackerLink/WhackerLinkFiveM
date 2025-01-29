@@ -53,6 +53,8 @@ let isVoiceGranted = false;
 let isVoiceRequested = false;
 let isVoiceGrantHandled = false;
 let isReceiving = false;
+let scanTgActive = false;
+let isReceivingParkedChannel = false;
 
 let affiliationCheckInterval;
 let registrationCheckInterval;
@@ -828,16 +830,19 @@ function connectWebSocket() {
                     console.log("ingoring audio, not for us");
                 }
             } else if (data.type === packetToNumber("GRP_VCH_RSP")) {
-                if (data.data.SrcId !== myRid && data.data.DstId === currentTg && data.data.Status === 0) {
+                if (data.data.SrcId !== myRid && data.data.DstId === currentTg && data.data.Status === 0 && !scanTgActive) {
                     isReceiving = true;
+                    isReceivingParkedChannel = true;
                     currentFrequncyChannel = data.data.Channel;
                     isTxing = false;
                     haltAllLine3Messages = true;
                     document.getElementById("line3").style.color = "black";
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
-                } else if (scanManager !== null && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId)) && scanEnabled) {
+                } else if (scanManager !== null && !isReceivingParkedChannel && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId)) && scanEnabled) {
                     console.log("Received GRP_VCH_RSP for TG in scan list");
+                    scanTgActive = true;
+                    isReceivingParkedChannel = false;
                     isReceiving = true;
                     currentFrequncyChannel = data.data.Channel;
                     isTxing = false;
@@ -854,6 +859,8 @@ function connectWebSocket() {
                     isVoiceGranted = true;
                     isVoiceRequested = false;
                     isReceiving = false;
+                    isReceivingParkedChannel = false;
+                    scanTgActive = false;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                     isVoiceRequested = false;
                     isVoiceGranted = true;
@@ -881,7 +888,7 @@ function connectWebSocket() {
                     bonk();
                 }
             } else if (data.type === packetToNumber("GRP_VCH_RLS")) {
-                if (data.data.SrcId !== myRid && data.data.DstId === currentTg) {
+                if (data.data.SrcId !== myRid && data.data.DstId === currentTg && !scanTgActive) {
                     haltAllLine3Messages = false;
                     if (!isInRange) {
                         setUiOOR(isInRange);
@@ -891,11 +898,14 @@ function connectWebSocket() {
                         document.getElementById("line3").innerHTML = '';
                     }
                     isReceiving = false;
+                    isReceivingParkedChannel = false;
                     currentFrequncyChannel = null;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                     pcmPlayer.clear();
-                } else if (scanManager !== null && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId)) && scanEnabled) {
+                } else if (scanManager !== null && !isReceivingParkedChannel && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId)) && scanEnabled) {
                     haltAllLine3Messages = false;
+                    scanTgActive = false;
+
                     if (!isInRange) {
                         setUiOOR(isInRange);
                     } else if (isInSiteTrunking) {
