@@ -301,10 +301,10 @@ window.addEventListener('message', async function (event) {
                 SendGroupVoiceRequest();
                 isVoiceRequested = true;
                 isVoiceGranted = false;
-            } else {
+            } /*else {
                 isTxing = false;
                 document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
-            }
+            }*/
         } else {
             isVoiceGranted = false;
             isTxing = false;
