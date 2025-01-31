@@ -274,6 +274,7 @@ window.addEventListener('message', async function (event) {
         if (!isRegistered) {
             console.log("Not registered, not txing");
             bonk();
+            SendRegistrationRequest();
             return;
         }
 
