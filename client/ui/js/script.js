@@ -664,6 +664,9 @@ function StartEmergencyAlarm() {
 }
 
 function changeChannel(direction) {
+    isTxing = false;
+    isReceiving = false;
+
     currentChannelIndex += direction;
 
     const currentZone = currentCodeplug.zones[currentZoneIndex];
@@ -687,6 +690,9 @@ function changeChannel(direction) {
 }
 
 function changeZone(direction) {
+    isTxing = false;
+    isReceiving = false;
+
     currentZoneIndex += direction;
 
     if (currentZoneIndex >= currentCodeplug.zones.length) {
