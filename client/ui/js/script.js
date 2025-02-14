@@ -770,6 +770,7 @@ function connectWebSocket() {
         isTxing = false;
         // console.debug("Codeplug: " + currentCodeplug);
         startCheckLoop();
+        pcmPlayer.clear();
     };
 
     socket.onclose = () => {
@@ -780,6 +781,7 @@ function connectWebSocket() {
         isVoiceGrantHandled = false;
         isTxing = false;
         console.debug('WebSocket connection closed');
+        pcmPlayer.clear();
     }
 
     socket.onerror = (error) => {
@@ -790,6 +792,7 @@ function connectWebSocket() {
         isVoiceGrantHandled = false;
         isTxing = false;
         console.error('WebSocket error:', error);
+        pcmPlayer.clear();
     }
 
     socket.onmessage = (event) => {
