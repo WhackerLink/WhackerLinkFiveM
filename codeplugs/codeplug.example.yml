@@ -8,6 +8,8 @@ radioWide:
 
 systems:
   - name: "System 1"
+    # This address is the Public IP of your Whackerlink Server. If hosted in a VPS, it is your Public IP of the VPS.
+    # If hosted locally, this is the Public IP of your Network.
     address: "localhost"
     port: 3000
     rid: null
