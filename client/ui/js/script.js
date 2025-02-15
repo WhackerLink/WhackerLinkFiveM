@@ -793,7 +793,8 @@ function connectWebSocket() {
         isVoiceRequested = false;
         isVoiceGrantHandled = false;
         isTxing = false;
-        console.error('WebSocket error:', error);
+        console.error('WebSocket error:');
+        console.error(error);
         pcmPlayer.clear();
     }
 
