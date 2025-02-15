@@ -203,6 +203,8 @@ async function sendAffiliation() {
             rssiIcon.src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
         }, 75);
     } catch (error) {
+        powerOff().then();
+        setLine2("Fail 01/01");
         console.error('Error sending affiliation:', error);
     }
 }
