@@ -247,17 +247,13 @@ window.addEventListener('message', async function (event) {
             rssiIcon.style.display = 'none';
         }
 
-        if (currentCodeplug == null) {
-            document.getElementById('notification').innerText = "Please set your codeplug first with /set_codeplug <codeplug>";
-            document.getElementById('notification').style.display = 'block';
-            setTimeout(() => {
-                document.getElementById('notification').style.display = 'none';
-            }, 2000);
-            return;
-        }
-
-        if (radioModel == null) {
-            radioModel = currentCodeplug.radioWide.model;
+        if (currentCodeplug === null || currentCodeplug === undefined) {
+            radioModel = "APX6000";
+            console.log("DEFAULT MODEL SET");
+        } else {
+            if (radioModel == null) {
+                radioModel = currentCodeplug.radioWide.model;
+            }
         }
 
         loadUIState();
@@ -422,15 +418,11 @@ window.addEventListener('message', async function (event) {
 });
 
 async function powerOn(reReg) {
-    pcmPlayer.clear();
-
+    radioOn = true;
+    initialized = true;
     currentMessageIndex = 0;
 
-    if (error === "FL_01/82") {
-        document.getElementById('line2').style.display = 'block';
-        setLine2(`Fail 01/82`);
-        return;
-    }
+    pcmPlayer.clear();
 
     if (myRid == null) {
         document.getElementById('line2').style.display = 'block';
@@ -498,8 +490,6 @@ async function powerOn(reReg) {
     document.getElementById("battery-icon").src = `models/${radioModel}/icons/battery${batteryLevel}.png`;
     document.getElementById("scan-icon").style.display = 'none';
     document.getElementById("scan-icon").src = `models/${radioModel}/icons/scan.png`;
-    radioOn = true;
-    initialized = true;
     rssiIcon.style.display = 'block';
     connectWebSocket();
 

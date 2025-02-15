@@ -19,7 +19,7 @@
 */
 
 function SendRegistrationRequest() {
-    if (!socketOpen) { return; }
+    if (!socketOpen || myRid === null) { return; }
 
     const request = {
         type: packetToNumber("U_REG_REQ"),
@@ -33,7 +33,7 @@ function SendRegistrationRequest() {
 }
 
 function SendDeRegistrationRequest() {
-    if (!socketOpen) { return; }
+    if (!socketOpen || myRid === null) { return; }
 
     const request = {
         type: packetToNumber("U_DE_REG_REQ"),
@@ -47,7 +47,7 @@ function SendDeRegistrationRequest() {
 }
 
 function SendGroupAffiliationRequest() {
-    if (!socketOpen) { return; }
+    if (!socketOpen || myRid === null || currentTg === null) { return; }
 
     const request = {
         type: packetToNumber("GRP_AFF_REQ"),
@@ -62,7 +62,7 @@ function SendGroupAffiliationRequest() {
 }
 
 function SendGroupVoiceRequest() {
-    if (!socketOpen) { return; }
+    if (!socketOpen || myRid === null || currentTg === null) { return; }
 
     const request = {
         type: packetToNumber("GRP_VCH_REQ"),
@@ -77,7 +77,7 @@ function SendGroupVoiceRequest() {
 }
 
 function SendGroupVoiceRelease() {
-    if (!socketOpen) { return; }
+    if (!socketOpen || myRid === null || currentTg === null) { return; }
 
     const request = {
         type: packetToNumber("GRP_VCH_RLS"),
@@ -93,7 +93,7 @@ function SendGroupVoiceRelease() {
 }
 
 function SendEmergencyAlarmRequest() {
-    if (!socketOpen) { return; }
+    if (!socketOpen || myRid === null || currentTg === null) { return; }
 
     const request = {
         type: packetToNumber("EMRG_ALRM_REQ"),
@@ -110,7 +110,7 @@ function SendEmergencyAlarmRequest() {
 }
 
 function SendAckResponse(service, extended) {
-    if (!socketOpen) { return; }
+    if (!socketOpen || myRid === null || currentTg === null) { return; }
 
     const request = {
         type: packetToNumber("ACK_RSP"),

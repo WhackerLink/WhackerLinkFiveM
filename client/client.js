@@ -303,11 +303,10 @@ function OpenRadio() {
     currentCodeplug = codeplug;
     if (codeplug === undefined || codeplug === null) {
         console.debug('No codeplug loaded');
-        SendNuiMessage(JSON.stringify({type: 'FL_01/82'}));
-        return;
+    } else {
+        SendNuiMessage(JSON.stringify({type: 'CLEAR_ERROR'}));
     }
 
-    SendNuiMessage(JSON.stringify({type: 'CLEAR_ERROR'}));
     SendNuiMessage(JSON.stringify({ type: 'openRadio', codeplug }));
     SendNuiMessage(JSON.stringify({ type: 'setRid', rid: GetResourceKvpString(getKeyWithResourcePrefix('myRid')) }));
     SetNuiFocus(false, false);
