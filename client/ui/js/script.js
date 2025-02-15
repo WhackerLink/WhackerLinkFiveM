@@ -659,6 +659,11 @@ function changeChannel(direction) {
     isTxing = false;
     isReceiving = false;
 
+    if (currentCodeplug.zones === null || currentCodeplug.zones === undefined) {
+        powerOff().then();
+        setLine2("Fail 01/82");
+    }
+
     currentChannelIndex += direction;
 
     const currentZone = currentCodeplug.zones[currentZoneIndex];
@@ -667,6 +672,11 @@ function changeChannel(direction) {
         currentChannelIndex = 0;
     } else if (currentChannelIndex < 0) {
         currentChannelIndex = currentZone.channels.length - 1;
+    }
+
+    if (currentZone.channels === null || currentZone.channels === undefined) {
+        powerOff().then();
+        setLine2("Fail 01/82");
     }
 
     const currentChannel = currentZone.channels[currentChannelIndex];
@@ -684,6 +694,11 @@ function changeChannel(direction) {
 function changeZone(direction) {
     isTxing = false;
     isReceiving = false;
+
+    if (currentCodeplug.zones === null || currentCodeplug.zones === undefined) {
+        powerOff().then();
+        setLine2("Fail 01/82");
+    }
 
     currentZoneIndex += direction;
 

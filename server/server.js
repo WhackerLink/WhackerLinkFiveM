@@ -105,7 +105,7 @@ RegisterCommand('set_codeplug', (source, args) => {
         // console.debug(`Setting codeplug for player ${source}: ${codeplugName}`);
         emitNet('receiveCodeplug', source, codeplugs[codeplugName]);
     } else {
-        console.debug(`Codeplug not found: ${codeplugName}`);
+        console.log(`Codeplug not found: ${codeplugName}`);
     }
 }, false);
 
