@@ -419,7 +419,6 @@ window.addEventListener('message', async function (event) {
 
 async function powerOn(reReg) {
     radioOn = true;
-    initialized = true;
     currentMessageIndex = 0;
 
     pcmPlayer.clear();
@@ -450,6 +449,8 @@ async function powerOn(reReg) {
     if (!initialized) {
         await micCapture.captureMicrophone(() => console.log('Microphone capture started.'));
     }
+
+    initialized = true;
 
     document.getElementById("line1").style.display = 'block';
     document.getElementById("line2").style.display = 'block';
