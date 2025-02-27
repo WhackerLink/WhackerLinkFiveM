@@ -1,7 +1,7 @@
 #radio-container {
     position: absolute;
-    bottom: 0px;
-    right: 0px;
+    bottom: 5px;
+    right: 10px;
     display: inline-block;
 }
 
@@ -29,43 +29,11 @@
     width: 12px;
     height: auto;
 }
-
 #rssi-icon {
     position: absolute;
-    top: 20%;
-    left: 22%;
-    display: block;
-}
-
-#red-icon, #yellow-icon, #green-icon {
-    position: absolute;
-    top: 29%;
+    top: 21.5%;
     left: 22.7%;
     display: block;
-}
-
-#red-icon {
-    top: 34.9%;
-    left: 10.5%;
-    width: 25px;
-    height: 9px;
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-}
-
-#yellow-icon {
-    top: 40.8%;
-    left: 10.4%;
-    width: 25px;
-    height: 9px;
-    box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
-}
-
-#green-icon {
-    top: 45.5%;
-    left: 10.4%;
-    width: 25px;
-    height: 9px;
-    box-shadow: 0 0 10px rgba(0, 176, 80, 0.5);
 }
 
 #channel-up, #zone-up, #rssi-btn {
@@ -193,14 +161,14 @@
     color: white;
     font-size: 14px;
     top: 53%;
-    left: 25%;
+    left: 26%;
 }
 
 #softText2 {
     color: white;
     font-size: 14px;
     top: 53%;
-    left: 32.5%;
+    left: 33.5%;
 }
 
 #softText3 {
@@ -213,7 +181,7 @@
     color: white;
     font-size: 14px;
     top: 53%;
-    left: 40.5%;
+    left: 41.2%;
 }
 
 #line1 {

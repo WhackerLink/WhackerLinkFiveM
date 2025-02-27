@@ -24,7 +24,7 @@ const micCapture = new MicCapture(onAudioFrameReady);
 const EXPECTED_PCM_LENGTH = 1600;
 const MAX_BUFFER_SIZE = EXPECTED_PCM_LENGTH * 2;
 
-const HOST_VERSION = "R02.08.00";
+const HOST_VERSION = "R03.00.00";
 
 const FNE_ID = 0xFFFFFF
 
@@ -32,6 +32,9 @@ const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 const rssiIcon = document.getElementById('rssi-icon');
 const scanIcon = document.getElementById('scan-icon');
+const redIcon = document.getElementById('red-icon');
+const yellowIcon = document.getElementById('yellow-icon');
+const greenIcon = document.getElementById('green-icon');
 
 let socket;
 let scanManager;
@@ -102,7 +105,7 @@ batteryLevelInterval = setInterval(() => {
 }, 3600000);
 
 function isMobile() {
-    return radioModel === "APX4500" || radioModel === "E5" || radioModel === "XTL2500";
+    return radioModel === "APX4500" || radioModel === "E5" || radioModel === "XTL2500" || radioModel === "APX4500-G";
 }
 
 function setBatteryLevel() {
@@ -198,9 +201,15 @@ function stopCheckLoop() {
 async function sendAffiliation() {
     try {
         rssiIcon.src = `models/${radioModel}/icons/tx.png`;
+        if (isMobile()) {
+            redIcon.src = `models/${radioModel}/icons/red.png`;
+            redIcon.style.display = 'block';
+        }
+
         await SendGroupAffiliationRequest();
         setTimeout(() => {
             rssiIcon.src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+            if (isMobile()) redIcon.style.display = 'none';
         }, 75);
     } catch (error) {
         powerOff().then();
@@ -212,9 +221,14 @@ async function sendAffiliation() {
 async function sendRegistration() {
     try {
         rssiIcon.src = `models/${radioModel}/icons/tx.png`;
+        if (isMobile()) {
+            redIcon.src = `models/${radioModel}/icons/red.png`;
+            redIcon.style.display = 'block';
+        }
         await SendRegistrationRequest();
         setTimeout(() => {
             rssiIcon.src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+            if (isMobile()) redIcon.style.display = 'none';
         }, 75);
     } catch (error) {
         console.error('Error sending registration:', error);
@@ -294,6 +308,11 @@ window.addEventListener('message', async function (event) {
         if (!isInSiteTrunking) {
             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
 
+            if (isMobile()) {
+                redIcon.src = `models/${radioModel}/icons/red.png`;
+                redIcon.style.display = 'block';
+            }
+
             await sleep(50);
 
             if (!isVoiceRequested && !isVoiceGranted) {
@@ -309,9 +328,11 @@ window.addEventListener('message', async function (event) {
             isTxing = false;
             isVoiceRequested = true;
             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+
+            if (isMobile()) redIcon.style.display = 'none';
         }
     } else if (event.data.type === "pttRelease") {
-        await sleep(450); // Temp fix to ensure all voice data makes it through before releasing; Is this correct?
+        await sleep(655); // Temp fix to ensure all voice data makes it through before releasing; Is this correct?
                               // Should we check if the audio buffer is empty instead? Now I am just talking to myself..
 
         isVoiceGrantHandled = false;
@@ -506,6 +527,7 @@ async function powerOff(stayConnected) {
     if (!stayConnected)
         await SendDeRegistrationRequest();
     await sleep(1000);
+
     isAffiliated = false;
     isRegistered = false;
     isVoiceGranted = false;
@@ -518,6 +540,7 @@ async function powerOff(stayConnected) {
     radioOn = false;
     haltAllLine3Messages = false;
     error = null;
+
     document.getElementById("line1").innerHTML = '';
     document.getElementById("line2").innerHTML = '';
     document.getElementById("line3").innerHTML = '';
@@ -535,6 +558,10 @@ async function powerOff(stayConnected) {
     document.getElementById("softText2").style.display = 'none';
     document.getElementById("softText3").style.display = 'none';
     document.getElementById("softText4").style.display = 'none';
+    redIcon.style.display = 'none';
+    yellowIcon.style.display = 'none';
+    greenIcon.style.display = 'none';
+
     if (!stayConnected) {
         disconnectWebSocket();
     }
@@ -858,6 +885,10 @@ function connectWebSocket() {
                     document.getElementById("line3").style.color = "black";
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
+                    if (isMobile()) {
+                        yellowIcon.src = `models/${radioModel}/icons/yellow.png`;
+                        yellowIcon.style.display = 'block';
+                    }
                 } else if (scanManager !== null && !isReceivingParkedChannel && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId)) && scanEnabled) {
                     console.log("Received GRP_VCH_RSP for TG in scan list");
                     scanTgActive = true;
@@ -871,6 +902,10 @@ function connectWebSocket() {
                     document.getElementById("line3").style.color = "black";
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
+                    if (isMobile()) {
+                        yellowIcon.src = `models/${radioModel}/icons/yellow.png`;
+                        yellowIcon.style.display = 'block';
+                    }
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg && data.data.Status === 0) {
                     //if (!isVoiceGranted && isVoiceRequested) {
                     currentFrequncyChannel = data.data.Channel;
@@ -881,15 +916,21 @@ function connectWebSocket() {
                     isReceivingParkedChannel = false;
                     scanTgActive = false;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                    if (isMobile()) redIcon.style.display = 'none';
                     isVoiceRequested = false;
                     isVoiceGranted = true;
                     setTimeout(() => {
                         if (isTxing) {
                             tpt_generate();
                             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
+                            if (isMobile()) {
+                                redIcon.src = `models/${radioModel}/icons/red.png`;
+                                redIcon.style.display = 'block';
+                            }
                         } else {
-                            console.log("After 2ms isTxing = false, boking");
+                            console.log("After 200ms isTxing = false, bonking");
                             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                            redIcon.style.display = 'none';
                             isTxing = false;
                             isVoiceGranted = false;
                             if (currentFrequncyChannel !== null) {
@@ -920,6 +961,7 @@ function connectWebSocket() {
                     isReceivingParkedChannel = false;
                     currentFrequncyChannel = null;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                    yellowIcon.style.display = 'none';
                     pcmPlayer.clear();
                 } else if (scanManager !== null && !isReceivingParkedChannel && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId)) && scanEnabled) {
                     haltAllLine3Messages = false;
@@ -939,11 +981,13 @@ function connectWebSocket() {
                     setLine1(currentZone.name);
                     setLine2(currentChannel.name);
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                    yellowIcon.style.display = 'none';
                     pcmPlayer.clear();
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
                     isVoiceGranted = false;
                     isVoiceRequested = false;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+                    redIcon.style.display = 'none';
                     pcmPlayer.clear();
                 }
             } else if (data.type === packetToNumber("EMRG_ALRM_RSP")) {
