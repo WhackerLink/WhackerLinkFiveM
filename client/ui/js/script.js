@@ -201,7 +201,7 @@ function stopCheckLoop() {
 async function sendAffiliation() {
     try {
         rssiIcon.src = `models/${radioModel}/icons/tx.png`;
-        if (isMobile()) {
+        if (isMobile() && radioModel !== "E5") { // E5 temp fix
             redIcon.src = `models/${radioModel}/icons/red.png`;
             redIcon.style.display = 'block';
         }
@@ -221,7 +221,7 @@ async function sendAffiliation() {
 async function sendRegistration() {
     try {
         rssiIcon.src = `models/${radioModel}/icons/tx.png`;
-        if (isMobile()) {
+        if (isMobile() && radioModel !== "E5") { // E5 temp fix
             redIcon.src = `models/${radioModel}/icons/red.png`;
             redIcon.style.display = 'block';
         }
@@ -308,7 +308,7 @@ window.addEventListener('message', async function (event) {
         if (!isInSiteTrunking) {
             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
 
-            if (isMobile()) {
+            if (isMobile() && radioModel !== "E5") { // E5 temp fix
                 redIcon.src = `models/${radioModel}/icons/red.png`;
                 redIcon.style.display = 'block';
             }
@@ -923,7 +923,7 @@ function connectWebSocket() {
                         if (isTxing) {
                             tpt_generate();
                             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/tx.png`;
-                            if (isMobile()) {
+                            if (isMobile() && radioModel !== "E5") { // E5 temp fix
                                 redIcon.src = `models/${radioModel}/icons/red.png`;
                                 redIcon.style.display = 'block';
                             }
