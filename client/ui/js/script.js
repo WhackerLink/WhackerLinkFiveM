@@ -710,12 +710,14 @@ function changeChannel(direction) {
     const currentChannel = currentZone.channels[currentChannelIndex];
 
     responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
+
+    updateDisplay();
+
     if (!isInSiteTrunking) {
         sendAffiliation().then();
     } else {
         isAffiliated = false;
     }
-    updateDisplay();
     reconnectIfSystemChanged();
 }
 

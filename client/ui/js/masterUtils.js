@@ -33,7 +33,7 @@ function SendRegistrationRequest() {
 }
 
 function SendDeRegistrationRequest() {
-    if (!socketOpen || myRid === null) { return; }
+    if (!socketOpen || myRid === null || !socket) { return; }
 
     const request = {
         type: packetToNumber("U_DE_REG_REQ"),
