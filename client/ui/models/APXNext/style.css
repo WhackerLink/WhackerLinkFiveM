@@ -1,7 +1,6 @@
 #radio-container {
     position: absolute;
-    bottom: 0px;
-    right: 10px;
+    bottom: 5px;
     display: inline-block;
 }
 
@@ -13,58 +12,48 @@ body {
 
 #radio-image {
     display: block;
-    width: 300px;
+    width: 250px;
     height: auto;
     position: relative;
 }
 
 #rssi-icon {
     position: absolute;
-    top: 46.5%;
-    left: 33.5%;
+    top: 56.5%;
+    left: 25.5%; /* Adjust this as needed */
+    height: 2%;
+    width: auto;
     display: block;
 }
 #scan-icon {
     position: absolute;
-    top: 47%;
+    top: 56.5%;
     left: 40%;
     display: none;
-    width: 12px;
+    width: 15px;
     height: auto;
 }
 
 #battery-icon {
     position: absolute;
-    top: 47%;
-    left: 63%;
-    height: 7%;
+    top: 46.5%;
+    left: 70%;
+    height: 3%;
     width: auto;
     display: none;
 }
 
-#zone-up {
+#zone-up, #scan-btn {
     position: absolute;
     transform: translateX(-50%);
-    top: 53%;
+    top: 69%;
     z-index: 1;
     display: block;
-    margin: 20px auto;
-    padding: 4px;
-    background-color: transparent;
-    color: transparent;
-    border: none;
-    cursor: pointer;
-}
-#rssi-btn, #scan-btn{
-    position: absolute;
-    transform: translateX(-50%);
-    top: 77%;
-    z-index: 1;
-    display: block;
-    margin: 7px auto;
+    margin: 10px auto;
     padding: 7px;
     background-color: transparent;
     color: transparent;
+    width: 45px;
     border: none;
     cursor: pointer;
 }
@@ -76,45 +65,50 @@ body {
 }
 
 #zone-up {
-    left: 26%;
+    left: 32%;
 }
 
 
 #scan-btn {
-    left: 57%;
+    left: 50%;
+
 }
 
 
 #rssi-btn {
-    left: 43%;
+    display: none; /* Completely removes it from layout */
 }
 
 #channel-knbu {
-    left: 54%;
-    top: 6%;
+    left: 55%;
+    top: 18.5%;
+    height: 70px;
 }
 #channel-knbd {
-    left: 46%;
-    top: 6%;
+    left: 44%;
+    top: 18.5%;
+    height: 70px;
 }
 #btn-emer {
-    right: 16%;
+    left: 30%;
 }
 
 #power-btn {
-    left: 10%;
-    top: 20%;
-    width: 48px;
+    left: 86%;
+    top: 24%;
+    height: 50px;
+    width: 60px;
+    padding: 10px;
 }
 
 #btn-emer {
     position: absolute;
     transform: translateX(-50%);
-    top: 43%;
+    top: 28%;
     z-index: 1;
     display: block;
-    margin: 20px auto;
-    padding: 7px;
+    margin: 10px auto;
+    padding: 10px;
     background-color: transparent;
     color: transparent;
     border: none;
@@ -127,7 +121,7 @@ body {
     z-index: 1;
     display: block;
     margin: 10px auto;
-    padding: 7px;
+    padding: 8px;
     background-color: transparent;
     color: transparent;
     border: none;
@@ -136,24 +130,24 @@ body {
 
 #line1, #line2, #line3 {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 25.5%; /* Adjust this as needed */
+    transform: none; /* Remove centering */
     z-index: 1;
     color: black;
-    font-size: 14px;
+    font-size: 13px;
     font-family: Helvetica, serif;
     font-weight: bold;
-    text-align: center;
+    text-align: left; /* Align text to the left */
     width: 90%;
 }
 
-#softText1, #softText2, #softText4 {
+#softText1, #softText2, #softText4, #next-text {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1;
     color: black;
-    font-size: 17px;
+    font-size: 13px;
     font-family: Helvetica, serif;
     font-weight: bold;
     text-align: center;
@@ -161,15 +155,16 @@ body {
 }
 
 #softText1 {
-    font-size: 0px;
-    top: 78%;
-    left: 38%;
+    font-size: 8px;
+    top: 72.5%;
+    left: 30%; /* Position relative to other icons */
 }
 
 #softText2 {
-    font-size: 12px;
-    top: 78%;
-    left: 43%;
+    font-size: 0px;
+    top: 0%;
+    left: 0%;
+    color: transparent;
 }
 
 #softText3 {
@@ -185,31 +180,38 @@ body {
     visibility: hidden;
 }
 #softText4 {
-    font-size: 12px;
-    top: 78%;
-    left: 57%;
+    font-size: 8px;
+    top: 72.5%;
+    left: 49.5%; /* Position relative to other icons */
+}
+#next-text {
+    font-size: 8px;
+    top: 72.5%;
+    left: 69%; /* Position relative to other icons */
 }
 
 
 #line1 {
-    top: 55.5%;
+    top: 58.5%;
+    color:#868380;
 }
 
 #line2 {
-    top: 65%;
-    font-size: 12px;
+    top: 61%;
+    font-size: 10px;
 }
 
 #line3 {
-    top: 72%;
-    font-size: 12px;
-    left: 49.5%;
+    top: 62.5%;
+    font-size: 8px;
+    left: 25.5%;
     width: 41%;
 }
 
 #startup-message {
     background-color: white;
     padding: 20px;
+    left: 48.5%;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -223,3 +225,48 @@ body {
 #startup-message p {
     margin: 5px 0;
 }
+
+#next-icon1, #next-icon2, #next-icon3 {
+    position: absolute;
+    display: none; /* Hidden by default until powered on */
+    width: 15px; /* Adjust as needed */
+    height: auto;
+}
+
+#next-icon1 {
+    top: 70%;
+    left: 26.5%; /* Position relative to other icons */
+}
+
+#next-icon2 {
+    top: 70%;
+    left: 46%; /* Position relative to other icons */
+}
+
+#next-icon3 {
+    top: 71%;
+    left: 65%; /* Position relative to other icons */
+}
+
+.tx-indicator, .rx-indicator {
+    position: absolute;
+    width: 8px; /* Adjust as needed */
+    height: 74px;
+    top: 56.41%; /* Adjust to fit your UI */
+    left: 22.5%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-weight: bold;
+    color: white;
+    display: none; /* Hidden by default */
+}
+
+.tx-indicator {
+    background-color:#ec1c24;
+}
+
+.rx-indicator {
+    background-color:#fcb400;
+}
+
+

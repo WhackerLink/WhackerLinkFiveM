@@ -1,96 +1,114 @@
 #radio-container {
-    position: fixed;
+    position: absolute;
     bottom: 5px;
-    right: 100px;
     display: inline-block;
 }
 
+body {
+    overflow-y: hidden; 
+    overflow-x: hidden; 
+  }
+
+
 #radio-image {
     display: block;
-    width: 350px;
+    width: 320px;
     height: auto;
     position: relative;
 }
 
 #rssi-icon {
     position: absolute;
-    top: 69.5%;
-    left: 30%;
+    top: 56.5%;
+    left: 34%;
+    height: 2.2%;
+    width: auto;
     display: block;
+}
+#scan-icon {
+    position: absolute;
+    top: 56.5%;
+    left: 45%;
+    display: none;
+    width: 12px;
+    height: auto;
 }
 
 #battery-icon {
     position: absolute;
-    top: 69%;
-    left: 65.5%;
-    height: 3.5%;
+    top: 56.5%;
+    left: 68%;
+    height: 2%;
     width: auto;
     display: none;
 }
 
-#channel-up, #zone-up, #rssi-btn {
+#zone-up, #rssi-btn, #scan-btn {
     position: absolute;
     transform: translateX(-50%);
-    top: 91%;
+    top: 79%;
     z-index: 1;
     display: block;
     margin: 10px auto;
     padding: 7px;
     background-color: transparent;
     color: transparent;
+    width: 32px;
     border: none;
     cursor: pointer;
 }
 
 #channel-up {
-    left: 63%;
-bottom: -4%;
+    left: 37%;
+    visibility: hidden;
+    display: none;
 }
 
 #zone-up {
-bottom: -4%;
-    left: 37%;
+    left: 39%;
+}
+
+
+#scan-btn {
+    left: 66%;
 
 }
 
-#rssi-btn {
-bottom: -4%;
-    left: 50%;
 
+#rssi-btn {
+    left: 53%;
 }
 
 #channel-knbu {
-    left: 52%;
-    top: 35%;
-    color: red;
+    left: 58%;
+    top: 32%;
+    height: 42px;
 }
 #channel-knbd {
-    left: 44%;
-    top: 35%;
-    color: blue;
-
-
+    left: 46%;
+    top: 32%;
+    height: 42px;
 }
 #btn-emer {
-   left 28%;
-   background-color: orange;
+    left: 35%;
 }
 
 #power-btn {
-    left: 86%;
-    top: 41%;
-    width: 50px;
-   background-color:green;
+    left: 87%;
+    top: 32%;
+    height: 50px;
+    width: 60px;
+    padding: 10px;
 }
 
 #btn-emer {
     position: absolute;
     transform: translateX(-50%);
-    top: 45%;
+    top: 39%;
     z-index: 1;
     display: block;
     margin: 10px auto;
-    padding: 7px;
+    padding: 10px;
     background-color: transparent;
     color: transparent;
     border: none;
@@ -103,7 +121,7 @@ bottom: -4%;
     z-index: 1;
     display: block;
     margin: 10px auto;
-    padding: 7px;
+    padding: 8px;
     background-color: transparent;
     color: transparent;
     border: none;
@@ -112,7 +130,7 @@ bottom: -4%;
 
 #line1, #line2, #line3 {
     position: absolute;
-    left: 50%;
+    left: 53%;
     transform: translateX(-50%);
     z-index: 1;
     color: black;
@@ -123,7 +141,7 @@ bottom: -4%;
     width: 90%;
 }
 
-#softText1, #softText2, #softText3 {
+#softText1, #softText2, #softText4 {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -138,41 +156,55 @@ bottom: -4%;
 
 #softText1 {
     font-size: 12px;
-    top: 87.2%;
-    left: 36%;
+    top: 74.8%;
+    left: 40.5%;
 }
 
 #softText2 {
     font-size: 12px;
-    top: 87.2%;
-    left: 49.5%;
+    top: 74.8%;
+    left: 52.5%;
 }
 
 #softText3 {
+    position: absolute;
+    left: 50%;
+    z-index: 1;
+    color: white;
+    font-size: 1px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+    visibility: hidden;
+}
+#softText4 {
     font-size: 12px;
-    top: 87.2%;
-    left: 63.5%;
+    top: 74.8%;
+    left: 65%;
 }
 
+
 #line1 {
-    top: 73%;
+    top: 62%;
 }
 
 #line2 {
-    top: 77%;
-    font-size: 15px;
+    top: 64%;
+    font-size: 18px;
 }
 
 #line3 {
-    top: 81.5%;
+    top: 68%;
     font-size: 14px;
-    left: 49.5%;
+    left: 53%;
     width: 41%;
 }
 
 #startup-message {
     background-color: white;
     padding: 20px;
+    left: 48.5%;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);

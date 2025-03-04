@@ -1,33 +1,34 @@
 #radio-container {
     position: absolute;
-    bottom: 0px;
-    right: 10px;
+    bottom: 5px;
     display: inline-block;
 }
 
 body {
     overflow-y: hidden; 
     overflow-x: hidden; 
-}
+  }
 
 
 #radio-image {
     display: block;
-    width: 300px;
+    width: 500px;
     height: auto;
     position: relative;
 }
 
 #rssi-icon {
     position: absolute;
-    top: 51%;
+    top: 21.5%;
     left: 36%;
+    height: 5%;
+    width: auto;
     display: block;
 }
 #scan-icon {
     position: absolute;
-    top: 51.5%;
-    left: 42%;
+    top: 21.5%;
+    left: 45%;
     display: none;
     width: 12px;
     height: auto;
@@ -35,9 +36,9 @@ body {
 
 #battery-icon {
     position: absolute;
-    top: 51%;
-    left: 62%;
-    height: 7%;
+    top: 21.5%;
+    left: 60%;
+    height: 5%;
     width: auto;
     display: none;
 }
@@ -45,26 +46,29 @@ body {
 #zone-up {
     position: absolute;
     transform: translateX(-50%);
-    top: 53%;
+    top: 22%;
     z-index: 1;
     display: block;
-    margin: 20px auto;
-    padding: 4px;
-    background-color: transparent;
-    color: transparent;
-    border: none;
-    cursor: pointer;
-}
-#rssi-btn, #scan-btn{
-    position: absolute;
-    transform: translateX(-50%);
-    top: 77%;
-    z-index: 1;
-    display: block;
-    margin: 7px auto;
+    margin: 10px auto;
     padding: 7px;
     background-color: transparent;
     color: transparent;
+    height: 75px;
+    width: 20px;
+    border: none;
+    cursor: pointer;
+}
+
+#rssi-btn, #scan-btn {
+    position: absolute;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: block;
+    margin: 0px auto;
+    padding: 0px;
+    background-color: transparent;
+    color: transparent;
+    width: 0px;
     border: none;
     cursor: pointer;
 }
@@ -76,46 +80,44 @@ body {
 }
 
 #zone-up {
-    left: 26%;
-}
-
-
-#scan-btn {
-    left: 57%;
-}
-
-
-#rssi-btn {
-    left: 43%;
+    left: 69.5%;
 }
 
 #channel-knbu {
-    left: 54%;
-    top: 6%;
+    left: 55%;
+    top: 55%;
+    height: 70px;
+    width: 40px;
 }
 #channel-knbd {
-    left: 46%;
-    top: 6%;
+    left: 45%;
+    top: 55%;
+    height: 70px;
+    width: 40px;
 }
 #btn-emer {
-    right: 18%;
+    left: 26%;
 }
 
 #power-btn {
-    left: 10%;
-    top: 20%;
-    width: 40px;
+    left: 88%;
+    top: 44%;
+    height: 80px;
+    width: 80px;
+    padding: 10px;
 }
 
 #btn-emer {
     position: absolute;
     transform: translateX(-50%);
-    top: 43%;
+    top: 22%;
     z-index: 1;
     display: block;
-    margin: 20px auto;
-    padding: 7px;
+    margin: 10px auto;
+    padding: 10px;
     background-color: transparent;
+    height: 65px;
+    width: 55px;
     color: transparent;
     border: none;
     cursor: pointer;
@@ -127,7 +129,7 @@ body {
     z-index: 1;
     display: block;
     margin: 10px auto;
-    padding: 7px;
+    padding: 8px;
     background-color: transparent;
     color: transparent;
     border: none;
@@ -136,11 +138,11 @@ body {
 
 #line1, #line2, #line3 {
     position: absolute;
-    left: 50%;
+    left: 49.5%;
     transform: translateX(-50%);
     z-index: 1;
     color: black;
-    font-size: 14px;
+    font-size: 17px;
     font-family: Helvetica, serif;
     font-weight: bold;
     text-align: center;
@@ -152,24 +154,25 @@ body {
     left: 50%;
     transform: translateX(-50%);
     z-index: 1;
-    color: black;
+    color: white;
     font-size: 17px;
     font-family: Helvetica, serif;
     font-weight: bold;
+    color: transparent;
     text-align: center;
     width: 90%;
 }
 
 #softText1 {
-    font-size: 0px;
-    top: 78%;
-    left: 38%;
+    font-size: 12px;
+    top: 82%;
+    left: 37.5%;
 }
 
 #softText2 {
     font-size: 12px;
-    top: 78%;
-    left: 43%;
+    top: 82%;
+    left: 49.5%;
 }
 
 #softText3 {
@@ -181,34 +184,39 @@ body {
     font-family: Helvetica, serif;
     font-weight: bold;
     text-align: center;
+    color: transparent;
     width: 90%;
     visibility: hidden;
 }
 #softText4 {
     font-size: 12px;
-    top: 78%;
-    left: 57%;
+    top: 82%;
+    left: 61%;
 }
 
+
 #line1 {
-    top: 58%;
+    top: 28%;
+    font-size: 18px;
 }
 
 #line2 {
-    top: 66%;
-    font-size: 10px;
+    top: 35%;
+    font-size: 16px;
 }
 
 #line3 {
-    top: 73%;
-    font-size: 10px;
+    top: 35%;
+    font-size: 16px;
     left: 49.5%;
-    width: 41%;
+    width: 20%;
+    background-color:#f1f1f1;
 }
 
 #startup-message {
     background-color: white;
     padding: 20px;
+    left: 48.5%;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);

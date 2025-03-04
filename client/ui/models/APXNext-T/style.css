@@ -1,97 +1,121 @@
 #radio-container {
-    position: fixed;
+    position: absolute;
     bottom: 5px;
-    right: 100px;
     display: inline-block;
 }
 
+body {
+    overflow-y: hidden; 
+    overflow-x: hidden; 
+  }
+
+
 #radio-image {
     display: block;
-    width: 350px;
+    width: 450px;
     height: auto;
     position: relative;
 }
 
 #rssi-icon {
     position: absolute;
-    top: 69.5%;
-    left: 30%;
+    top: 18%;
+    left: 34%;
+    height: 6%;
+    width: auto;
     display: block;
+}
+#scan-icon {
+    position: absolute;
+    top: 68.5%;
+    left: 45%;
+    display: none;
+    width: 12px;
+    height: auto;
 }
 
 #battery-icon {
     position: absolute;
-    top: 69%;
-    left: 65.5%;
-    height: 3.5%;
+    top: 18%;
+    left: 63.5%;
+    height: 6%;
     width: auto;
     display: none;
 }
 
-#channel-up, #zone-up, #rssi-btn {
+#zone-up {
     position: absolute;
     transform: translateX(-50%);
-    top: 91%;
+    top: 15%;
     z-index: 1;
     display: block;
     margin: 10px auto;
     padding: 7px;
     background-color: transparent;
     color: transparent;
+    height: 80px;
+    width: 20px;
+    border: none;
+    cursor: pointer;
+}
+
+#rssi-btn, #scan-btn {
+    position: absolute;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: block;
+    margin: 0px auto;
+    padding: 0px;
+    background-color: transparent;
+    color: transparent;
+    width: 0px;
     border: none;
     cursor: pointer;
 }
 
 #channel-up {
-    left: 63%;
-bottom: -4%;
+    left: 37%;
+    visibility: hidden;
+    display: none;
 }
 
 #zone-up {
-bottom: -4%;
-    left: 37%;
-
-}
-
-#rssi-btn {
-bottom: -4%;
-    left: 50%;
-
+    left: 73%;
 }
 
 #channel-knbu {
-    left: 52%;
-    top: 35%;
-    color: red;
+    left: 55%;
+    top: 58%;
+    height: 70px;
 }
 #channel-knbd {
     left: 44%;
-    top: 35%;
-    color: blue;
-
-
+    top: 58%;
+    height: 70px;
 }
 #btn-emer {
-   left 28%;
-   background-color: orange;
+    left: 23%;
 }
 
 #power-btn {
-    left: 86%;
-    top: 41%;
-    width: 50px;
-   background-color:green;
+    left: 88%;
+    top: 44%;
+    height: 80px;
+    width: 80px;
+    padding: 10px;
 }
 
 #btn-emer {
     position: absolute;
     transform: translateX(-50%);
-    top: 45%;
+    top: 22%;
     z-index: 1;
     display: block;
     margin: 10px auto;
-    padding: 7px;
+    padding: 10px;
     background-color: transparent;
+    height: 55px;
+    width: 55px;
     color: transparent;
     border: none;
     cursor: pointer;
@@ -103,7 +127,7 @@ bottom: -4%;
     z-index: 1;
     display: block;
     margin: 10px auto;
-    padding: 7px;
+    padding: 8px;
     background-color: transparent;
     color: transparent;
     border: none;
@@ -123,7 +147,7 @@ bottom: -4%;
     width: 90%;
 }
 
-#softText1, #softText2, #softText3 {
+#softText1, #softText2, #softText4 {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -132,47 +156,64 @@ bottom: -4%;
     font-size: 17px;
     font-family: Helvetica, serif;
     font-weight: bold;
+    color: transparent;
     text-align: center;
     width: 90%;
 }
 
 #softText1 {
     font-size: 12px;
-    top: 87.2%;
-    left: 36%;
+    top: 82%;
+    left: 37.5%;
 }
 
 #softText2 {
     font-size: 12px;
-    top: 87.2%;
+    top: 82%;
     left: 49.5%;
 }
 
 #softText3 {
+    position: absolute;
+    left: 50%;
+    z-index: 1;
+    color: white;
+    font-size: 1px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    color: transparent;
+    width: 90%;
+    visibility: hidden;
+}
+#softText4 {
     font-size: 12px;
-    top: 87.2%;
-    left: 63.5%;
+    top: 82%;
+    left: 61%;
 }
 
+
 #line1 {
-    top: 73%;
+    top: 28%;
 }
 
 #line2 {
-    top: 77%;
+    top: 34%;
     font-size: 15px;
 }
 
 #line3 {
-    top: 81.5%;
-    font-size: 14px;
-    left: 49.5%;
-    width: 41%;
+    top: 34%;
+    font-size: 16px;
+    left: 50%;
+    width: 20%;
+    background-color:#f1f1f1;
 }
 
 #startup-message {
     background-color: white;
     padding: 20px;
+    left: 48.5%;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);

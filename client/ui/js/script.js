@@ -35,6 +35,8 @@ const scanIcon = document.getElementById('scan-icon');
 const redIcon = document.getElementById('red-icon');
 const yellowIcon = document.getElementById('yellow-icon');
 const greenIcon = document.getElementById('green-icon');
+const rxBox = document.getElementById("rx-box");
+const txBox = document.getElementById("tx-box");
 
 let socket;
 let scanManager;
@@ -200,6 +202,11 @@ function stopCheckLoop() {
 
 async function sendAffiliation() {
     try {
+        if (radioModel === "APXNext") {
+            document.getElementById("tx-box").style.display = "block"; // Show TX box
+            document.getElementById("rx-box").style.display = "none";
+        }
+
         rssiIcon.src = `models/${radioModel}/icons/tx.png`;
         if (isMobile() && radioModel !== "E5" && radioModel !== "APX4500-G") { // E5 temp fix
             redIcon.src = `models/${radioModel}/icons/red.png`;
@@ -210,6 +217,10 @@ async function sendAffiliation() {
         setTimeout(() => {
             rssiIcon.src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
             if (isMobile()) redIcon.style.display = 'none';
+            if (radioModel === "APXNext") {
+                document.getElementById("tx-box").style.display = "none";
+                document.getElementById("rx-box").style.display = "none";
+            }
         }, 75);
     } catch (error) {
         powerOff().then();
@@ -220,6 +231,12 @@ async function sendAffiliation() {
 
 async function sendRegistration() {
     try {
+        if (radioModel === "APXNext") {
+            txBox.backgroundColor = 'red';
+            document.getElementById("tx-box").style.display = "block";
+            document.getElementById("rx-box").style.display = "none";
+        }
+
         rssiIcon.src = `models/${radioModel}/icons/tx.png`;
         if (isMobile() && radioModel !== "E5" && radioModel !== "APX4500-G") { // E5 temp fix
             redIcon.src = `models/${radioModel}/icons/red.png`;
@@ -229,6 +246,10 @@ async function sendRegistration() {
         setTimeout(() => {
             rssiIcon.src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
             if (isMobile()) redIcon.style.display = 'none';
+            if (radioModel === "APXNext") {
+                document.getElementById("tx-box").style.display = "none";
+                document.getElementById("rx-box").style.display = "none";
+            }
         }, 75);
     } catch (error) {
         console.error('Error sending registration:', error);
@@ -313,6 +334,12 @@ window.addEventListener('message', async function (event) {
                 redIcon.style.display = 'block';
             }
 
+            if (radioModel === "APXNext") {
+                txBox.style.display = "block";
+                rxBox.style.display = "none";
+                txBox.style.backgroundColor = "red";
+            }
+
             await sleep(50);
 
             if (!isVoiceRequested && !isVoiceGranted) {
@@ -330,6 +357,10 @@ window.addEventListener('message', async function (event) {
             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
 
             if (isMobile()) redIcon.style.display = 'none';
+
+            if (radioModel === "APXNext") {
+                txBox.style.display = "none";
+            }
         }
     } else if (event.data.type === "pttRelease") {
         await sleep(655); // Temp fix to ensure all voice data makes it through before releasing; Is this correct?
@@ -513,6 +544,19 @@ async function powerOn(reReg) {
     document.getElementById("scan-icon").style.display = 'none';
     document.getElementById("scan-icon").src = `models/${radioModel}/icons/scan.png`;
     rssiIcon.style.display = 'block';
+
+    if (radioModel === "APXNext") {
+        document.getElementById("next-icon1").style.display = "block";
+        document.getElementById("next-icon2").style.display = "block";
+        document.getElementById("next-icon3").style.display = "block";
+        document.getElementById("next-text").innerHTML = 'More';
+    } else {
+        document.getElementById("next-icon1").style.display = "none";
+        document.getElementById("next-icon2").style.display = "none";
+        document.getElementById("next-icon3").style.display = "none";
+        document.getElementById("next-text").innerHTML = '';
+    }
+
     connectWebSocket();
 
     if (reReg) {
@@ -558,9 +602,19 @@ async function powerOff(stayConnected) {
     document.getElementById("softText2").style.display = 'none';
     document.getElementById("softText3").style.display = 'none';
     document.getElementById("softText4").style.display = 'none';
+
+    document.getElementById("next-icon1").style.display = "none";
+    document.getElementById("next-icon2").style.display = "none";
+    document.getElementById("next-icon3").style.display = "none";
+    document.getElementById("tx-box").style.display = "none";
+    document.getElementById("rx-box").style.display = "none";
+    document.getElementById("next-text").innerHTML = '';
+
     redIcon.style.display = 'none';
     yellowIcon.style.display = 'none';
     greenIcon.style.display = 'none';
+    rxBox.style.display = "none";
+    txBox.style.display = "none";
 
     if (!stayConnected) {
         disconnectWebSocket();
@@ -887,6 +941,9 @@ function connectWebSocket() {
                     document.getElementById("line3").style.color = "black";
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
+                    if (radioModel === "APXNext") rxBox.style.display = "block";
+                    txBox.style.display = "none";
+                    rxBox.style.backgroundColor = "yellow";
                     if (isMobile()) {
                         yellowIcon.src = `models/${radioModel}/icons/yellow.png`;
                         yellowIcon.style.display = 'block';
@@ -904,6 +961,7 @@ function connectWebSocket() {
                     document.getElementById("line3").style.color = "black";
                     document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
+                    rxBox.style.display = "none";
                     if (isMobile()) {
                         yellowIcon.src = `models/${radioModel}/icons/yellow.png`;
                         yellowIcon.style.display = 'block';
@@ -919,6 +977,7 @@ function connectWebSocket() {
                     scanTgActive = false;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                     if (isMobile()) redIcon.style.display = 'none';
+                    txBox.style.display = "none";
                     isVoiceRequested = false;
                     isVoiceGranted = true;
                     setTimeout(() => {
@@ -929,10 +988,17 @@ function connectWebSocket() {
                                 redIcon.src = `models/${radioModel}/icons/red.png`;
                                 redIcon.style.display = 'block';
                             }
+
+                            if (radioModel === "APXNext") {
+                                if (radioModel === "APXNext") txBox.style.display = "block";
+                                rxBox.style.display = "none";
+                                txBox.style.backgroundColor = "red";
+                            }
                         } else {
                             console.log("After 200ms isTxing = false, bonking");
                             document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                             redIcon.style.display = 'none';
+                            txBox.style.display = "none";
                             isTxing = false;
                             isVoiceGranted = false;
                             if (currentFrequncyChannel !== null) {
@@ -964,6 +1030,7 @@ function connectWebSocket() {
                     currentFrequncyChannel = null;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                     yellowIcon.style.display = 'none';
+                    rxBox.style.display = "none";
                     pcmPlayer.clear();
                 } else if (scanManager !== null && !isReceivingParkedChannel && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId)) && scanEnabled) {
                     haltAllLine3Messages = false;
@@ -984,12 +1051,14 @@ function connectWebSocket() {
                     setLine2(currentChannel.name);
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                     yellowIcon.style.display = 'none';
+                    rxBox.style.display = "none";
                     pcmPlayer.clear();
                 } else if (data.data.SrcId === myRid && data.data.DstId === currentTg) {
                     isVoiceGranted = false;
                     isVoiceRequested = false;
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
                     redIcon.style.display = 'none';
+                    txBox.style.display = "none";
                     pcmPlayer.clear();
                 }
             } else if (data.type === packetToNumber("EMRG_ALRM_RSP")) {
@@ -1346,6 +1415,20 @@ function loadRadioModelAssets(model) {
     const radioStylesheet = document.getElementById('radio-stylesheet');
     radioImage.src = `models/${model}/radio.png`;
     radioStylesheet.href = `models/${model}/style.css`;
+
+    if (model === "APXNext") {
+        document.getElementById("next-icon1").src = `models/${model}/icons/next1.png`;
+        document.getElementById("next-icon2").src = `models/${model}/icons/next2.png`;
+        document.getElementById("next-icon3").src = `models/${model}/icons/next3.png`;
+    } else {
+        document.getElementById("next-icon1").src = "";
+        document.getElementById("next-icon2").src = "";
+        document.getElementById("next-icon3").src = "";
+        document.getElementById("next-icon1").style.display = "none";
+        document.getElementById("next-icon2").style.display = "none";
+        document.getElementById("next-icon3").style.display = "none";
+        document.getElementById("next-text").innerHTML = '';
+    }
 
     if (currentRssiLevel !== null) {
         rssiIcon.src = `models/${model}/icons/rssi${currentRssiLevel}.png`;
