@@ -811,6 +811,19 @@ function updateDisplay() {
     currentTg = currentChannel.tgid.toString();
 }
 
+function hashKey(key) {
+    if (!key || key.trim() === '') {
+        return '';
+    }
+
+    const encoder = new TextEncoder();
+    const data = encoder.encode(key.trim());
+
+    return crypto.subtle.digest('SHA-256', data).then(hashBuffer => {
+        return btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
+    });
+}
+
 function reconnectIfSystemChanged() {
     const currentZone = currentCodeplug.zones[currentZoneIndex];
     const currentChannel = currentZone.channels[currentChannelIndex];
@@ -818,7 +831,7 @@ function reconnectIfSystemChanged() {
 
     pcmPlayer.clear();
 
-    if (socket && socket.url !== `ws://${currentSystem.address}:${currentSystem.port}/client?authKey=${currentSystem.authKey}`) {
+    if (socket && socket.url !== `ws://${currentSystem.address}:${currentSystem.port}/client?authKey=${hashKey(currentSystem.authKey)}`) {
         disconnectWebSocket();
         connectWebSocket();
         if (!isInSiteTrunking) {
@@ -848,7 +861,7 @@ function connectWebSocket() {
         }
     }
 
-    socket = new WebSocket(`ws://${currentSystem.address}:${currentSystem.port}/client?authKey=${currentSystem.authKey}`);
+    socket = new WebSocket(`ws://${currentSystem.address}:${currentSystem.port}/client?authKey=${hashKey(currentSystem.authKey)}`);
     socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
