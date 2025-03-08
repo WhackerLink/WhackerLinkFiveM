@@ -818,7 +818,7 @@ function reconnectIfSystemChanged() {
 
     pcmPlayer.clear();
 
-    if (socket && socket.url !== `ws://${currentSystem.address}:${currentSystem.port}/client`) {
+    if (socket && socket.url !== `ws://${currentSystem.address}:${currentSystem.port}/client?authKey=${currentSystem.authKey}`) {
         disconnectWebSocket();
         connectWebSocket();
         if (!isInSiteTrunking) {
