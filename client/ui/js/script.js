@@ -811,7 +811,7 @@ function updateDisplay() {
     currentTg = currentChannel.tgid.toString();
 }
 
-function hashKey(key) {
+async function hashKey(key) {
     if (!key || key.trim() === '') {
         return '';
     }
@@ -819,19 +819,23 @@ function hashKey(key) {
     const encoder = new TextEncoder();
     const data = encoder.encode(key.trim());
 
-    return crypto.subtle.digest('SHA-256', data).then(hashBuffer => {
-        return btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
-    });
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashBase64 = btoa(String.fromCharCode(...hashArray));
+
+    return hashBase64;
 }
 
-function reconnectIfSystemChanged() {
+async function reconnectIfSystemChanged() {
     const currentZone = currentCodeplug.zones[currentZoneIndex];
     const currentChannel = currentZone.channels[currentChannelIndex];
     const currentSystem = currentCodeplug.systems.find(system => system.name === currentChannel.system);
 
     pcmPlayer.clear();
 
-    if (socket && socket.url !== `ws://${currentSystem.address}:${currentSystem.port}/client?authKey=${hashKey(currentSystem.authKey)}`) {
+    const hashedAuthKey = await hashKey(currentSystem.authKey);
+
+    if (socket && socket.url !== `ws://${currentSystem.address}:${currentSystem.port}/client?authKey=${hashedAuthKey}`) {
         disconnectWebSocket();
         connectWebSocket();
         if (!isInSiteTrunking) {
@@ -843,7 +847,7 @@ function reconnectIfSystemChanged() {
     }
 }
 
-function connectWebSocket() {
+async function connectWebSocket() {
     //console.log(JSON.stringify(currentCodeplug));
     const currentZone = currentCodeplug.zones[currentZoneIndex];
     const currentChannel = currentZone.channels[currentChannelIndex];
@@ -861,7 +865,9 @@ function connectWebSocket() {
         }
     }
 
-    socket = new WebSocket(`ws://${currentSystem.address}:${currentSystem.port}/client?authKey=${hashKey(currentSystem.authKey)}`);
+    const hashedAuthKey = await hashKey(currentSystem.authKey);
+
+    socket = new WebSocket(`ws://${currentSystem.address}:${currentSystem.port}/client?authKey=${hashedAuthKey}`);
     socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
@@ -1145,7 +1151,7 @@ function connectWebSocket() {
                 }
             } else if (data.type === packetToNumber("GRP_VCH_UPD")) {
                 if (data.data.VoiceChannel.SrcId.toString() !== myRid && data.data.VoiceChannel.DstId.toString() === currentTg
-                        && isAffiliated && isRegistered && isInRange && !isReceiving && !isTxing) {
+                    && isAffiliated && isRegistered && isInRange && !isReceiving && !isTxing) {
                     isReceiving = true;
                     currentFrequncyChannel = data.data.VoiceChannel.Frequency;
                     isTxing = false;
