@@ -848,7 +848,7 @@ function connectWebSocket() {
         }
     }
 
-    socket = new WebSocket(`ws://${currentSystem.address}:${currentSystem.port}/client`);
+    socket = new WebSocket(`ws://${currentSystem.address}:${currentSystem.port}/client?authKey=${currentSystem.authKey}`);
     socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
