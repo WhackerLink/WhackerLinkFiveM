@@ -765,6 +765,8 @@ function changeChannel(direction) {
 
     responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
 
+    SendGroupAffiliationRemoval(currentTg);
+
     updateDisplay();
 
     if (!isInSiteTrunking) {

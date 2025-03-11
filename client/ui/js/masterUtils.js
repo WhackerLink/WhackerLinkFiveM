@@ -61,6 +61,20 @@ function SendGroupAffiliationRequest() {
     socket.send(JSON.stringify(request));
 }
 
+function SendGroupAffiliationRemoval(lastTg) {
+    if (!socketOpen || myRid === null || currentTg === null) { return; }
+
+    const request = {
+        type: packetToNumber("GRP_AFF_RMV"),
+        data: {
+            SrcId: myRid,
+            DstId: lastTg
+        }
+    }
+
+    socket.send(JSON.stringify(request));
+}
+
 function SendGroupVoiceRequest() {
     if (!socketOpen || myRid === null || currentTg === null) { return; }
 

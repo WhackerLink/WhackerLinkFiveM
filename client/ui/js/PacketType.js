@@ -43,7 +43,8 @@
         STS_BCAST: 0x21,
         SPEC_FUNC: 0x22,
         ACK_RSP: 0x23,
-        GRP_VCH_UPD: 0x24
+        GRP_VCH_UPD: 0x24,
+        GRP_AFF_RMV: 0x26
     };
 
     const PacketTypeReverse = Object.fromEntries(
