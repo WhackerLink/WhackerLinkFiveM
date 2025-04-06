@@ -765,6 +765,8 @@ function changeChannel(direction) {
 
     responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
 
+    SendGroupAffiliationRemoval(currentTg);
+
     updateDisplay();
 
     if (!isInSiteTrunking) {
@@ -834,8 +836,9 @@ async function reconnectIfSystemChanged() {
     pcmPlayer.clear();
 
     const hashedAuthKey = await hashKey(currentSystem.authKey);
+    const masterEndpoint = `ws://${currentSystem.address}:${currentSystem.port}/client?authKey=${encodeURIComponent(hashedAuthKey)}`;
 
-    if (socket && socket.url !== `ws://${currentSystem.address}:${currentSystem.port}/client?authKey=${hashedAuthKey}`) {
+    if (socket && socket.url !== masterEndpoint) {
         disconnectWebSocket();
         connectWebSocket();
         if (!isInSiteTrunking) {
@@ -866,8 +869,9 @@ async function connectWebSocket() {
     }
 
     const hashedAuthKey = await hashKey(currentSystem.authKey);
+    const masterEndpoint = `ws://${currentSystem.address}:${currentSystem.port}/client?authKey=${encodeURIComponent(hashedAuthKey)}`;
 
-    socket = new WebSocket(`ws://${currentSystem.address}:${currentSystem.port}/client?authKey=${hashedAuthKey}`);
+    socket = new WebSocket(masterEndpoint);
     socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
