@@ -81,7 +81,7 @@ PCMPlayer.prototype.createContext = function() {
     this.gainNode.gain.value = 1;
     this.gainNode.connect(this.audioCtx.destination);
     this.startTime = this.audioCtx.currentTime;
-    console.debug("Audio context created!!");
+    //console.debug("Audio context created!!");
 };
 
 PCMPlayer.prototype.isTypedArray = function(data) {

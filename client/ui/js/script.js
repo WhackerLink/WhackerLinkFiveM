@@ -926,7 +926,7 @@ async function connectWebSocket() {
             }
 
             if (data.type === packetToNumber("GRP_AFF_RSP")) {
-                console.log(currentTg + " " + myRid);
+                //console.log(currentTg + " " + myRid);
                 if (data.data.SrcId.trim() !== myRid.trim() || data.data.DstId.trim() !== currentTg) {
                     return;
                 }
@@ -972,7 +972,7 @@ async function connectWebSocket() {
                         yellowIcon.style.display = 'block';
                     }
                 } else if (scanManager !== null && !isReceivingParkedChannel && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId)) && scanEnabled) {
-                    console.log("Received GRP_VCH_RSP for TG in scan list");
+                    //console.log("Received GRP_VCH_RSP for TG in scan list");
                     scanTgActive = true;
                     isReceivingParkedChannel = false;
                     isReceiving = true;
@@ -1459,5 +1459,5 @@ function loadRadioModelAssets(model) {
         rssiIcon.src = `models/${model}/icons/rssi${currentRssiLevel}.png`;
     }
 
-    console.log("Loaded model assets");
+    //console.log("Loaded model assets");
 }
