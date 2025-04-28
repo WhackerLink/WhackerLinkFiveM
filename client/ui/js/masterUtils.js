@@ -123,7 +123,7 @@ function SendEmergencyAlarmRequest() {
     socket.send(JSON.stringify(request));
 }
 
-function SendAckResponse(service, extended) {
+function SendAckResponse(service, dstId, extended) {
     if (!socketOpen || myRid === null || currentTg === null) { return; }
 
     const request = {
@@ -131,8 +131,8 @@ function SendAckResponse(service, extended) {
         data: {
             Service: service,
             Extended: extended,
-            SrcId: myRid,
-            DstId: currentTg
+            SrcId: dstId,
+            DstId: myRid
         }
     }
 

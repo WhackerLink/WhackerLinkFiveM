@@ -1114,8 +1114,8 @@ async function connectWebSocket() {
                     document.getElementById("line3").innerHTML = `Page: ${data.data.SrcId}`;
 
                     // send twice for future use (for loop is really not needed here smh)
-                    SendAckResponse(packetToNumber("CALL_ALRT"));
-                    SendAckResponse(packetToNumber("CALL_ALRT"));
+                    SendAckResponse(packetToNumber("CALL_ALRT"), data.data.SrcId);
+                    SendAckResponse(packetToNumber("CALL_ALRT"), data.data.SrcId);
 
                     play_page_alert();
 
@@ -1136,12 +1136,12 @@ async function connectWebSocket() {
             } else if (data.type === packetToNumber("SPEC_FUNC")) {
                 if (data.data.DstId.toString() === myRid && data.data.Function === 0x01 && Number(data.data.SrcId) === FNE_ID) {
                     console.log("Unit INHIBITED");
-                    SendAckResponse(packetToNumber("SPEC_FUNC"), 0x01); // inhibit = 0x01
+                    SendAckResponse(packetToNumber("SPEC_FUNC"), data.data.SrcId,0x01); // inhibit = 0x01
                     inhibited = true;
                     powerOff(true).then();
                 } else if (data.data.DstId.toString() === myRid && data.data.Function === 0x02 && Number(data.data.SrcId) === FNE_ID) {
                     console.log("Unit UNINHIBITED");
-                    SendAckResponse(packetToNumber("SPEC_FUNC"), 0x02); // uninhibit = 0x01
+                    SendAckResponse(packetToNumber("SPEC_FUNC"), data.data.SrcId,0x02); // uninhibit = 0x01
                     inhibited = false;
                     powerOn(true).then();
                 }
