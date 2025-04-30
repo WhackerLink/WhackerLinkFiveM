@@ -1,6 +1,6 @@
 {
   "name": "whackerlinkfivem",
-  "version": "1.0.0",
+  "version": "R03.01.00",
   "main": "server/server.js",
   "license": "GPL-3.0-only",
   "author": "Caleb, K4PHP (_php_)",

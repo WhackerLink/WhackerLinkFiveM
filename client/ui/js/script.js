@@ -24,7 +24,7 @@ const micCapture = new MicCapture(onAudioFrameReady);
 const EXPECTED_PCM_LENGTH = 1600;
 const MAX_BUFFER_SIZE = EXPECTED_PCM_LENGTH * 2;
 
-const HOST_VERSION = "R03.00.00";
+const HOST_VERSION = "R03.01.00";
 
 const FNE_ID = 0xFFFFFF
 
