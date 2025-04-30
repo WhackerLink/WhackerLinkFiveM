@@ -19,7 +19,7 @@
 */
 
 function SendRegistrationRequest() {
-    if (!socketOpen || myRid === null) { return; }
+    //if (!socketOpen || myRid === null) { return; }
 
     const request = {
         type: packetToNumber("U_REG_REQ"),

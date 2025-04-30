@@ -470,154 +470,179 @@ window.addEventListener('message', async function (event) {
 });
 
 async function powerOn(reReg) {
-    radioOn = true;
-    currentMessageIndex = 0;
+    try {
+        radioOn = true;
+        currentMessageIndex = 0;
 
-    pcmPlayer.clear();
+        pcmPlayer.clear();
 
-    if (myRid == null) {
-        document.getElementById('line2').style.display = 'block';
-        setLine2(`Fail 01/83`);
-        return;
-    }
+        if (myRid == null) {
+            document.getElementById('line2').style.display = 'block';
+            setLine2(`Fail 01/83`);
+            return;
+        }
 
-    if (error !== null) {
-        document.getElementById('line2').style.display = 'block';
-        setLine2(`Fail 01/00`);
-        return;
-    }
+        if (error !== null) {
+            document.getElementById('line2').style.display = 'block';
+            setLine2(`Fail 01/00`);
+            return;
+        }
 
-    if (inhibited) {
-        console.log('Unit is INHIBITED');
-        return;
-    }
+        if (inhibited) {
+            console.log('Unit is INHIBITED');
+            return;
+        }
 
-    const currentZone = currentCodeplug.zones[currentZoneIndex];
-    const currentChannel = currentZone.channels[currentChannelIndex];
+        if (currentCodeplug == null || currentCodeplug === undefined) {
+            document.getElementById('line2').style.display = 'block';
+            setLine2(`Fail 01/82`);
+            return;
+        }
 
-    scanManager = new ScanManager(currentCodeplug);
-    // console.debug(JSON.stringify(scanManager.getScanListForChannel(currentZone.name, currentChannel.name), null, 2));
+        try {
+            const currentZone = currentCodeplug.zones[currentZoneIndex];
+            const currentChannel = currentZone.channels[currentChannelIndex];
 
-    if (!initialized) {
-        await micCapture.captureMicrophone(() => console.log('Microphone capture started.'));
-    }
+            scanManager = new ScanManager(currentCodeplug);
+        } catch (error) {
+            setLine2(`Fail 01/82`);
+            return;
+        }
 
-    initialized = true;
+        // console.debug(JSON.stringify(scanManager.getScanListForChannel(currentZone.name, currentChannel.name), null, 2));
 
-    document.getElementById("line1").style.display = 'block';
-    document.getElementById("line2").style.display = 'block';
-    document.getElementById("line3").style.display = 'block';
+        if (!initialized) {
+            await micCapture.captureMicrophone(() => console.log('Microphone capture started.'));
+        }
 
-    if (radioModel === "APX900") {
-        const bootImage = document.getElementById('boot-image');
-        bootImage.src = `models/${radioModel}/boot.png`;
-        bootImage.style.display = 'block';
+        initialized = true;
 
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        document.getElementById("line1").style.display = 'block';
+        document.getElementById("line2").style.display = 'block';
+        document.getElementById("line3").style.display = 'block';
 
-        bootImage.style.display = 'none';
-    } else {
-        const bootScreenMessages = [
-            {text: "", duration: 0, line: "line1"},
-            {text: "", duration: 0, line: "line3"},
-            {text: HOST_VERSION, duration: 1500, line: "line2"},
-            {text: radioModel, duration: 1500, line: "line2"}
-        ];
+        if (radioModel === "APX900") {
+            const bootImage = document.getElementById('boot-image');
+            bootImage.src = `models/${radioModel}/boot.png`;
+            bootImage.style.display = 'block';
 
-        await displayBootScreen(bootScreenMessages);
-    }
+            await new Promise(resolve => setTimeout(resolve, 1500));
 
-    responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
-    responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
+            bootImage.style.display = 'none';
+        } else {
+            const bootScreenMessages = [
+                {text: "", duration: 0, line: "line1"},
+                {text: "", duration: 0, line: "line3"},
+                {text: HOST_VERSION, duration: 1500, line: "line2"},
+                {text: radioModel, duration: 1500, line: "line2"}
+            ];
 
-    updateDisplay();
-    document.getElementById("softText1").innerHTML = 'ZnUp';
-    document.getElementById("softText2").innerHTML = 'RSSI';
-    document.getElementById("softText3").innerHTML = 'ChUp';
-    document.getElementById("softText4").innerHTML = 'Scan';
-    document.getElementById("softText1").style.display = 'block';
-    document.getElementById("softText2").style.display = 'block';
-    document.getElementById("softText3").style.display = 'block';
-    document.getElementById("softText4").style.display = 'block';
-    document.getElementById("battery-icon").style.display = 'block';
-    document.getElementById("battery-icon").src = `models/${radioModel}/icons/battery${batteryLevel}.png`;
-    document.getElementById("scan-icon").style.display = 'none';
-    document.getElementById("scan-icon").src = `models/${radioModel}/icons/scan.png`;
-    rssiIcon.style.display = 'block';
+            await displayBootScreen(bootScreenMessages);
+        }
 
-    if (radioModel === "APXNext") {
-        document.getElementById("next-icon1").style.display = "block";
-        document.getElementById("next-icon2").style.display = "block";
-        document.getElementById("next-icon3").style.display = "block";
-        document.getElementById("next-text").innerHTML = 'More';
-    } else {
-        document.getElementById("next-icon1").style.display = "none";
-        document.getElementById("next-icon2").style.display = "none";
-        document.getElementById("next-icon3").style.display = "none";
-        document.getElementById("next-text").innerHTML = '';
-    }
+        responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
+        responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
 
-    connectWebSocket();
+        updateDisplay();
+        document.getElementById("softText1").innerHTML = 'ZnUp';
+        document.getElementById("softText2").innerHTML = 'RSSI';
+        document.getElementById("softText3").innerHTML = 'ChUp';
+        document.getElementById("softText4").innerHTML = 'Scan';
+        document.getElementById("softText1").style.display = 'block';
+        document.getElementById("softText2").style.display = 'block';
+        document.getElementById("softText3").style.display = 'block';
+        document.getElementById("softText4").style.display = 'block';
+        document.getElementById("battery-icon").style.display = 'block';
+        document.getElementById("battery-icon").src = `models/${radioModel}/icons/battery${batteryLevel}.png`;
+        document.getElementById("scan-icon").style.display = 'none';
+        document.getElementById("scan-icon").src = `models/${radioModel}/icons/scan.png`;
+        rssiIcon.style.display = 'block';
 
-    if (reReg) {
-        SendRegistrationRequest();
-        SendGroupAffiliationRequest();
+        if (radioModel === "APXNext") {
+            document.getElementById("next-icon1").style.display = "block";
+            document.getElementById("next-icon2").style.display = "block";
+            document.getElementById("next-icon3").style.display = "block";
+            document.getElementById("next-text").innerHTML = 'More';
+        } else {
+            document.getElementById("next-icon1").style.display = "none";
+            document.getElementById("next-icon2").style.display = "none";
+            document.getElementById("next-icon3").style.display = "none";
+            document.getElementById("next-text").innerHTML = '';
+        }
+
+        connectWebSocket();
+
+        if (reReg) {
+            SendRegistrationRequest();
+            SendGroupAffiliationRequest();
+        }
+    } catch (error) {
+        console.log(error);
+
+        setLine2(`Fail 01/12`);
     }
 }
 
 async function powerOff(stayConnected) {
-    pcmPlayer.clear();
-    stopCheckLoop();
-    if (!stayConnected)
-        await SendDeRegistrationRequest();
-    await sleep(1000);
+    try {
+        pcmPlayer.clear();
+        stopCheckLoop();
+        if (!stayConnected)
+            await SendDeRegistrationRequest();
+        await sleep(1000);
 
-    isAffiliated = false;
-    isRegistered = false;
-    isVoiceGranted = false;
-    isVoiceRequested = false;
-    isVoiceGrantHandled = false;
-    isInRange = false;
-    fringVC = false;
-    isInSiteTrunking = false;
-    isTxing = false;
-    radioOn = false;
-    haltAllLine3Messages = false;
-    error = null;
+        isAffiliated = false;
+        isRegistered = false;
+        isVoiceGranted = false;
+        isVoiceRequested = false;
+        isVoiceGrantHandled = false;
+        isInRange = false;
+        fringVC = false;
+        isInSiteTrunking = false;
+        isTxing = false;
+        radioOn = false;
+        haltAllLine3Messages = false;
+        error = null;
 
-    document.getElementById("line1").innerHTML = '';
-    document.getElementById("line2").innerHTML = '';
-    document.getElementById("line3").innerHTML = '';
-    document.getElementById("line1").style.display = 'none';
-    document.getElementById("line2").style.display = 'none';
-    document.getElementById("line3").style.display = 'none';
-    document.getElementById("rssi-icon").style.display = 'none';
-    document.getElementById("scan-icon").style.display = 'none';
-    document.getElementById("battery-icon").style.display = 'none';
-    document.getElementById("softText1").innerHTML = '';
-    document.getElementById("softText2").innerHTML = '';
-    document.getElementById("softText3").innerHTML = '';
-    document.getElementById("softText4").innerHTML = '';
-    document.getElementById("softText1").style.display = 'none';
-    document.getElementById("softText2").style.display = 'none';
-    document.getElementById("softText3").style.display = 'none';
-    document.getElementById("softText4").style.display = 'none';
+        document.getElementById("line1").innerHTML = '';
+        document.getElementById("line2").innerHTML = '';
+        document.getElementById("line3").innerHTML = '';
+        document.getElementById("line1").style.display = 'none';
+        document.getElementById("line2").style.display = 'none';
+        document.getElementById("line3").style.display = 'none';
+        document.getElementById("rssi-icon").style.display = 'none';
+        document.getElementById("scan-icon").style.display = 'none';
+        document.getElementById("battery-icon").style.display = 'none';
+        document.getElementById("softText1").innerHTML = '';
+        document.getElementById("softText2").innerHTML = '';
+        document.getElementById("softText3").innerHTML = '';
+        document.getElementById("softText4").innerHTML = '';
+        document.getElementById("softText1").style.display = 'none';
+        document.getElementById("softText2").style.display = 'none';
+        document.getElementById("softText3").style.display = 'none';
+        document.getElementById("softText4").style.display = 'none';
 
-    document.getElementById("next-icon1").style.display = "none";
-    document.getElementById("next-icon2").style.display = "none";
-    document.getElementById("next-icon3").style.display = "none";
-    document.getElementById("tx-box").style.display = "none";
-    document.getElementById("rx-box").style.display = "none";
-    document.getElementById("next-text").innerHTML = '';
+        document.getElementById("next-icon1").style.display = "none";
+        document.getElementById("next-icon2").style.display = "none";
+        document.getElementById("next-icon3").style.display = "none";
+        document.getElementById("tx-box").style.display = "none";
+        document.getElementById("rx-box").style.display = "none";
+        document.getElementById("next-text").innerHTML = '';
 
-    redIcon.style.display = 'none';
-    yellowIcon.style.display = 'none';
-    greenIcon.style.display = 'none';
-    rxBox.style.display = "none";
-    txBox.style.display = "none";
+        redIcon.style.display = 'none';
+        yellowIcon.style.display = 'none';
+        greenIcon.style.display = 'none';
+        rxBox.style.display = "none";
+        txBox.style.display = "none";
 
-    if (!stayConnected) {
-        disconnectWebSocket();
+        if (!stayConnected) {
+            disconnectWebSocket();
+        }
+    } catch (error) {
+        console.log(error);
+        setLine1("");
+        setLine2("");
+        setLine3("")
     }
 }
 
@@ -952,7 +977,7 @@ async function connectWebSocket() {
                     }
                     handleAudioData(bytes.buffer);
                 } else {
-                    console.log("ingoring audio, not for us");
+                    console.log("ignoring audio, not for us");
                 }
             } else if (data.type === packetToNumber("GRP_VCH_RSP")) {
                 if (data.data.SrcId !== myRid && data.data.DstId === currentTg && data.data.Status === 0 && !scanTgActive) {
@@ -1461,3 +1486,28 @@ function loadRadioModelAssets(model) {
 
     //console.log("Loaded model assets");
 }
+
+function displayError(err) {
+    setLine1("");
+    setLine3("");
+
+    powerOff().then(r => {});
+
+    setLine2(err);
+}
+
+window.onerror = function (message, source, lineno, colno, error) {
+    console.error("Caught by window.onerror:", message, error, lineno, source);
+
+    displayError("Fail 01/00");
+
+    return true;
+};
+
+window.onunhandledrejection = function (event) {
+    console.error("Unhandled promise rejection:", event.reason);
+
+    displayError("Fail 01/10");
+
+    return true;
+};
