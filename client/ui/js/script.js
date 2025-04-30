@@ -26,7 +26,7 @@ const MAX_BUFFER_SIZE = EXPECTED_PCM_LENGTH * 2;
 
 const HOST_VERSION = "R03.01.00";
 
-const FNE_ID = 0xFFFFFF
+const FNE_ID = 0xFFFFFC
 
 const beepAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -109,6 +109,10 @@ batteryLevelInterval = setInterval(() => {
 
 function isMobile() {
     return radioModel === "APX4500" || radioModel === "E5" || radioModel === "XTL2500" || radioModel === "APX4500-G";
+}
+
+function isScannerModel() {
+    return radioModel === "UNIG5";
 }
 
 function setBatteryLevel() {
@@ -202,6 +206,9 @@ function stopCheckLoop() {
 }
 
 async function sendAffiliation() {
+    if (isScannerModel())
+        return;
+
     try {
         if (radioModel === "APXNext") {
             document.getElementById("tx-box").style.display = "block"; // Show TX box
@@ -231,6 +238,9 @@ async function sendAffiliation() {
 }
 
 async function sendRegistration() {
+    if (isScannerModel())
+        return;
+
     try {
         if (radioModel === "APXNext") {
             txBox.backgroundColor = 'red';
@@ -299,6 +309,9 @@ window.addEventListener('message', async function (event) {
     } else if (event.data.type === 'closeRadio') {
         document.getElementById('radio-container').style.display = 'none';
     } else if (event.data.type === "pttPress") {
+        if (isScannerModel())
+            return;
+
         if (!isInRange) {
             console.debug("Not in range, not txing");
             bonk();
@@ -364,6 +377,9 @@ window.addEventListener('message', async function (event) {
             }
         }
     } else if (event.data.type === "pttRelease") {
+        if (isScannerModel())
+            return;
+
         await sleep(655); // Temp fix to ensure all voice data makes it through before releasing; Is this correct?
                               // Should we check if the audio buffer is empty instead? Now I am just talking to myself..
 
@@ -544,23 +560,28 @@ async function powerOn(reReg) {
             await displayBootScreen(bootScreenMessages);
         }
 
-        responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
-        responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
+        if (!isScannerModel()) {
+            responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
+            responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
+        }
 
         updateDisplay();
-        document.getElementById("softText1").innerHTML = 'ZnUp';
-        document.getElementById("softText2").innerHTML = 'RSSI';
-        document.getElementById("softText3").innerHTML = 'ChUp';
-        document.getElementById("softText4").innerHTML = 'Scan';
-        document.getElementById("softText1").style.display = 'block';
-        document.getElementById("softText2").style.display = 'block';
-        document.getElementById("softText3").style.display = 'block';
-        document.getElementById("softText4").style.display = 'block';
-        document.getElementById("battery-icon").style.display = 'block';
-        document.getElementById("battery-icon").src = `models/${radioModel}/icons/battery${batteryLevel}.png`;
-        document.getElementById("scan-icon").style.display = 'none';
-        document.getElementById("scan-icon").src = `models/${radioModel}/icons/scan.png`;
-        rssiIcon.style.display = 'block';
+
+        if (!isScannerModel()) {
+            document.getElementById("softText1").innerHTML = 'ZnUp';
+            document.getElementById("softText2").innerHTML = 'RSSI';
+            document.getElementById("softText3").innerHTML = 'ChUp';
+            document.getElementById("softText4").innerHTML = 'Scan';
+            document.getElementById("softText1").style.display = 'block';
+            document.getElementById("softText2").style.display = 'block';
+            document.getElementById("softText3").style.display = 'block';
+            document.getElementById("softText4").style.display = 'block';
+            document.getElementById("battery-icon").style.display = 'block';
+            document.getElementById("battery-icon").src = `models/${radioModel}/icons/battery${batteryLevel}.png`;
+            document.getElementById("scan-icon").style.display = 'none';
+            document.getElementById("scan-icon").src = `models/${radioModel}/icons/scan.png`;
+            rssiIcon.style.display = 'block';
+        }
 
         if (radioModel === "APXNext") {
             document.getElementById("next-icon1").style.display = "block";
@@ -908,6 +929,11 @@ async function connectWebSocket() {
     socket.binaryType = 'arraybuffer';
 
     socket.onopen = () => {
+        if (isScannerModel()){
+            socket.send("CONVENTIONAL_PEER_ENABLE");
+            console.log("connected as conv peer, aff restrictions will be ignored");
+        }
+
         isInSiteTrunking = false;
         setUiSiteTrunking(isInSiteTrunking);
         console.debug('WebSocket connection established');
@@ -916,7 +942,8 @@ async function connectWebSocket() {
         isVoiceGrantHandled = false;
         isTxing = false;
         // console.debug("Codeplug: " + currentCodeplug);
-        startCheckLoop();
+        if (!isScannerModel())
+            startCheckLoop();
         pcmPlayer.clear();
     };
 
@@ -999,7 +1026,12 @@ async function connectWebSocket() {
                     isTxing = false;
                     haltAllLine3Messages = true;
                     document.getElementById("line3").style.color = "black";
-                    document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
+                    if (isScannerModel()) {
+                        document.getElementById("line3").style.color = "white";
+                        document.getElementById("line3").innerHTML = `Fm:[${data.data.SrcId}]`;
+                    } else{
+                        document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
+                    }
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
                     if (radioModel === "APXNext") rxBox.style.display = "block";
                     txBox.style.display = "none";
@@ -1024,7 +1056,12 @@ async function connectWebSocket() {
                     setLine1(scanManager.getChannelAndZoneForTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId).zone);
                     setLine2(scanManager.getChannelAndZoneForTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId).channel);
                     document.getElementById("line3").style.color = "black";
-                    document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
+                    if (isScannerModel()) {
+                        document.getElementById("line3").style.color = "white";
+                        document.getElementById("line3").innerHTML = `Fm:[${data.data.SrcId}]`;
+                    } else{
+                        document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
+                    }
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
                     rxBox.style.display = "none";
                     if (isMobile()) {
@@ -1206,7 +1243,12 @@ async function connectWebSocket() {
                     isTxing = false;
                     haltAllLine3Messages = true;
                     document.getElementById("line3").style.color = "black";
-                    document.getElementById("line3").innerHTML = `ID: ${data.data.VoiceChannel.SrcId}`;
+                    if (isScannerModel()) {
+                        document.getElementById("line3").style.color = "white";
+                        document.getElementById("line3").innerHTML = `Fm:[${data.data.SrcId}]`;
+                    } else{
+                        document.getElementById("line3").innerHTML = `ID: ${data.data.SrcId}`;
+                    }
                     document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rx.png`;
                 }
             } else {
