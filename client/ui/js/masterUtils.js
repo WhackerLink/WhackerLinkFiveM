@@ -46,14 +46,19 @@ function SendDeRegistrationRequest() {
     socket.send(JSON.stringify(request));
 }
 
-function SendGroupAffiliationRequest() {
+function SendGroupAffiliationRequest(dstId = null, srcId = null) {
     if (!socketOpen || myRid === null || currentTg === null) { return; }
+
+    if (srcId == null)
+        srcId = myRid;
+    if (dstId == null)
+        dstId = currentTg;
 
     const request = {
         type: packetToNumber("GRP_AFF_REQ"),
         data: {
-            SrcId: myRid,
-            DstId: currentTg,
+            SrcId: srcId,
+            DstId: dstId,
             Site: currentSite
         }
     }

@@ -70,6 +70,7 @@ let locationBroadcastInterval;
 
 let myRid = "1234";
 let currentTg = "2001";
+let scanTg = "";
 let radioModel;
 let currentRssiLevel = "0";
 let currentDbLevel;
@@ -493,15 +494,18 @@ async function powerOn(reReg) {
             return;
         }
 
-        if (currentCodeplug == null || currentCodeplug === undefined) {
+        if (currentCodeplug === null || currentCodeplug === undefined) {
             document.getElementById('line2').style.display = 'block';
             setLine2(`Fail 01/82`);
             return;
         }
 
+        let currentZone;
+        let currentChannel;
+
         try {
-            const currentZone = currentCodeplug.zones[currentZoneIndex];
-            const currentChannel = currentZone.channels[currentChannelIndex];
+            currentZone = currentCodeplug.zones[currentZoneIndex];
+            currentChannel = currentZone.channels[currentChannelIndex];
 
             scanManager = new ScanManager(currentCodeplug);
         } catch (error) {
@@ -765,10 +769,12 @@ function StartEmergencyAlarm() {
 function changeChannel(direction) {
     isTxing = false;
     isReceiving = false;
+    isReceivingParkedChannel = false;
+
+    scanOff();
 
     if (currentCodeplug.zones === null || currentCodeplug.zones === undefined) {
-        powerOff().then();
-        setLine2("Fail 01/82");
+        displayError("Fail 01/82");
     }
 
     currentChannelIndex += direction;
@@ -805,10 +811,12 @@ function changeChannel(direction) {
 function changeZone(direction) {
     isTxing = false;
     isReceiving = false;
+    isReceivingParkedChannel = false;
+
+    scanOff();
 
     if (currentCodeplug.zones === null || currentCodeplug.zones === undefined) {
-        powerOff().then();
-        setLine2("Fail 01/82");
+        displayError("Fail 01/82");
     }
 
     currentZoneIndex += direction;
@@ -938,6 +946,10 @@ async function connectWebSocket() {
     socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
 
+        const currentZone = currentCodeplug.zones[currentZoneIndex];
+        const currentChannel = currentZone.channels[currentChannelIndex];
+        const currentSystem = currentCodeplug.systems.find(system => system.name === currentChannel.system);
+
         if (typeof event.data === 'string') {
             // console.debug(`Received WlinkPacket from master: ${event.data}`);
 
@@ -998,6 +1010,11 @@ async function connectWebSocket() {
                     }
                 } else if (scanManager !== null && !isReceivingParkedChannel && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId)) && scanEnabled) {
                     //console.log("Received GRP_VCH_RSP for TG in scan list");
+                    if (isReceivingParkedChannel || isReceiving) {
+                        return;
+                    }
+
+                    scanTg = data.data.DstId;
                     scanTgActive = true;
                     isReceivingParkedChannel = false;
                     isReceiving = true;
@@ -1080,9 +1097,10 @@ async function connectWebSocket() {
                     yellowIcon.style.display = 'none';
                     rxBox.style.display = "none";
                     pcmPlayer.clear();
-                } else if (scanManager !== null && !isReceivingParkedChannel && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId)) && scanEnabled) {
+                } else if (scanManager !== null && !isReceivingParkedChannel && (data.data.SrcId !== myRid && scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.DstId)) && scanEnabled && data.data.DstId === scanTg) {
                     haltAllLine3Messages = false;
                     scanTgActive = false;
+                    scanTg = "";
 
                     if (!isInRange) {
                         setUiOOR(isInRange);
@@ -1094,6 +1112,8 @@ async function connectWebSocket() {
 
                     isReceiving = false;
                     currentFrequncyChannel = null;
+
+                    console.log(currentZoneIndex + " " + currentChannelIndex);
 
                     setLine1(currentZone.name);
                     setLine2(currentChannel.name);
@@ -1432,10 +1452,27 @@ function knobClick() {
 }
 
 function scanOn() {
+    const currentZone = currentCodeplug.zones[currentZoneIndex];
+    const currentChannel = currentZone.channels[currentChannelIndex];
+
+    console.log(currentZone + " " + currentChannel)
+
+    const currentScanList = scanManager.getScanListForChannel(currentZone.name, currentChannel.name);
+
+    if (currentScanList == null){
+        displayError("Fail 01/84");
+        return;
+    }
+
+    scanManager.getChannelsInScanList(currentScanList.name).forEach(channel => {
+        console.log("tgid " + channel.tgid)
+        SendGroupAffiliationRequest(channel.tgid);
+    });
+
     scanEnabled = true;
+
     scanIcon.src =  `models/${radioModel}/icons/scan.png`;
-    scanIcon.style.display= "block"; 
-  
+    scanIcon.style.display= "block";
 }
 
 function scanOff() {
