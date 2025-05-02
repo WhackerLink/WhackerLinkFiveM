@@ -73,6 +73,7 @@ let groupGrantCheckInterval;
 let batteryLevelInterval;
 let reconnectInterval;
 let locationBroadcastInterval;
+let toneWatchdogInterval;
 
 let myRid = "1234";
 let currentTg = "2001";
@@ -128,6 +129,25 @@ function setBatteryLevel() {
     } else {
         powerOff().then();
     }
+}
+
+function startToneWatchdogLoop() {
+    toneWatchdogInterval = setInterval(() => {
+        const now = Date.now();
+
+        if (lastTone && toneStartTime) {
+            const duration = now - toneStartTime;
+
+            if (duration >= 2500 && duration <= 4000) {
+                //console.log(`forcing flush of tone ${lastTone} after ${duration} ms`);
+                toneHistory.push({ freq: lastTone, duration });
+                detectQC2Pair();
+
+                lastTone = null;
+                toneStartTime = null;
+            }
+        }
+    }, 200);
 }
 
 function startCheckLoop() {
@@ -542,6 +562,8 @@ async function powerOn(reReg) {
         }
 
         initialized = true;
+
+        startToneWatchdogLoop();
 
         document.getElementById("line1").style.display = 'block';
         document.getElementById("line2").style.display = 'block';
@@ -1352,24 +1374,6 @@ function handleAudioData(data) {
         console.debug('Received empty audio data array');
     }
 }
-
-setInterval(() => {
-    const now = Date.now();
-
-    if (lastTone && toneStartTime) {
-        const duration = now - toneStartTime;
-
-        if (duration >= 2500 && duration <= 4000) {
-            //console.log(`forcing flush of tone ${lastTone} after ${duration} ms`);
-            toneHistory.push({ freq: lastTone, duration });
-            detectQC2Pair();
-
-            lastTone = null;
-            toneStartTime = null;
-        }
-    }
-}, 200);
-
 
 function detectTone(samples) {
     const fftSize = 2048;
