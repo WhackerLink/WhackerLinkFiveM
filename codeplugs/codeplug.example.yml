@@ -15,6 +15,12 @@ systems:
     port: 3000
     rid: null
 
+qcList:
+  - a: 855.5
+    b: 349
+  - a: 1006.9
+    b: 500.9
+
 zones:
   - name: "Zone 1"
     channels:

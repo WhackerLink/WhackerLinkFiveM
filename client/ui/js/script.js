@@ -24,6 +24,9 @@ const micCapture = new MicCapture(onAudioFrameReady);
 const EXPECTED_PCM_LENGTH = 1600;
 const MAX_BUFFER_SIZE = EXPECTED_PCM_LENGTH * 2;
 
+const FREQUENCY_TOLERANCE = 10;
+const FREQ_MATCH_THRESHOLD = 5;
+
 const HOST_VERSION = "R03.01.00";
 
 const FNE_ID = 0xFFFFFC
@@ -51,6 +54,9 @@ let isTxing = false;
 let audioBuffer = [];
 let radioOn = false;
 let currentMessageIndex = 0;
+let toneHistory = [];
+let lastTone = null;
+let toneStartTime = null;
 
 let isAffiliated = false;
 let isRegistered = false;
@@ -949,6 +955,9 @@ async function connectWebSocket() {
 
     socket.onclose = () => {
         isInSiteTrunking = true;
+        document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+        redIcon.style.display = 'none';
+        txBox.style.display = "none";
         setUiSiteTrunking(isInSiteTrunking);
         isVoiceGranted = false;
         isVoiceRequested = false;
@@ -1236,6 +1245,9 @@ async function connectWebSocket() {
                     pcmPlayer.clear();
                 }
             } else if (data.type === packetToNumber("GRP_VCH_UPD")) {
+                if (data.data.VoiceChannel.SrcId.toString() == null)
+                    return;
+
                 if (data.data.VoiceChannel.SrcId.toString() !== myRid && data.data.VoiceChannel.DstId.toString() === currentTg
                     && isAffiliated && isRegistered && isInRange && !isReceiving && !isTxing) {
                     isReceiving = true;
@@ -1328,8 +1340,146 @@ function handleAudioData(data) {
 
     if (dataArray.length > 0) {
         pcmPlayer.feed(dataArray);
+
+        const float32Array = new Float32Array(dataArray.length / 2);
+        for (let i = 0; i < dataArray.length; i += 2) {
+            const sample = (dataArray[i + 1] << 8) | dataArray[i];
+            float32Array[i / 2] = sample > 0x7FFF ? (sample - 0x10000) / 0x8000 : sample / 0x7FFF;
+        }
+
+        detectTone(float32Array);
     } else {
         console.debug('Received empty audio data array');
+    }
+}
+
+setInterval(() => {
+    const now = Date.now();
+
+    if (lastTone && toneStartTime) {
+        const duration = now - toneStartTime;
+
+        if (duration >= 2500 && duration <= 4000) {
+            //console.log(`forcing flush of tone ${lastTone} after ${duration} ms`);
+            toneHistory.push({ freq: lastTone, duration });
+            detectQC2Pair();
+
+            lastTone = null;
+            toneStartTime = null;
+        }
+    }
+}, 200);
+
+
+function detectTone(samples) {
+    const fftSize = 2048;
+    const context = new OfflineAudioContext(1, fftSize, 8000);
+    const buffer = context.createBuffer(1, samples.length, 8000);
+    buffer.getChannelData(0).set(samples);
+
+    const source = context.createBufferSource();
+    source.buffer = buffer;
+
+    const analyser = context.createAnalyser();
+    analyser.fftSize = fftSize;
+
+    source.connect(analyser);
+    analyser.connect(context.destination);
+
+    source.start();
+
+    context.startRendering().then(() => {
+        const freqData = new Float32Array(analyser.frequencyBinCount);
+        analyser.getFloatFrequencyData(freqData);
+
+        let maxVal = -Infinity;
+        let maxIndex = -1;
+        for (let i = 0; i < freqData.length; i++) {
+            if (freqData[i] > maxVal) {
+                maxVal = freqData[i];
+                maxIndex = i;
+            }
+        }
+
+        const detectedFreq = Math.round(maxIndex * 8000 / fftSize);
+
+        processTone(detectedFreq);
+    });
+}
+
+function processTone(frequency) {
+    const now = Date.now();
+
+    //console.log(`detected frequency: ${frequency} Hz`);
+
+    if (frequency < 300 || frequency > 3000) {
+        //console.log('frequency out of valid range');
+        if (lastTone !== null) {
+            const duration = now - toneStartTime;
+            //console.log(`ending tone ${lastTone} after ${duration} ms`);
+            toneHistory.push({ freq: lastTone, duration });
+            detectQC2Pair();
+            lastTone = null;
+            toneStartTime = null;
+        }
+        return;
+    }
+
+    if (lastTone === null) {
+        //console.log(`starting new tone ${frequency}`);
+        toneStartTime = now;
+        lastTone = frequency;
+    } else if (Math.abs(frequency - lastTone) <= FREQUENCY_TOLERANCE) {
+        const duration = now - toneStartTime;
+        //console.log(`continuing tone ${frequency} for ${duration} ms`);
+    } else {
+        const duration = now - toneStartTime;
+        //console.log(`tone changed: ${lastTone} lasted ${duration} ms`);
+        toneHistory.push({ freq: lastTone, duration });
+        detectQC2Pair();
+
+        lastTone = frequency;
+        toneStartTime = now;
+        //console.log(`new tone started: ${frequency}`);
+    }
+}
+
+function detectQC2Pair() {
+    if (toneHistory.length < 2) {
+        //console.log('not enough tones in history to detect qc2');
+        return;
+    }
+
+    const recent = toneHistory.slice(-2);
+    const [toneA, toneB] = recent;
+
+    const durationA = toneA.duration;
+    const durationB = toneB.duration;
+
+    //console.log(`checking pair: A=${toneA.freq} Hz (${durationA} ms), B=${toneB.freq} (${durationB} ms)`);
+
+    if (
+        durationA >= 900 && durationA <= 1200 &&
+        durationB >= 2500 && durationB <= 3500
+    ) {
+        console.log(`QC2 Pair Detected A: ${toneA.freq}, B: ${toneB.freq}`);
+
+        if (currentCodeplug.qcList != null) {
+            for (const pair of currentCodeplug.qcList) {
+                const isMatchA = Math.abs(toneA.freq - pair.a) <= FREQ_MATCH_THRESHOLD;
+                const isMatchB = Math.abs(toneB.freq - pair.b) <= FREQ_MATCH_THRESHOLD;
+
+                if (isMatchA && isMatchB) {
+                    console.log(`QC2 ALERT: A=${pair.a} B=${pair.b}`);
+                    minitorStandard();
+                    break;
+                }
+            }
+        }
+
+        toneHistory = [];
+    } else {
+        console.log(`no QC2 pattern`);
     }
 }
 
@@ -1482,6 +1632,9 @@ function buttonBeep() {
     playSoundEffect('audio/buttonbeep.wav');
 }
 
+function minitorStandard() {
+    playSoundEffect('audio/minitor_standard.wav');
+}
 
 function playSoundEffect(audioPath) {
     let audio = new Audio(audioPath);
