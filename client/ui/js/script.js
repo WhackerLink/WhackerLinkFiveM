@@ -26,6 +26,7 @@ const MAX_BUFFER_SIZE = EXPECTED_PCM_LENGTH * 2;
 
 const FREQUENCY_TOLERANCE = 10;
 const FREQ_MATCH_THRESHOLD = 5;
+const AUDIO_TIMEOUT_MS = 3000;
 
 const HOST_VERSION = "R03.01.00";
 
@@ -57,6 +58,7 @@ let currentMessageIndex = 0;
 let toneHistory = [];
 let lastTone = null;
 let toneStartTime = null;
+let lastAudioTime = Date.now();
 
 let isAffiliated = false;
 let isRegistered = false;
@@ -74,6 +76,7 @@ let batteryLevelInterval;
 let reconnectInterval;
 let locationBroadcastInterval;
 let toneWatchdogInterval;
+let audioWatchdogInterval;
 
 let myRid = "1234";
 let currentTg = "2001";
@@ -155,6 +158,23 @@ function startCheckLoop() {
         return;
     }
 
+    audioWatchdogInterval = setInterval(() => {
+        const now = Date.now();
+        if (now - lastAudioTime > AUDIO_TIMEOUT_MS && (isReceivingParkedChannel || scanTgActive)) {
+            console.warn("AUDIO WATCHDOG; no valid audio detected in the last 3000 ms, forcing GRP_VCH_RLS logic");
+            isVoiceGranted = false;
+            isVoiceRequested = false;
+            isTxing = false;
+            isReceiving = false;
+            isReceivingParkedChannel = false;
+            document.getElementById("line3").innerHTML = '';
+            document.getElementById("rssi-icon").src = `models/${radioModel}/icons/rssi${currentRssiLevel}.png`;
+            redIcon.style.display = 'none';
+            txBox.style.display = "none";
+            pcmPlayer.clear();
+        }
+    }, 1000);
+
     setTimeout(() => {
         sendRegistration().then(() => {
             setTimeout(() => {
@@ -225,6 +245,7 @@ function startCheckLoop() {
 }
 
 function stopCheckLoop() {
+    clearInterval(audioWatchdogInterval);
     clearInterval(affiliationCheckInterval);
     clearInterval(registrationCheckInterval);
     clearInterval(groupGrantCheckInterval);
@@ -990,6 +1011,8 @@ async function connectWebSocket() {
         isVoiceGranted = false;
         isVoiceRequested = false;
         isVoiceGrantHandled = false;
+        isReceivingParkedChannel = false;
+        scanTgActive = false;
         isTxing = false;
         console.debug('WebSocket connection closed');
         pcmPlayer.clear();
@@ -1002,6 +1025,8 @@ async function connectWebSocket() {
         isVoiceRequested = false;
         isVoiceGrantHandled = false;
         isTxing = false;
+        isReceivingParkedChannel = false;
+        scanTgActive = false;
         console.error('WebSocket error:');
         console.error(error);
         pcmPlayer.clear();
@@ -1045,6 +1070,7 @@ async function connectWebSocket() {
                     return;
 
                 if (data.data.VoiceChannel.SrcId !== myRid && (data.data.VoiceChannel.DstId.toString() === currentTg || (scanManager.isTgInCurrentScanList(currentZone.name, currentChannel.name, data.data.VoiceChannel.DstId) && scanEnabled)) && data.data.VoiceChannel.Frequency.toString() === currentFrequncyChannel.toString()) {
+                    lastAudioTime = Date.now();
                     const binaryString = atob(data.data.Data);
                     const len = binaryString.length;
                     const bytes = new Uint8Array(len);
@@ -1489,7 +1515,7 @@ function detectQC2Pair() {
 
         toneHistory = [];
     } else {
-        console.log(`no QC2 pattern`);
+        //console.log(`no QC2 pattern`);
     }
 }
 

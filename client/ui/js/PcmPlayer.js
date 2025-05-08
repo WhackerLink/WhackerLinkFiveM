@@ -27,7 +27,6 @@
 *
 */
 
-
 function PCMPlayer(option) {
     this.init(option);
 }
