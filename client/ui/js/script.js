@@ -331,6 +331,10 @@ window.addEventListener('message', async function (event) {
         changeChannel(1);
     } else if (event.data.type === 'channelDown') {
         changeChannel(-1);
+    } else if (event.data.type === 'zoneUp') {
+        changeZone(1);
+    } else if (event.data.type === 'zoneDown') {
+        changeZone(-1);
     } else if (event.data.type === 'openRadio') {
         currentCodeplug = event.data.codeplug;
 
