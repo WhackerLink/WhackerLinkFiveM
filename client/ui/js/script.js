@@ -1523,23 +1523,39 @@ function detectQC2Pair() {
     }
 }
 
+let volumeChangeTimeout = null;
+
 function volumeUp() {
+    if (volumeChangeTimeout) return;
+    volumeChangeTimeout = setTimeout(() => { volumeChangeTimeout = null; }, 550);
     if (volumeLevel < 1.0) {
         volumeLevel += 0.1;
         volumeLevel = Math.min(1.0, volumeLevel);
         //beepAudioCtx.gainNode.gain.value = volumeLevel;
         pcmPlayer.volume(volumeLevel);
+        beep(910, 500, 30, 'sine');
         console.log(`Volume increased: ${volumeLevel}`);
+    }
+    else {
+        console.log("Volume is already at maximum");
+        tripleBeep();
     }
 }
 
 function volumeDown() {
+    if (volumeChangeTimeout) return;
+    volumeChangeTimeout = setTimeout(() => { volumeChangeTimeout = null; }, 550);
     if (volumeLevel > 0.0) {
         volumeLevel -= 0.1;
         volumeLevel = Math.max(0.1, volumeLevel);
         //beepAudioCtx.gainNode.gain.value = volumeLevel;
         pcmPlayer.volume(volumeLevel);
+        beep(910, 500, 30, 'sine');
         console.log(`Volume decreased: ${volumeLevel}`);
+    }
+    else {
+        console.log("Volume is already at minimum");
+        tripleBeep();
     }
 }
 
@@ -1616,6 +1632,16 @@ function emergency_tone_generate() {
 
 function bonk() {
     beep(310, 1000, 30, 'sine');
+}
+
+function tripleBeep() {
+    beep(910, 80, 30, 'sine');
+    setTimeout(() => {
+        beep(910, 80, 30, 'sine');
+    }, 100);
+    setTimeout(() => {
+        beep(910, 80, 30, 'sine');
+    }, 200);
 }
 
 function sleep(ms) {
