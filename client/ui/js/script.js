@@ -344,6 +344,11 @@ async function sendRegistration() {
 }
 
 window.addEventListener('message', async function (event) {
+    // Block all radio functions if radio is not on, except for powerToggle, openRadio, closeRadio
+    const alwaysAllowed = ['powerToggle', 'openRadio', 'closeRadio'];
+    if (!radioOn && !alwaysAllowed.includes(event.data.type)) {
+        return;
+    }
     if (event.data.type === 'resetBatteryLevel'){
         batteryLevel = 4;
     } else if (event.data.type === 'powerToggle') {
@@ -569,6 +574,12 @@ window.addEventListener('message', async function (event) {
 async function powerOn(reReg) {
     try {
         radioOn = true;
+        // Notify client that radio is powered on
+        fetch(`https://${GetParentResourceName()}/radioPowerState`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ poweredOn: true })
+        });
         currentMessageIndex = 0;
 
         pcmPlayer.clear();
@@ -693,6 +704,12 @@ async function powerOn(reReg) {
 async function powerOff(stayConnected) {
     try {
         pcmPlayer.clear();
+        // Notify client that radio is powered off
+        fetch(`https://${GetParentResourceName()}/radioPowerState`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ poweredOn: false })
+        });
         stopCheckLoop();
         if (!stayConnected)
             await SendDeRegistrationRequest();
