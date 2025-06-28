@@ -101,6 +101,35 @@ function socketOpen() {
     return socket && socket.readyState === WebSocket.OPEN;
 }
 
+let beepVolumeReduction = 0.6; // default value
+fetch('/configs/config.yml')
+  .then(response => response.text())
+  .then(yamlText => {
+    const lines = yamlText.split('\n');
+    for (const line of lines) {
+      const matchBeepVolume = line.match(/^\s*beepVolumeReduction\s*:\s*([0-9.]+)\s*$/i);
+      if (matchBeepVolume) {
+        let parsed = parseFloat(matchBeepVolume[1]);
+        if (isNaN(parsed)) {
+          console.error('beepVolumeReduction in config.yml is not a number. Using default value.');
+          return;
+        }
+        if (parsed < 0.0) {
+          console.error('beepVolumeReduction in config.yml is less than 0. Clamping to 0.');
+          beepVolumeReduction = 0.0;
+        } else if (parsed > 1.0) {
+          console.error('beepVolumeReduction in config.yml is greater than 1. Clamping to 1.');
+          beepVolumeReduction = 1.0;
+        } else {
+          beepVolumeReduction = parsed;
+        }
+      }
+    }
+  })
+  .catch(err => {
+    console.warn('Could not load config.yml, using default config values:', err);
+  });
+
 reconnectInterval = setInterval(() => {
     if (isInSiteTrunking && radioOn) {
         connectWebSocket();
@@ -1565,7 +1594,7 @@ function beep(frequency, duration, volume, type) {
 
     oscillator.connect(gainNode);
     gainNode.connect(beepAudioCtx.destination);
-    gainNode.gain.value = Math.max(0.1, volumeLevel - 0.3);
+    gainNode.gain.value = Math.max(0.0, volumeLevel * (1.0 - beepVolumeReduction));
     oscillator.frequency.value = frequency;
     oscillator.type = type;
 
