@@ -19,6 +19,7 @@
 */
 
 let isRadioOpen = false;
+let radioPoweredOn = false;
 let isPttPressed = false;
 let pttTimeout = null;
 let isHandlingPtt = false;
@@ -80,6 +81,13 @@ on('onClientResourceStart', (resourceName) => {
             "This is free software, and you are welcome to redistribute it\n" +
             "under certain conditions; Check the included LICENSE file for more details.\n");
     }, 5000);
+});
+
+
+RegisterNuiCallbackType('radioPowerState');
+on('__cfx_nui:radioPowerState', (data, cb) => {
+    radioPoweredOn = !!data.poweredOn;
+    if (cb) cb({});
 });
 
 RegisterNuiCallbackType('getPlayerLocation');
@@ -359,7 +367,7 @@ function handlePTTDown() {
             SendNuiMessage(JSON.stringify({ type: 'pttPress' }));
             //console.debug('PTT press confirmed');
 
-            if (!inVehicle && !disableAnimations) {
+            if (radioPoweredOn && !inVehicle && !disableAnimations) {
                 playRadioAnimation();
             }
         }

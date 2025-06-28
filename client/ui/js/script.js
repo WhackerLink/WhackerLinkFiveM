@@ -101,6 +101,35 @@ function socketOpen() {
     return socket && socket.readyState === WebSocket.OPEN;
 }
 
+let beepVolumeReduction = 0.6; // default value
+fetch('/configs/config.yml')
+  .then(response => response.text())
+  .then(yamlText => {
+    const lines = yamlText.split('\n');
+    for (const line of lines) {
+      const matchBeepVolume = line.match(/^\s*beepVolumeReduction\s*:\s*([0-9.]+)\s*$/i);
+      if (matchBeepVolume) {
+        let parsed = parseFloat(matchBeepVolume[1]);
+        if (isNaN(parsed)) {
+          console.error('beepVolumeReduction in config.yml is not a number. Using default value.');
+          return;
+        }
+        if (parsed < 0.0) {
+          console.error('beepVolumeReduction in config.yml is less than 0. Clamping to 0.');
+          beepVolumeReduction = 0.0;
+        } else if (parsed > 1.0) {
+          console.error('beepVolumeReduction in config.yml is greater than 1. Clamping to 1.');
+          beepVolumeReduction = 1.0;
+        } else {
+          beepVolumeReduction = parsed;
+        }
+      }
+    }
+  })
+  .catch(err => {
+    console.warn('Could not load config.yml, using default config values:', err);
+  });
+
 reconnectInterval = setInterval(() => {
     if (isInSiteTrunking && radioOn) {
         connectWebSocket();
@@ -315,6 +344,11 @@ async function sendRegistration() {
 }
 
 window.addEventListener('message', async function (event) {
+    // Block all radio functions if radio is not on, except for powerToggle, openRadio, closeRadio
+    const alwaysAllowed = ['powerToggle', 'openRadio', 'closeRadio'];
+    if (!radioOn && !alwaysAllowed.includes(event.data.type)) {
+        return;
+    }
     if (event.data.type === 'resetBatteryLevel'){
         batteryLevel = 4;
     } else if (event.data.type === 'powerToggle') {
@@ -540,6 +574,12 @@ window.addEventListener('message', async function (event) {
 async function powerOn(reReg) {
     try {
         radioOn = true;
+        // Notify client that radio is powered on
+        fetch(`https://${GetParentResourceName()}/radioPowerState`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ poweredOn: true })
+        });
         currentMessageIndex = 0;
 
         pcmPlayer.clear();
@@ -664,6 +704,12 @@ async function powerOn(reReg) {
 async function powerOff(stayConnected) {
     try {
         pcmPlayer.clear();
+        // Notify client that radio is powered off
+        fetch(`https://${GetParentResourceName()}/radioPowerState`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ poweredOn: false })
+        });
         stopCheckLoop();
         if (!stayConnected)
             await SendDeRegistrationRequest();
@@ -1532,23 +1578,39 @@ function detectQC2Pair() {
     }
 }
 
+let volumeChangeTimeout = null;
+
 function volumeUp() {
+    if (volumeChangeTimeout) return;
+    volumeChangeTimeout = setTimeout(() => { volumeChangeTimeout = null; }, 550);
     if (volumeLevel < 1.0) {
         volumeLevel += 0.1;
         volumeLevel = Math.min(1.0, volumeLevel);
         //beepAudioCtx.gainNode.gain.value = volumeLevel;
         pcmPlayer.volume(volumeLevel);
+        beep(910, 500, 30, 'sine');
         console.log(`Volume increased: ${volumeLevel}`);
+    }
+    else {
+        console.log("Volume is already at maximum");
+        tripleBeep();
     }
 }
 
 function volumeDown() {
+    if (volumeChangeTimeout) return;
+    volumeChangeTimeout = setTimeout(() => { volumeChangeTimeout = null; }, 550);
     if (volumeLevel > 0.0) {
         volumeLevel -= 0.1;
         volumeLevel = Math.max(0.1, volumeLevel);
         //beepAudioCtx.gainNode.gain.value = volumeLevel;
         pcmPlayer.volume(volumeLevel);
+        beep(910, 500, 30, 'sine');
         console.log(`Volume decreased: ${volumeLevel}`);
+    }
+    else {
+        console.log("Volume is already at minimum");
+        tripleBeep();
     }
 }
 
@@ -1558,7 +1620,7 @@ function beep(frequency, duration, volume, type) {
 
     oscillator.connect(gainNode);
     gainNode.connect(beepAudioCtx.destination);
-    gainNode.gain.value = Math.max(0.1, volumeLevel - 0.3);
+    gainNode.gain.value = Math.max(0.0, volumeLevel * (1.0 - beepVolumeReduction));
     oscillator.frequency.value = frequency;
     oscillator.type = type;
 
@@ -1625,6 +1687,16 @@ function emergency_tone_generate() {
 
 function bonk() {
     beep(310, 1000, 30, 'sine');
+}
+
+function tripleBeep() {
+    beep(910, 80, 30, 'sine');
+    setTimeout(() => {
+        beep(910, 80, 30, 'sine');
+    }, 100);
+    setTimeout(() => {
+        beep(910, 80, 30, 'sine');
+    }, 200);
 }
 
 function sleep(ms) {
