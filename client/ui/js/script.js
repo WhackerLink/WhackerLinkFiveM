@@ -953,7 +953,16 @@ function changeZone(direction) {
 
     responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
     responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
+    SendGroupAffiliationRemoval(currentTg);
+
     updateDisplay();
+
+    if (!isInSiteTrunking) {
+        sendAffiliation().then();
+    } else {
+        isAffiliated = false;
+    }
+    
     reconnectIfSystemChanged();
 }
 
