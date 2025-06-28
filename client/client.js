@@ -367,7 +367,6 @@ function handlePTTDown() {
             SendNuiMessage(JSON.stringify({ type: 'pttPress' }));
             //console.debug('PTT press confirmed');
 
-            // Only play animation if radio is powered on
             if (radioPoweredOn && !inVehicle && !disableAnimations) {
                 playRadioAnimation();
             }
