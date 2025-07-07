@@ -344,9 +344,8 @@ async function sendRegistration() {
 }
 
 window.addEventListener('message', async function (event) {
-    // Block all radio functions if radio is not on, except for powerToggle, openRadio, closeRadio
-    const alwaysAllowed = ['powerToggle', 'openRadio', 'closeRadio'];
-    if (!radioOn && !alwaysAllowed.includes(event.data.type)) {
+    const deniedWhenOff = ['volumeUp', 'volumeDown', 'channelUp', 'channelDown', 'zoneUp', 'zoneDown', 'pttPress', 'pttRelease', 'resetBatteryLevel', 'activate_emergency'];
+    if (!radioOn && deniedWhenOff.includes(event.data.type)) {
         return;
     }
     if (event.data.type === 'resetBatteryLevel'){
