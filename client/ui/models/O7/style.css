@@ -1,0 +1,271 @@
+#radio-container {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    display: inline-block;
+}
+
+#battery-icon {
+    position: absolute;
+    top: 69%;
+    left: 60.5%;
+    height: 10%;
+    width: auto;
+    display: none;
+    visibility: hidden;
+}
+
+#radio-image {
+    display: block;
+    width: 600px;
+    height: auto;
+}
+
+#scan-icon {
+    position: absolute;
+    top: 17%;
+    left: 24.5%;
+    display: block;
+    width: 14px;
+    height: auto;
+}
+
+#rssi-icon {
+    position: absolute;
+    top: 16.5%;
+    left: 20.5%;
+    display: block;
+    width: 20px;
+    height: auto;
+}
+
+#red-icon, #yellow-icon, #green-icon {
+    position: absolute;
+    top: 28%;
+    left: 23.7%;
+    display: block;
+}
+
+#red-icon {
+    top: 34.9%;
+    left: 10.5%;
+    width: 25px;
+    height: 9px;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+#yellow-icon {
+    top: 40.8%;
+    left: 10.4%;
+    width: 25px;
+    height: 9px;
+    box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+}
+
+#green-icon {
+    top: 45.5%;
+    left: 10.4%;
+    width: 25px;
+    height: 9px;
+    box-shadow: 0 0 10px rgba(0, 176, 80, 0.5);
+}
+
+#channel-up, #zone-up, #rssi-btn {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 91%;
+    width: 40px;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#channel-up {
+    top: 67.5%;
+    left: 49%;
+    background-color: transparent;
+}
+
+#zone-up {
+    top: 67.5%;
+    left: 24%;
+    background-color: transparent;
+}
+
+#rssi-btn {
+    top: 67.5%;
+    left: 33%;
+    background-color: transparent;
+}
+
+#channel-knbu {
+    left: 52%;
+    top: 35%;
+}
+
+#channel-knbd {
+    left: 44%;
+    top: 35%;
+}
+
+#btn-emer {
+    left: 91%;
+    top: 10%;
+}
+
+#scan-btn {
+    top: 67.5%;
+    position: absolute;
+    transform: translateX(-50%);
+    left: 40.5%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+
+
+#power-btn {
+    left: 8.2%;
+    top: 7.5%;
+    width: 35px;
+    position: absolute;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#btn-emer {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 11%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#channel-knbu, #channel-knbd {
+    position: absolute;
+    transform: translateX(-50%);
+    visibility: hidden;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: white;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#line1, #line2, #line3 {
+    position: absolute;
+    left: 36.2%;
+    transform: translateX(-50%);
+    z-index: 1;
+    color: white;
+    font-size: 19px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+}
+
+#softText1, #softText2, #softText3, #softText4 {
+    position: absolute;
+    left: 37.5%;
+    transform: translateX(-50%);
+    z-index: 1;
+    color: white;
+    font-size: 19px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+}
+
+#softText1 {
+    color: white;
+    font-size: 12px;
+    top: 54%;
+    left: 24.25%;
+}
+
+#softText2 {
+    color: white;
+    font-size: 12px;
+    top: 54%;
+    left: 32%;
+}
+
+#softText3 {
+    color: white;
+    font-size: 12px;
+    top: 54%;
+    left: 48.5%;
+}
+#softText4 {
+    color: white;
+    font-size: 12px;
+    top: 54%;
+    left: 40.5%;
+}
+
+#line1 {
+    color: white;
+    font-size: 13.5px;
+    top: 24.5%;
+}
+
+#line2 {
+    color: white;
+    top: 34.5%;
+    font-size: 16px;
+}
+
+#line3 {
+    color: white;
+    top: 44.5%;
+    font-size: 12px;
+    width: 30.1%;
+}
+
+#startup-message {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+#startup-message h1 {
+    color: white;
+    margin: 0 0 10px;
+}
+
+#startup-message p {
+    color: white;
+    margin: 5px 0;
+}
