@@ -19,6 +19,10 @@ files {
     'client/ui/radio.png'
 }
 
+dependencies {
+  'yarn'
+}
+
 author 'Caleb, K4PHP (_php_)'
 version 'R03.01.00'
 description 'WhackerLink FiveM Plugin'
