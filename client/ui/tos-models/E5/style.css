@@ -1,0 +1,225 @@
+#radio-container {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    width: 500px;
+    display: inline-block;
+    cursor: move;
+    z-index: 1000;
+    overflow: hidden; 
+
+}
+#power-btn {
+    left: 5.5%;
+    width: 5%;
+    height: 15%;
+}
+
+#battery-icon {
+    position: absolute;
+    top: 69%;
+    left: 60.5%;
+    height: 10%;
+    width: auto;
+    display: none;
+   visibility: hidden;
+
+}
+
+body {
+  overflow-y: hidden; /* Hide vertical scrollbar */
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+
+#radio-image {
+    display: block;
+    width: 500px;
+    height: auto;
+    position: relative;
+}
+
+#rssi-icon {
+   position: absolute;
+    top: 13.2%;
+    left: 26.7%;
+    display: block;
+}
+
+#channel-up, #zone-up, #rssi-btn, #scan-btn {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 65%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#channel-up {
+    left: 69%;
+}
+
+#zone-up {
+    left: 30%;
+}
+
+#rssi-btn {
+    left: 50%;
+}
+#scan-btn {
+    left: 60%;
+   
+}
+
+#scan-icon {
+    position: absolute;
+    top: 13%;
+    left: 45%;
+    display: none;
+    width: 12px;
+    height: auto;
+}
+
+#channel-knbu {
+	  left: 85%;
+
+}
+#channel-knbd {
+	 left: 78%;
+
+}
+
+#btn-emer {
+left: 94%;
+height: 15%;
+}
+
+#btn-emer{
+    position: absolute;
+    transform: translateX(-50%);
+    top: 4%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+   background-color: transparent;
+	color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#power-btn{
+    position: absolute;
+    transform: translateX(-50%);
+    top: 5%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+   background-color: transparent;
+	color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#channel-knbu, #channel-knbd {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 5%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 5px;
+    padding-top: 20px;
+    background-color: transparent;
+	color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#line1, #line2, #line3 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    color: black;
+    font-size: 17px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+}
+
+#softText1, #softText2, #softText3, #softText4 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    color: white;
+    font-size: 17px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+}
+
+#softText1 {
+    font-size: 12px;
+    top: 56%;
+    left: 32%;
+}
+
+#softText2 {
+    font-size: 12px;
+    top: 56%;
+    left: 50%;
+}
+
+#softText3 {
+    font-size: 12px;
+    top: 56%;
+    left: 67.5%;
+}
+
+#softText4{
+font-size: 12px;
+top: 56%;
+left: 58.5%;
+}
+
+#line1 {
+    top: 20%;
+}
+
+#line2 {
+   top: 32%;
+   font-size: 15px;
+}
+
+#line3 {
+    top: 43%;
+    font-size: 14px;
+    left: 49.5%;
+    width: 46%;
+}
+
+#startup-message {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+#startup-message h1 {
+    margin: 0 0 10px;
+}
+
+#startup-message p {
+    margin: 5px 0;
+}
