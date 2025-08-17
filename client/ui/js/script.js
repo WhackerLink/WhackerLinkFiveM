@@ -97,38 +97,14 @@ let currentLng = null;
 
 let inhibited = false;
 
+let isPaging = false;
+let isAlertPlaying = false;
+let isTonePlaying = false;
+let tonesQueue = [];
+
 function socketOpen() {
     return socket && socket.readyState === WebSocket.OPEN;
 }
-
-let beepVolumeReduction = 0.6; // default value
-fetch('/configs/config.yml')
-  .then(response => response.text())
-  .then(yamlText => {
-    const lines = yamlText.split('\n');
-    for (const line of lines) {
-      const matchBeepVolume = line.match(/^\s*beepVolumeReduction\s*:\s*([0-9.]+)\s*$/i);
-      if (matchBeepVolume) {
-        let parsed = parseFloat(matchBeepVolume[1]);
-        if (isNaN(parsed)) {
-          console.error('beepVolumeReduction in config.yml is not a number. Using default value.');
-          return;
-        }
-        if (parsed < 0.0) {
-          console.error('beepVolumeReduction in config.yml is less than 0. Clamping to 0.');
-          beepVolumeReduction = 0.0;
-        } else if (parsed > 1.0) {
-          console.error('beepVolumeReduction in config.yml is greater than 1. Clamping to 1.');
-          beepVolumeReduction = 1.0;
-        } else {
-          beepVolumeReduction = parsed;
-        }
-      }
-    }
-  })
-  .catch(err => {
-    console.warn('Could not load config.yml, using default config values:', err);
-  });
 
 reconnectInterval = setInterval(() => {
     if (isInSiteTrunking && radioOn) {
@@ -151,7 +127,7 @@ function isMobile() {
 }
 
 function isScannerModel() {
-    return radioModel === "UNIG5";
+    return radioModel === "UNIG5" || radioModel === "MIN6";
 }
 
 function setBatteryLevel() {
@@ -344,10 +320,6 @@ async function sendRegistration() {
 }
 
 window.addEventListener('message', async function (event) {
-    const deniedWhenOff = ['volumeUp', 'volumeDown', 'channelUp', 'channelDown', 'zoneUp', 'zoneDown', 'pttPress', 'pttRelease', 'resetBatteryLevel', 'activate_emergency'];
-    if (!radioOn && deniedWhenOff.includes(event.data.type)) {
-        return;
-    }
     if (event.data.type === 'resetBatteryLevel'){
         batteryLevel = 4;
     } else if (event.data.type === 'powerToggle') {
@@ -364,10 +336,6 @@ window.addEventListener('message', async function (event) {
         changeChannel(1);
     } else if (event.data.type === 'channelDown') {
         changeChannel(-1);
-    } else if (event.data.type === 'zoneUp') {
-        changeZone(1);
-    } else if (event.data.type === 'zoneDown') {
-        changeZone(-1);
     } else if (event.data.type === 'openRadio') {
         currentCodeplug = event.data.codeplug;
 
@@ -573,12 +541,6 @@ window.addEventListener('message', async function (event) {
 async function powerOn(reReg) {
     try {
         radioOn = true;
-        // Notify client that radio is powered on
-        fetch(`https://${GetParentResourceName()}/radioPowerState`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ poweredOn: true })
-        });
         currentMessageIndex = 0;
 
         pcmPlayer.clear();
@@ -703,12 +665,6 @@ async function powerOn(reReg) {
 async function powerOff(stayConnected) {
     try {
         pcmPlayer.clear();
-        // Notify client that radio is powered off
-        fetch(`https://${GetParentResourceName()}/radioPowerState`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ poweredOn: false })
-        });
         stopCheckLoop();
         if (!stayConnected)
             await SendDeRegistrationRequest();
@@ -952,16 +908,7 @@ function changeZone(direction) {
 
     responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
     responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
-    SendGroupAffiliationRemoval(currentTg);
-
     updateDisplay();
-
-    if (!isInSiteTrunking) {
-        sendAffiliation().then();
-    } else {
-        isAffiliated = false;
-    }
-    
     reconnectIfSystemChanged();
 }
 
@@ -1479,10 +1426,19 @@ function detectTone(samples) {
 
     source.connect(analyser);
     analyser.connect(context.destination);
+    
+    if (isPaging) {
+        setTimeout(() => {
+            playTones(source, analyser, context, fftSize);
+        }, 3250);
+    } else {
+        playTones(source, analyser, context, fftSize);
+    }
+} 
 
+function playTones(source, analyser, ctx, fftSize) {
     source.start();
-
-    context.startRendering().then(() => {
+    ctx.startRendering().then(() => {
         const freqData = new Float32Array(analyser.frequencyBinCount);
         analyser.getFloatFrequencyData(freqData);
 
@@ -1501,16 +1457,49 @@ function detectTone(samples) {
     });
 }
 
+// function processTone(frequency) {
+//     const now = Date.now();
+
+//     //console.log(`detected frequency: ${frequency} Hz`);
+
+//     if (frequency < 300 || frequency > 3000) {
+//         //console.log('frequency out of valid range');
+//         if (lastTone !== null) {
+//             const duration = now - toneStartTime;
+//             //console.log(`ending tone ${lastTone} after ${duration} ms`);
+//             toneHistory.push({ freq: lastTone, duration });
+//             detectQC2Pair();
+//             lastTone = null;
+//             toneStartTime = null;
+//         }
+//         return;
+//     }
+
+//     if (lastTone === null) {
+//         //console.log(`starting new tone ${frequency}`);
+//         toneStartTime = now;
+//         lastTone = frequency;
+//     } else if (Math.abs(frequency - lastTone) <= FREQUENCY_TOLERANCE) {
+//         const duration = now - toneStartTime;
+//         //console.log(`continuing tone ${frequency} for ${duration} ms`);
+//     } else {
+//         const duration = now - toneStartTime;
+//         //console.log(`tone changed: ${lastTone} lasted ${duration} ms`);
+//         toneHistory.push({ freq: lastTone, duration });
+//         detectQC2Pair();
+
+//         lastTone = frequency;
+//         toneStartTime = now;
+//         //console.log(`new tone started: ${frequency}`);
+//     }
+// }
+
 function processTone(frequency) {
     const now = Date.now();
 
-    //console.log(`detected frequency: ${frequency} Hz`);
-
     if (frequency < 300 || frequency > 3000) {
-        //console.log('frequency out of valid range');
         if (lastTone !== null) {
             const duration = now - toneStartTime;
-            //console.log(`ending tone ${lastTone} after ${duration} ms`);
             toneHistory.push({ freq: lastTone, duration });
             detectQC2Pair();
             lastTone = null;
@@ -1520,29 +1509,20 @@ function processTone(frequency) {
     }
 
     if (lastTone === null) {
-        //console.log(`starting new tone ${frequency}`);
         toneStartTime = now;
         lastTone = frequency;
-    } else if (Math.abs(frequency - lastTone) <= FREQUENCY_TOLERANCE) {
+    } else if (Math.abs(frequency - lastTone) > FREQUENCY_TOLERANCE) {
         const duration = now - toneStartTime;
-        //console.log(`continuing tone ${frequency} for ${duration} ms`);
-    } else {
-        const duration = now - toneStartTime;
-        //console.log(`tone changed: ${lastTone} lasted ${duration} ms`);
         toneHistory.push({ freq: lastTone, duration });
         detectQC2Pair();
 
         lastTone = frequency;
         toneStartTime = now;
-        //console.log(`new tone started: ${frequency}`);
     }
 }
 
 function detectQC2Pair() {
-    if (toneHistory.length < 2) {
-        //console.log('not enough tones in history to detect qc2');
-        return;
-    }
+    if (toneHistory.length < 2) return;
 
     const recent = toneHistory.slice(-2);
     const [toneA, toneB] = recent;
@@ -1550,66 +1530,81 @@ function detectQC2Pair() {
     const durationA = toneA.duration;
     const durationB = toneB.duration;
 
-    //console.log(`checking pair: A=${toneA.freq} Hz (${durationA} ms), B=${toneB.freq} (${durationB} ms)`);
+    console.log(`checking pair: A=${toneA.freq} Hz (${durationA} ms), B=${toneB.freq} (${durationB} ms)`);
 
-    if (
-        durationA >= 900 && durationA <= 1200 &&
-        durationB >= 2500 && durationB <= 3500
-    ) {
-        console.log(`QC2 Pair Detected A: ${toneA.freq}, B: ${toneB.freq}`);
-
+    if (durationA >= 5 && durationA <= 1200 && durationB >= 20 && durationB <= 3500) {
         if (currentCodeplug.qcList != null) {
             for (const pair of currentCodeplug.qcList) {
                 const isMatchA = Math.abs(toneA.freq - pair.a) <= FREQ_MATCH_THRESHOLD;
                 const isMatchB = Math.abs(toneB.freq - pair.b) <= FREQ_MATCH_THRESHOLD;
 
                 if (isMatchA && isMatchB) {
-                    console.log(`QC2 ALERT: A=${pair.a} B=${pair.b}`);
-                    minitorStandard();
+                    console.log(`QC2 Match: A=${pair.a}, B=${pair.b}`);
+                    minitorStandard();  // ✅ Start paging workflow
+                    tonesQueue.push({ a: pair.a, b: pair.b });
                     break;
                 }
             }
         }
-
         toneHistory = [];
-    } else {
-        //console.log(`no QC2 pattern`);
     }
 }
 
-let volumeChangeTimeout = null;
+
+function minitorStandard() {
+    if (isPaging) return; // Already paging
+    isPaging = true;
+
+    isAlertPlaying = true;
+    playSoundEffect('audio/minitor_standard.wav', () => {
+        isAlertPlaying = false;
+        tryPlayNextTone();
+    });
+}
+
+function tryPlayNextTone() {
+    if (isTonePlaying || isAlertPlaying) return;
+
+    const nextTone = tonesQueue.shift();
+    if (!nextTone) {
+        isPaging = false; // ✅ Done with queue
+        return;
+    }
+
+    playToneSet(nextTone.a, nextTone.b, () => {
+        tryPlayNextTone(); // Continue with next in queue
+    });
+}
+
+function playToneSet(freqA, freqB, onComplete) {
+    isTonePlaying = true;
+    console.log(`Playing Tone A=${freqA}, B=${freqB}`);
+
+    // Simulate 4s tone duration
+    setTimeout(() => {
+        isTonePlaying = false;
+        onComplete?.();
+    }, 4000);
+}
+
 
 function volumeUp() {
-    if (volumeChangeTimeout) return;
-    volumeChangeTimeout = setTimeout(() => { volumeChangeTimeout = null; }, 550);
     if (volumeLevel < 1.0) {
         volumeLevel += 0.1;
         volumeLevel = Math.min(1.0, volumeLevel);
         //beepAudioCtx.gainNode.gain.value = volumeLevel;
         pcmPlayer.volume(volumeLevel);
-        beep(910, 500, 30, 'sine');
         console.log(`Volume increased: ${volumeLevel}`);
-    }
-    else {
-        console.log("Volume is already at maximum");
-        tripleBeep();
     }
 }
 
 function volumeDown() {
-    if (volumeChangeTimeout) return;
-    volumeChangeTimeout = setTimeout(() => { volumeChangeTimeout = null; }, 550);
     if (volumeLevel > 0.0) {
         volumeLevel -= 0.1;
         volumeLevel = Math.max(0.1, volumeLevel);
         //beepAudioCtx.gainNode.gain.value = volumeLevel;
         pcmPlayer.volume(volumeLevel);
-        beep(910, 500, 30, 'sine');
         console.log(`Volume decreased: ${volumeLevel}`);
-    }
-    else {
-        console.log("Volume is already at minimum");
-        tripleBeep();
     }
 }
 
@@ -1619,7 +1614,7 @@ function beep(frequency, duration, volume, type) {
 
     oscillator.connect(gainNode);
     gainNode.connect(beepAudioCtx.destination);
-    gainNode.gain.value = Math.max(0.0, volumeLevel * (1.0 - beepVolumeReduction));
+    gainNode.gain.value = Math.max(0.1, volumeLevel - 0.3);
     oscillator.frequency.value = frequency;
     oscillator.type = type;
 
@@ -1688,16 +1683,6 @@ function bonk() {
     beep(310, 1000, 30, 'sine');
 }
 
-function tripleBeep() {
-    beep(910, 80, 30, 'sine');
-    setTimeout(() => {
-        beep(910, 80, 30, 'sine');
-    }, 100);
-    setTimeout(() => {
-        beep(910, 80, 30, 'sine');
-    }, 200);
-}
-
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -1752,13 +1737,35 @@ function buttonBeep() {
     playSoundEffect('audio/buttonbeep.wav');
 }
 
-function minitorStandard() {
-    playSoundEffect('audio/minitor_standard.wav');
-}
+// function minitorStandard() {
+//     isPaging = true;
+//     isAlertPlaying = true;
+//     playSoundEffect('audio/minitor_standard.wav');
+// }
 
-function playSoundEffect(audioPath) {
-    let audio = new Audio(audioPath);
-    audio.play().then();
+
+// Original PlaySoundEffect 
+// function playSoundEffect(audioPath) {
+//     let audio = new Audio(audioPath);
+//     audio.play().then();
+//     audio.onended((e) => {
+//         if (tonesQueue.length === 0) {
+//             isPaging = false;
+//         }
+//     })
+// }
+
+// Custom PlaySoundEffect With Alerting for QC2 Tones
+function playSoundEffect(audioPath, onComplete) {
+    const audio = new Audio(audioPath);
+    audio.play().then(() => {
+        audio.onended = () => {
+            onComplete?.();
+        };
+    }).catch((err) => {
+        console.error('Error playing sound:', err);
+        onComplete?.(); // Fallback
+    });
 }
 
 

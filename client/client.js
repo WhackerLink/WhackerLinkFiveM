@@ -19,7 +19,6 @@
 */
 
 let isRadioOpen = false;
-let radioPoweredOn = false;
 let isPttPressed = false;
 let pttTimeout = null;
 let isHandlingPtt = false;
@@ -81,13 +80,6 @@ on('onClientResourceStart', (resourceName) => {
             "This is free software, and you are welcome to redistribute it\n" +
             "under certain conditions; Check the included LICENSE file for more details.\n");
     }, 5000);
-});
-
-
-RegisterNuiCallbackType('radioPowerState');
-on('__cfx_nui:radioPowerState', (data, cb) => {
-    radioPoweredOn = !!data.poweredOn;
-    if (cb) cb({});
 });
 
 RegisterNuiCallbackType('getPlayerLocation');
@@ -237,21 +229,11 @@ RegisterKeyMapping('+ptt', 'Push-To-Talk', 'keyboard', 'N');
 RegisterKeyMapping('power_toggle', 'Radio power toggle', 'keyboard', 'P');
 RegisterKeyMapping('channel_up', 'Channel Up', 'keyboard', 'PAGEUP');
 RegisterKeyMapping('channel_down', 'Channel Down', 'keyboard', 'PAGEDOWN');
-RegisterKeyMapping('zone_up', 'Zone Up', 'keyboard', '');
-RegisterKeyMapping('zone_down', 'Zone Down', 'keyboard', '');
-RegisterKeyMapping('volume_up', 'Volume Up', 'keyboard', '');
-RegisterKeyMapping('volume_down', 'Volume Down', 'keyboard', '');
+RegisterKeyMapping('volume_up', 'Volume Up', 'keyboard', 'NUMPAD+');
+RegisterKeyMapping('volume_down', 'Volume Down', 'keyboard', 'NUMPAD-');
 
 RegisterCommand('power_toggle', () => {
     SendNuiMessage(JSON.stringify({ type: 'powerToggle' }));
-}, false);
-
-RegisterCommand('zone_up', () => {
-    SendNuiMessage(JSON.stringify({ type: 'zoneUp' }));
-}, false);
-
-RegisterCommand('zone_down', () => {
-    SendNuiMessage(JSON.stringify({ type: 'zoneDown' }));
 }, false);
 
 RegisterCommand('channel_up', () => {
@@ -367,7 +349,7 @@ function handlePTTDown() {
             SendNuiMessage(JSON.stringify({ type: 'pttPress' }));
             //console.debug('PTT press confirmed');
 
-            if (radioPoweredOn && !inVehicle && !disableAnimations) {
+            if (!inVehicle && !disableAnimations) {
                 playRadioAnimation();
             }
         }
