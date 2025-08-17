@@ -229,6 +229,10 @@ RegisterKeyMapping('+ptt', 'Push-To-Talk', 'keyboard', 'N');
 RegisterKeyMapping('power_toggle', 'Radio power toggle', 'keyboard', 'P');
 RegisterKeyMapping('channel_up', 'Channel Up', 'keyboard', 'PAGEUP');
 RegisterKeyMapping('channel_down', 'Channel Down', 'keyboard', 'PAGEDOWN');
+RegisterKeyMapping('zone_up', 'Zone Up', 'keyboard', '');
+RegisterKeyMapping('zone_down', 'Zone Down', 'keyboard', '');
+RegisterKeyMapping('volume_up', 'Volume Up', 'keyboard', '');
+RegisterKeyMapping('volume_down', 'Volume Down', 'keyboard', '');
 RegisterKeyMapping('volume_up', 'Volume Up', 'keyboard', 'NUMPAD+');
 RegisterKeyMapping('volume_down', 'Volume Down', 'keyboard', 'NUMPAD-');
 
