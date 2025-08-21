@@ -1543,43 +1543,6 @@ function processTone(frequency) {
     }
 }
 
-// function processTone(frequency) {
-//     const now = Date.now();
-
-//     //console.log(`detected frequency: ${frequency} Hz`);
-
-//     if (frequency < 300 || frequency > 3000) {
-//         //console.log('frequency out of valid range');
-//         if (lastTone !== null) {
-//             const duration = now - toneStartTime;
-//             //console.log(`ending tone ${lastTone} after ${duration} ms`);
-//             toneHistory.push({ freq: lastTone, duration });
-//             detectQC2Pair();
-//             lastTone = null;
-//             toneStartTime = null;
-//         }
-//         return;
-//     }
-
-//     if (lastTone === null) {
-//         //console.log(`starting new tone ${frequency}`);
-//         toneStartTime = now;
-//         lastTone = frequency;
-//     } else if (Math.abs(frequency - lastTone) <= FREQUENCY_TOLERANCE) {
-//         const duration = now - toneStartTime;
-//         //console.log(`continuing tone ${frequency} for ${duration} ms`);
-//     } else {
-//         const duration = now - toneStartTime;
-//         //console.log(`tone changed: ${lastTone} lasted ${duration} ms`);
-//         toneHistory.push({ freq: lastTone, duration });
-//         detectQC2Pair();
-
-//         lastTone = frequency;
-//         toneStartTime = now;
-//         //console.log(`new tone started: ${frequency}`);
-//     }
-// }
-
 function detectQC2Pair() {
     if (toneHistory.length < 2) return;
 
@@ -1608,45 +1571,6 @@ function detectQC2Pair() {
         toneHistory = [];
     }
 }
-
-// function detectQC2Pair() {
-//     if (toneHistory.length < 2) {
-//         //console.log('not enough tones in history to detect qc2');
-//         return;
-//     }
-
-//     const recent = toneHistory.slice(-2);
-//     const [toneA, toneB] = recent;
-
-//     const durationA = toneA.duration;
-//     const durationB = toneB.duration;
-
-//     //console.log(`checking pair: A=${toneA.freq} Hz (${durationA} ms), B=${toneB.freq} (${durationB} ms)`);
-
-//     if (
-//         durationA >= 900 && durationA <= 1200 &&
-//         durationB >= 2500 && durationB <= 3500
-//     ) {
-//         console.log(`QC2 Pair Detected A: ${toneA.freq}, B: ${toneB.freq}`);
-
-//         if (currentCodeplug.qcList != null) {
-//             for (const pair of currentCodeplug.qcList) {
-//                 const isMatchA = Math.abs(toneA.freq - pair.a) <= FREQ_MATCH_THRESHOLD;
-//                 const isMatchB = Math.abs(toneB.freq - pair.b) <= FREQ_MATCH_THRESHOLD;
-
-//                 if (isMatchA && isMatchB) {
-//                     console.log(`QC2 ALERT: A=${pair.a} B=${pair.b}`);
-//                     minitorStandard();
-//                     break;
-//                 }
-//             }
-//         }
-
-//         toneHistory = [];
-//     } else {
-//         //console.log(`no QC2 pattern`);
-//     }
-// }
 
 let volumeChangeTimeout = null;
 
