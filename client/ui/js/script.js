@@ -653,8 +653,8 @@ async function powerOn(reReg) {
         }
 
         if (!isScannerModel()) {
-            responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
-            responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
+            // responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
+            // responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
         }
 
         updateDisplay();
@@ -913,7 +913,7 @@ function changeChannel(direction) {
 
     const currentChannel = currentZone.channels[currentChannelIndex];
 
-    responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
+    // responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
 
     SendGroupAffiliationRemoval(currentTg);
 
@@ -950,8 +950,8 @@ function changeZone(direction) {
     const currentZone = currentCodeplug.zones[currentZoneIndex];
     const currentChannel = currentZone.channels[currentChannelIndex];
 
-    responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
-    responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
+    // responsiveVoice.speak(`${currentZone.name}`, `US English Female`, {rate: .8});
+    // responsiveVoice.speak(`${currentChannel.name}`, `US English Female`, {rate: .8});
     SendGroupAffiliationRemoval(currentTg);
 
     updateDisplay();
