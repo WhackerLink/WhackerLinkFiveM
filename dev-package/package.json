@@ -5,6 +5,10 @@
   "license": "GPL-3.0-only",
   "author": "Caleb, K4PHP (_php_)",
   "dependencies": {
-    "js-yaml": "^4.1.0"
+    "@citizenfx/client": "^2.0.8903-1",
+    "@citizenfx/server": "^2.0.8903-1",
+    "fs": "^0.0.1-security",
+    "js-yaml": "^4.1.0",
+    "ws": "^8.18.0"
   }
 }
