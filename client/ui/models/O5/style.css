@@ -1,0 +1,457 @@
+@font-face {
+    font-family: 'nimbus_sans_lbold';
+    src: url('fonts/NimbusSanL-Bol-webfont.eot');
+    src: url('fonts/NimbusSanL-Bol-webfont.eot?#iefix') format('embedded-opentype'),
+    url('fonts/NimbusSanL-Bol-webfont.woff2') format('woff2'),
+    url('fonts/NimbusSanL-Bol-webfont.woff') format('woff'),
+    url('fonts/NimbusSanL-Bol-webfont.ttf') format('truetype'),
+    url('fonts/NimbusSanL-Bol-webfont.svg#nimbus_sans_lbold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+@font-face {
+    font-family: 'nimbusantbolconregular';
+    src: url('fonts/nimbussanst-boldcondensed-webfont.woff2') format('woff2'),
+    url('fonts/nimbussanst-boldcondensed-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+}
+#zn {
+    display:none;
+}
+
+#znTxt {
+    display:none;
+}
+
+#ch {
+    display:none;
+}
+
+#chKnob
+{
+    position: absolute;
+    left: 471px;
+    top: 15px;
+    width: 59px;
+    height: 53px;
+}
+
+#chTxt {
+    display:none;
+}
+
+
+#ln01-div
+{
+    position: absolute;
+    top: 36px;
+    left: 165px;
+    width: 253px;
+    height: 24px;
+    text-align: center;
+}
+
+#ln01 {
+    font-family: "nimbusantbolconregular";
+    font-size: 20px;
+    margin-top:0;
+    margin-left:0;
+    vertical-align: top;
+    color: #282828;
+}
+
+#ln02-div
+{
+    position: absolute;
+    top: 49px;
+    left: 165px;
+    width: 253px;
+    height: 24px;
+    text-align: center;
+}
+
+#ln02 {
+    font-family: "nimbus_sans_lbold";
+    font-size: 25px;
+    margin-top:0;
+    margin-left:0;
+    vertical-align: top;
+    color: #282828;
+}
+
+
+#bt01-div
+{
+    position: absolute;
+    top: 78px;
+    left: 150px;
+    width: 57px;
+    height: 20px;
+    text-align: center;
+}
+
+#bt01 {
+    font-family: "nimbusantbolconregular";
+    font-size: 14px;
+    text-transform: capitalize;
+    font-weight: bold;
+    margin-top:0;
+    margin-left:0;
+    vertical-align: top;
+    color: #282828;
+}
+
+#bt02-div
+{
+    position: absolute;
+    top: 78px;
+    left: 207px;
+    width: 57px;
+    height: 20px;
+    text-align: center;
+}
+
+#bt02 {
+    font-family: "nimbusantbolconregular";
+    font-size: 14px;
+    text-transform: capitalize;
+    font-weight: bold;
+    margin-top:0;
+    margin-left:0;
+    vertical-align: top;
+    color: #282828;
+}
+
+#bt03-div
+{
+    position: absolute;
+    top: 78px;
+    left: 264px;
+    width: 57px;
+    height: 20px;
+    text-align: center;
+}
+
+#bt03 {
+    font-family: "nimbusantbolconregular";
+    font-size: 14px;
+    text-transform: capitalize;
+    font-weight: bold;
+    margin-top:0;
+    margin-left:0;
+    vertical-align: top;
+    color: #282828;
+}
+
+#bt04-div
+{
+    position: absolute;
+    top: 78px;
+    left: 321px;
+    width: 57px;
+    height: 20px;
+    text-align: center;
+}
+
+#bt04 {
+    font-family: "nimbusantbolconregular";
+    font-size: 14px;
+    text-transform: capitalize;
+    font-weight: bold;
+    margin-top:0;
+    margin-left:0;
+    vertical-align: top;
+    color: #282828;
+}
+
+#bt05-div
+{
+    position: absolute;
+    top: 78px;
+    left: 378px;
+    width: 55px;
+    height: 20px;
+    text-align: center;
+}
+
+#bt05 {
+    font-family: "nimbusantbolconregular";
+    font-size: 14px;
+    text-transform: capitalize;
+    font-weight: bold;
+    margin-top:0;
+    margin-left:0;
+    vertical-align: top;
+    color: #282828;
+}
+
+#radio {
+    position: absolute;
+    right: 50px;
+    bottom: 50px;
+    height: 150px;
+    width: 750px;
+    margin-top: 38%;
+    background: url("Motorola-O5.png") no-repeat;
+    background-size: contain;
+}
+
+#btnEmerg {
+    position: absolute;
+    left: 538px;
+    top: 14px;
+    width: 21px;
+    height: 21px;
+
+}
+
+#btn1
+{
+    position: absolute;
+    left: 160px;
+    top: 118px;
+    width: 41px;
+    height: 16px;
+}
+
+
+
+#btn2
+{
+    position: absolute;
+    left: 218px;
+    top: 118px;
+    width: 41px;
+    height: 16px;
+}
+
+#btn3
+{
+    position: absolute;
+    left: 276px;
+    top: 118px;
+    width: 41px;
+    height: 16px;
+}
+
+#btn4
+{
+    position: absolute;
+    left: 335px;
+    top: 118px;
+    width: 41px;
+    height: 16px;
+}
+
+#btn5
+{
+    position: absolute;
+    left: 393px;
+    top: 118px;
+    width: 41px;
+    height: 16px;
+}
+
+#btnUp
+{
+    position: absolute;
+    left: 495px;
+    top: 77px;
+    width: 20px;
+    height: 20px;
+}
+
+#btnDown
+{
+    position: absolute;
+    left: 495px;
+    top: 115px;
+    width: 20px;
+    height: 20px;
+}
+
+#btnLeft
+{
+    position: absolute;
+    left: 476px;
+    top: 97px;
+    width: 20px;
+    height: 20px;
+}
+
+#btnRight
+{
+    position: absolute;
+    left: 514px;
+    top: 97px;
+    width: 20px;
+    height: 20px;
+}
+
+#btnHome
+{
+    position: absolute;
+    left: 95px;
+    top: 59px;
+    width: 22px;
+    height: 21px;
+}
+
+#btnPower
+{
+    position: absolute;
+    left: 95px;
+    top: 87px;
+    width: 22px;
+    height: 21px;
+}
+
+
+#redLED
+{
+    position: absolute;
+    left: 430px;
+    top: 35px;
+    width: 20px;
+    height: 9px;
+}
+
+#orangeLED
+{
+    position: absolute;
+    left: 430px;
+    top: 52px;
+    width: 20px;
+    height: 9px;}
+
+#greenLED
+{
+    position: absolute;
+    left: 430px;
+    top: 68px;
+    width: 20px;
+    height: 9px;
+}
+
+
+#battery-icon-div {
+}
+
+#rssi-icon-div {
+    position: absolute;
+    background: url("icons/rssi-0.png") no-repeat;
+    background-size: contain;
+    width: 16px;
+    height: 12px;
+    left: 152px;
+    top: 27px;
+    display:none;
+}
+
+
+#rssi-icon-div.rssi-0 {
+    background: url("icons/rssi-0.png") no-repeat;
+    background-size: contain;
+}
+
+#rssi-icon-div.rssi-1 {
+    background: url("icons/rssi-1.png") no-repeat;
+    background-size: contain;
+}
+
+#rssi-icon-div.rssi-2 {
+    background: url("icons/rssi-2.png") no-repeat;
+    background-size: contain;
+}
+
+#rssi-icon-div.rssi-3 {
+    background: url("icons/rssi-3.png") no-repeat;
+    background-size: contain;
+}
+
+#rssi-icon-div.rssi-4 {
+    background: url("icons/rssi-4.png") no-repeat;
+    background-size: contain;
+}
+
+#rssi-icon-div.rssi-tx {
+    background: url("icons/rssi-tx.png") no-repeat;
+    background-size: contain;
+}
+
+#rssi-icon-div.rssi-rx {
+    background: url("icons/rssi-rx.png") no-repeat;
+    background-size: contain;
+}
+
+#scan-icon-div {
+    position: absolute;
+    background: url("icons/scan.png") no-repeat;
+    background-size: contain;
+    width: 15px;
+    height: 29px;
+    left: 202px;
+    top: 27px;
+    display:none;
+}
+
+#secure-icon-div {
+    position: absolute;
+    background: url("icons/secure.png") no-repeat;
+    background-size: contain;
+    width: 15px;
+    height: 35px;
+    left: 186px;
+    top: 26px;
+    display:none;
+}
+
+#direct-icon-div {
+    position: absolute;
+    background: url("icons/dir.png") no-repeat;
+    background-size: contain;
+    width: 15px;
+    height: 35px;
+    left: 171px;
+    top: 26px;
+    display:none;
+}
+
+
+#gps-icon-div {
+    position: absolute;
+    background: url("icons/gps.png") no-repeat;
+    background-size: contain;
+    width: 13px;
+    height: 40px;
+    left: 413px;
+    top: 27px;
+    display:none;
+}
+
+
+.small-text {
+}
+
+
+.smaller-text {
+}
+
+#alert-div
+{
+    display: none;
+    width: 0;
+}
