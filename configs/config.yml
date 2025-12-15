@@ -2,3 +2,4 @@ siteBlips: true
 disableAnimations: false
 # Beep volume reduction factor. 0.0 is full volume, 1.0 is silent
 beepVolumeReduction: 0.6
+responsiveVoiceApiKey: "add your api key"

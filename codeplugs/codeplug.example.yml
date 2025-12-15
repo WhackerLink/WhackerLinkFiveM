@@ -5,6 +5,7 @@ radioWide:
   serialNumber: "123ABC1234"
   model: "APX6000"
   inCarMode: "APX4500"
+  isAnnonceZoneChannelChanges: false
 
 systems:
   - name: "System 1"
@@ -22,30 +23,44 @@ qcList:
     b: 500.9
 
 zones:
-  - name: "Zone 1"
+  - name: "Z1" # Displayed on the radio UI
+    name_announce: "Zone 1" # Announced when switching to this zone
     channels:
-      - name: "Channel 1"
+      - name: "Ch 1" # Displayed on the radio UI
+        name_announce: "Channel 1" # Announced when switching to this channel
         system: "System 1"
         tgid: "2001"
         scanList: List 1
-      - name: "Channel 2"
+        isReceiveOnly: false
+      - name: "Ch 2" # Displayed on the radio UI
+        name_announce: "Channel 2" # Announced when switching to this channel
         system: "System 1"
         tgid: "15002"
-      - name: "Channel 3"
+        isReceiveOnly: false
+      - name: "Ch 3" # Displayed on the radio UI
+        name_announce: "Channel 3" # Announced when switching to this channel
         system: "System 1"
         tgid: "15003"
+        isReceiveOnly: false
 
-  - name: "Zone 2"
+  - name: "Z2" # Displayed on the radio UI
+    name_announce: "Zone 2" # Announced when switching to this zone
     channels:
-      - name: "Channel A"
+      - name: "Ch A" # Displayed on the radio UI
+        name_announce: "Channel A" # Announced when switching to this channel
         system: "System 1"
         tgid: "16001"
-      - name: "Channel B"
+        isReceiveOnly: false
+      - name: "Ch B" # Displayed on the radio UI
+        name_announce: "Channel B" # Announced when switching to this channel
         system: "System 1"
         tgid: "16002"
-      - name: "Channel C"
+        isReceiveOnly: false
+      - name: "Ch C" # Displayed on the radio UI
+        name_announce: "Channel C" # Announced when switching to this channel
         system: "System 1"
         tgid: "16002"
+        isReceiveOnly: false
 
 scanLists:
   - name: List 1
