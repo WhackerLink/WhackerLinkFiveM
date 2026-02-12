@@ -3,6 +3,7 @@
     bottom: 5px;
     right: 10px;
     display: inline-block;
+    transform-origin: right bottom;
 }
 
 #radio-image {
@@ -12,7 +13,8 @@
     position: relative;
 }
 
-#channel-up, #zone-up {
+#channel-up,
+#zone-up {
     position: absolute;
     transform: translateX(-50%);
     top: 91%;
@@ -34,7 +36,12 @@
     left: 37%;
 }
 
-#line1, #line2, #line3, #softText1, #softText2, #softText3 {
+#line1,
+#line2,
+#line3,
+#softText1,
+#softText2,
+#softText3 {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);

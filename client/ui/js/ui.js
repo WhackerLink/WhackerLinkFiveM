@@ -23,6 +23,29 @@ let isScaling = false;
 let scaleFactor = 1;
 
 const radioContainer = document.getElementById('radio-container');
+radioContainer.style.transformOrigin = 'right bottom';
+
+function clampRadioToViewport() {
+    const rect = radioContainer.getBoundingClientRect();
+    const maxRight = Math.max(window.innerWidth - rect.width, 0);
+    const maxBottom = Math.max(window.innerHeight - rect.height, 0);
+
+    const currentRight =
+        parseFloat(radioContainer.style.right) ||
+        Math.max(window.innerWidth - rect.right, 0);
+    const currentBottom =
+        parseFloat(radioContainer.style.bottom) ||
+        Math.max(window.innerHeight - rect.bottom, 0);
+
+    const clampedRight = Math.min(Math.max(currentRight, 0), maxRight);
+    const clampedBottom = Math.min(Math.max(currentBottom, 0), maxBottom);
+
+    radioContainer.style.right = `${clampedRight}px`;
+    radioContainer.style.bottom = `${clampedBottom}px`;
+    radioContainer.style.left = 'auto';
+    radioContainer.style.top = 'auto';
+    radioContainer.style.position = 'absolute';
+}
 
 function saveUIState() {
     const uiState = {
@@ -109,11 +132,12 @@ radioContainer.addEventListener('mousedown', (e) => {
     const onMouseMove = (e) => {
         const newRight = window.innerWidth - e.clientX - offsetX;
         const newBottom = window.innerHeight - e.clientY - offsetY;
-        radioContainer.style.right = `${Math.max(newRight, 0)}px`;
-        radioContainer.style.bottom = `${Math.max(newBottom, 0)}px`;
+        radioContainer.style.right = `${newRight}px`;
+        radioContainer.style.bottom = `${newBottom}px`;
         radioContainer.style.left = 'auto';
         radioContainer.style.top = 'auto';
         radioContainer.style.position = 'absolute';
+        clampRadioToViewport();
         saveUIState();
     };
 
@@ -134,6 +158,7 @@ radioContainer.addEventListener('wheel', (e) => {
     scaleFactor += e.deltaY > 0 ? -0.05 : 0.05;
     scaleFactor = Math.min(Math.max(scaleFactor, 0.5), 2);
     radioContainer.style.transform = `scale(${scaleFactor})`;
+    clampRadioToViewport();
 
     saveUIState();
 });
@@ -164,3 +189,4 @@ radioContainer.addEventListener('blur', () => {
 });
 
 document.addEventListener('DOMContentLoaded', loadUIState);
+window.addEventListener('resize', clampRadioToViewport);
