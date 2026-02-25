@@ -633,6 +633,13 @@ window.addEventListener('message', async function (event) {
         currentRssiLevel = event.data.level;
         currentDbLevel = event.data.dbRssi;
         rssiIcon.src = `models/${radioModel}/icons/rssi${event.data.level}.png`;
+    } else if (event.data.type === "manDownState"){
+        if (event.data.active) {
+            StartEmergencyAlarm(); // TODO: Add pre-alarm like apx has etc
+            console.log("man down active");
+        }
+        else
+            console.log("reset man down"); // TODO: handle at some point
     }
 });
 

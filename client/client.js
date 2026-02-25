@@ -41,6 +41,14 @@ const EMERGENCY_COOLDOWN_MS = 2000;
 const PTT_COOLDOWN_MS = 650;
 const MIN_PTT_DURATION_MS = 350;
 
+let manDownActive = false;
+let lastMoveTime = 0;
+let lastMovePos = null;
+let manDownTimeout = 0;
+
+const MAN_DOWN_CHECK_INTERVAL_MS = 250;
+const MAN_DOWN_MOVE_THRESHOLD = 0.35;
+
 function displayStartupMessage() {
     SendNuiMessage(JSON.stringify({
         type: 'showStartupMessage'
@@ -50,6 +58,64 @@ function displayStartupMessage() {
             type: 'hideStartupMessage'
         }));
     }, 3000);
+}
+
+function setManDownState(active, reason = '') {
+    if (manDownActive === active) return;
+
+    manDownActive = active;
+
+    if (manDownTimeout > 0){
+        SendNuiMessage(JSON.stringify({
+            type: 'manDownState',
+            active,
+            reason
+        }));
+    }
+}
+
+function shouldIgnoreManDown(playerPed) {
+    if (IsPedInAnyVehicle(playerPed, false)) return true;
+    if (IsPedSwimming(playerPed)) return true;
+    return false;
+}
+
+function startManDownDetector() {
+    const ped = PlayerPedId();
+
+    lastMoveTime = Date.now();
+    lastMovePos = GetEntityCoords(ped);
+
+    setInterval(() => {
+        const playerPed = PlayerPedId();
+        if (!DoesEntityExist(playerPed)) return;
+
+        if (!radioPoweredOn) { setManDownState(false, 'radio off'); return; }
+
+        if (shouldIgnoreManDown(playerPed)) {
+            setManDownState(false, 'ignored state');
+            lastMoveTime = Date.now();
+            lastMovePos = GetEntityCoords(playerPed);
+            return;
+        }
+
+        const now = Date.now();
+        const pos = GetEntityCoords(playerPed);
+
+        const dist = Vdist(pos[0], pos[1], pos[2], lastMovePos[0], lastMovePos[1], lastMovePos[2]);
+
+        if (dist >= MAN_DOWN_MOVE_THRESHOLD) {
+            lastMoveTime = now;
+            lastMovePos = pos;
+            setManDownState(false, 'movement detected');manDownTimeout
+            return;
+        }
+
+        const idleMs = now - lastMoveTime;
+        if (idleMs >= MAN_DOWN_TIMEOUT_MS) {
+            setManDownState(true, `No movement for ${Math.floor(idleMs / 1000)}s`);
+        }
+    }, MAN_DOWN_CHECK_INTERVAL_MS);
 }
 
 on('onClientResourceStart', (resourceName) => {
@@ -81,6 +147,8 @@ on('onClientResourceStart', (resourceName) => {
             "This is free software, and you are welcome to redistribute it\n" +
             "under certain conditions; Check the included LICENSE file for more details.\n");
     }, 5000);
+
+    startManDownDetector();
 });
 
 
@@ -190,6 +258,8 @@ onNet('open_radio', () => {
 onNet('receiveCodeplug', (codeplug) => {
     // console.debug('Received new codeplug:', codeplug);
     currentCodeplug = codeplug;
+
+    manDownTimeout = currentCodeplug.radioWide.manDownTimeout;
 
     if (inVehicle) {
         currentCodeplug.currentModelConfig = currentCodeplug.inCarModeConfig;

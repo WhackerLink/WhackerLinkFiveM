@@ -5,6 +5,8 @@ radioWide:
   serialNumber: "123ABC1234"
   model: "APX6000"
   inCarMode: "APX4500"
+  # 0 to disable, 30 seconds by default
+  manDownTimeout: 30_000
 
 systems:
   - name: "System 1"
