@@ -14,12 +14,13 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
-* Copyright (C) 2024 Caleb, K4PHP
+* Copyright (C) 2024-2026 Caleb, K4PHP
 *
 */
 
 (function(global) {
     const PacketType = {
+        // Trunking
         UNKOWN: 0x00,
         AUDIO_DATA: 0x01,
         GRP_AFF_REQ: 0x02,
@@ -44,7 +45,11 @@
         SPEC_FUNC: 0x22,
         ACK_RSP: 0x23,
         GRP_VCH_UPD: 0x24,
-        GRP_AFF_RMV: 0x26
+        GRP_AFF_RMV: 0x26,
+
+        // Conventional
+        CONV_VOICE : 0x50,
+        CONV_VOICE_TERM: 0x52
     };
 
     const PacketTypeReverse = Object.fromEntries(

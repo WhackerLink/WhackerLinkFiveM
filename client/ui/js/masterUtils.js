@@ -173,3 +173,19 @@ function SendStsBcast(site, status) {
 
     socket.send(JSON.stringify(request));
 }
+
+function SendConvVoice(data, srcId, dstId, mode){
+    if (!socketOpen) { return; }
+
+    const request = {
+        type: packetToNumber("CONV_VOICE"),
+        data: {
+            SrcId: myRid, // P25 only
+            DstId: dstId, // P25 only
+            Data: data,
+            Mode: mode
+        }
+    }
+
+    socket.send(JSON.stringify(request));
+}

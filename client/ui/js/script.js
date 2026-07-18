@@ -1182,7 +1182,25 @@ async function connectWebSocket() {
                 return;
             }
 
-            if (data.type === packetToNumber("GRP_AFF_RSP")) {
+            // Conventional
+            if (data.type === packetToNumber("CONV_VOICE")) {
+                if (data.data.Mode !== 0x01){
+                    console.warn("Only MDC analog is supported for conv right now! invalid CONV_VOICE mode..")
+                }
+
+                // for now, just play it. we will worry about gating it later.... TODO TODO TODO
+                lastAudioTime = Date.now();
+                const binaryString = atob(data.data.Data);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                handleAudioData(bytes.buffer, true);
+            }
+
+            // Trunking
+            else if (data.type === packetToNumber("GRP_AFF_RSP")) {
                 //console.log(currentTg + " " + myRid);
                 if (data.data.SrcId.trim() !== myRid.trim() || data.data.DstId.trim() !== currentTg) {
                     return;
@@ -1520,7 +1538,7 @@ function setLine3(text) {
     document.getElementById('line3').innerHTML = text;
 }
 
-function handleAudioData(data) {
+function handleAudioData(data, isMdc = false) {
     let dataArray = new Uint8Array(data);
 
     if (dataArray.length > 0) {
@@ -1528,6 +1546,10 @@ function handleAudioData(data) {
         if (audioGainConfig.enabled && audioGainConfig.inputGain !== 1.0) {
             const processedBuffer = applyInputGain(dataArray.buffer, audioGainConfig.inputGain);
             dataArray = new Uint8Array(processedBuffer);
+        }
+
+        if (isMdc){
+            // TODO: Handle mdc
         }
         
         pcmPlayer.feed(dataArray);
