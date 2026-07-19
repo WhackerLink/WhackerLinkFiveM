@@ -22,7 +22,12 @@ const pcmPlayer = new PCMPlayer({encoding: '16bitInt', channels: 1, sampleRate: 
 const micCapture = new MicCapture(onAudioFrameReady);
 
 const EXPECTED_PCM_LENGTH = 1600;
+const CONV_PCM_LENGTH = 320;
 const MAX_BUFFER_SIZE = EXPECTED_PCM_LENGTH * 2;
+const MDC_LEAD_SILENCE_SAMPLES = 0;
+const MDC_TAIL_SILENCE_SAMPLES = 0;
+const MDC_PREAMBLE_BYTES = 0;
+const MDC_VOICE_DELAY_MS = 260;
 
 const FREQUENCY_TOLERANCE = 10;
 const FREQ_MATCH_THRESHOLD = 5;
@@ -96,6 +101,7 @@ let currentConvFreq = "";
 let currentConvRxSrcId = null;
 let mdcDecoder = null;
 let mdcPttSent = false;
+let mdcVoiceHoldUntil = 0;
 let socketMode = null;
 
 let currentLat = null;
@@ -154,10 +160,27 @@ function isCurrentConventional() {
     return isConventionalMode(getSystemMode(getCurrentSystem()));
 }
 
+function normalizeFrequency(frequency) {
+    if (frequency == null) return null;
+
+    const parsed = Number(frequency);
+    if (!Number.isNaN(parsed))
+        return parsed.toFixed(5).replace(/0+$/, "").replace(/\.$/, "");
+
+    return frequency.toString();
+}
+
+function frequenciesMatch(a, b) {
+    const freqA = normalizeFrequency(a);
+    const freqB = normalizeFrequency(b);
+
+    return freqA !== null && freqB !== null && freqA === freqB;
+}
+
 function getCurrentChannelFrequency() {
     const currentChannel = getCurrentChannel();
     if (!currentChannel || currentChannel.frequency == null) return null;
-    return currentChannel.frequency.toString();
+    return normalizeFrequency(currentChannel.frequency);
 }
 
 function getCurrentMdcMode() {
@@ -165,7 +188,7 @@ function getCurrentMdcMode() {
 }
 
 function isMdcVoiceMode(mode) {
-    return mode === 0x01 || mode === "ANALOG_MDC" || mode === "mdc" || mode === "mdcconv";
+    return mode === 0x01 || mode === "1" || mode === "ANALOG_MDC" || mode === "mdc" || mode === "mdcconv";
 }
 
 function getSystemAuthKey(system) {
@@ -605,6 +628,8 @@ window.addEventListener('message', async function (event) {
             currentFrequncyChannel = frequency;
             currentConvFreq = frequency;
             mdcPttSent = false;
+            mdcVoiceHoldUntil = 0;
+            audioBuffer = [];
             isVoiceRequested = false;
             isVoiceGranted = true;
             isTxing = true;
@@ -648,15 +673,18 @@ window.addEventListener('message', async function (event) {
         if (isScannerModel())
             return;
 
-        await sleep(655); // Temp fix to ensure all voice data makes it through before releasing; Is this correct?
-                              // Should we check if the audio buffer is empty instead? Now I am just talking to myself..
-
         isVoiceGrantHandled = false;
 
         if (isTxing && isCurrentConventional()) {
+            await sleep(25);
+            isTxing = false;
+            isVoiceGranted = false;
             SendConvVoiceTerm(myRid, currentTg, getCurrentMdcMode(), currentFrequncyChannel);
             mdcPttSent = false;
+            mdcVoiceHoldUntil = 0;
         } else if (isTxing && isRegistered) {
+            await sleep(655); // Temp fix to ensure all voice data makes it through before releasing; Is this correct?
+                                  // Should we check if the audio buffer is empty instead? Now I am just talking to myself..
             SendGroupVoiceRelease();
             currentFrequncyChannel = null;
         } else {
@@ -1384,12 +1412,13 @@ async function connectWebSocket() {
                     console.warn("Only MDC analog is supported for conv right now! invalid CONV_VOICE mode..")
                 }
 
-                if (currentConvFreq == null || currentConvFreq.toString() !== data.data.Frequency.toString()){
+                if (!frequenciesMatch(currentConvFreq, data.data.Frequency)){
                     return;
                 }
 
-                if (currentConvFreq !== data.data.Frequency.toString()) {
-                    currentConvFreq = data.data.Frequency.toString();
+                const packetFrequency = normalizeFrequency(data.data.Frequency);
+                if (currentConvFreq !== packetFrequency) {
+                    currentConvFreq = packetFrequency;
                     resetConvReceive();
                 }
 
@@ -1419,7 +1448,7 @@ async function connectWebSocket() {
                 if (!isCurrentConventional())
                     return;
 
-                if (data.data.Frequency == null || currentConvFreq == null || currentConvFreq.toString() !== data.data.Frequency.toString())
+                if (!frequenciesMatch(currentConvFreq, data.data.Frequency))
                     return;
 
                 isReceiving = false;
@@ -2098,28 +2127,80 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function onAudioFrameReady(buffer, rms) {
-    if (isTxing && currentFrequncyChannel !== null) {
-        if (isCurrentConventional() && getCurrentMdcMode() === 0x01 && !mdcPttSent && typeof Mdc1200 !== 'undefined') {
-            const unitId = parseInt(myRid, 10) & 0xffff;
-            const mdcSamples = Mdc1200.encodePacket(0x01, 0x00, unitId, {sampleRate: 8000});
-            const mdcBytes = new Uint8Array(mdcSamples.length * 2);
+function appendAudioBuffer(buffer) {
+    for (let i = 0; i < buffer.length; i++)
+        audioBuffer.push(buffer[i]);
+}
 
-            for (let i = 0; i < mdcSamples.length; i++) {
-                mdcBytes[i * 2] = mdcSamples[i] & 0xff;
-                mdcBytes[(i * 2) + 1] = (mdcSamples[i] >> 8) & 0xff;
-            }
+function encodePcmBytes(buffer) {
+    let binary = "";
 
-            const encoded = btoa(String.fromCharCode(...mdcBytes));
-            SendConvVoice(encoded, myRid, currentTg, getCurrentMdcMode(), currentFrequncyChannel);
-            mdcPttSent = true;
+    for (let i = 0; i < buffer.length; i++)
+        binary += String.fromCharCode(buffer[i]);
+
+    return btoa(binary);
+}
+
+function encodeMdcPttId() {
+    const unitId = parseInt(myRid, 10) & 0xffff;
+    const samples = Mdc1200.encodePacket(0x01, 0x00, unitId, {sampleRate: 8000, preamble: MDC_PREAMBLE_BYTES});
+    const pcm = new Uint8Array((MDC_LEAD_SILENCE_SAMPLES + samples.length + MDC_TAIL_SILENCE_SAMPLES) * 2);
+    let offset = MDC_LEAD_SILENCE_SAMPLES * 2;
+
+    for (let i = 0; i < samples.length; i++) {
+        pcm[offset++] = samples[i] & 0xff;
+        pcm[offset++] = (samples[i] >> 8) & 0xff;
+    }
+
+    return pcm;
+}
+
+function sendConventionalPcm(buffer) {
+    for (let i = 0; i < buffer.length; i += CONV_PCM_LENGTH) {
+        let frame = buffer.slice(i, i + CONV_PCM_LENGTH);
+
+        if (frame.length < CONV_PCM_LENGTH) {
+            const padded = new Uint8Array(CONV_PCM_LENGTH);
+            padded.set(frame);
+            frame = padded;
         }
 
+        SendConvVoice(encodePcmBytes(frame), myRid, currentTg, getCurrentMdcMode(), currentFrequncyChannel);
+    }
+}
+
+function holdConventionalVoiceForMdc() {
+    if (getCurrentMdcMode() === 0x01 && !mdcPttSent && typeof Mdc1200 !== 'undefined') {
+        sendConventionalPcm(encodeMdcPttId());
+        mdcPttSent = true;
+        mdcVoiceHoldUntil = Date.now() + MDC_VOICE_DELAY_MS;
+        return true;
+    }
+
+    return Date.now() < mdcVoiceHoldUntil;
+}
+
+function onAudioFrameReady(buffer, rms) {
+    if (isTxing && currentFrequncyChannel !== null) {
         if (fringVC) {
             const degradedBuffer = simulateFringeCoverage(buffer, 8000);
-            audioBuffer.push(...degradedBuffer);
+            if (isCurrentConventional()) {
+                if (holdConventionalVoiceForMdc()) return;
+
+                sendConventionalPcm(degradedBuffer);
+                return;
+            }
+
+            appendAudioBuffer(degradedBuffer);
         } else {
-            audioBuffer.push(...buffer);
+            if (isCurrentConventional()) {
+                if (holdConventionalVoiceForMdc()) return;
+
+                sendConventionalPcm(buffer);
+                return;
+            }
+
+            appendAudioBuffer(buffer);
         }
 
         if (audioBuffer.length > MAX_BUFFER_SIZE) {
@@ -2132,27 +2213,26 @@ function onAudioFrameReady(buffer, rms) {
             audioBuffer = audioBuffer.slice(EXPECTED_PCM_LENGTH);
 
             if (isCurrentConventional()) {
-                const encoded = btoa(String.fromCharCode(...fullFrame));
+                const encoded = encodePcmBytes(fullFrame);
                 SendConvVoice(encoded, myRid, currentTg, getCurrentMdcMode(), currentFrequncyChannel);
-                return;
+            } else {
+                const response = {
+                    type: 0x01,
+                    rms: rms * 30.0,
+                    data: {
+                        VoiceChannel: {
+                            SrcId: myRid,
+                            DstId: currentTg,
+                            Frequency: currentFrequncyChannel
+                        },
+                        Site: currentSite,
+                        Data: fullFrame
+                    }
+                };
+
+                const jsonString = JSON.stringify(response);
+                setTimeout(() => socket.send(jsonString), 0);
             }
-
-            const response = {
-                type: 0x01,
-                rms: rms * 30.0,
-                data: {
-                    VoiceChannel: {
-                        SrcId: myRid,
-                        DstId: currentTg,
-                        Frequency: currentFrequncyChannel
-                    },
-                    Site: currentSite,
-                    Data: fullFrame
-                }
-            };
-
-            const jsonString = JSON.stringify(response);
-            setTimeout(() => socket.send(jsonString), 0);
         }
     }
 }

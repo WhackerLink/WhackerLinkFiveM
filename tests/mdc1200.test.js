@@ -19,6 +19,36 @@ function decodeInFrames(pcm) {
     return packet;
 }
 
+function decodeInByteFrames(pcm, frameSize) {
+    const decoder = new Mdc1200.Decoder(8000);
+    let packet = null;
+
+    for (let i = 0; i < pcm.byteLength; i += frameSize) {
+        const frame = pcm.subarray(i, Math.min(i + frameSize, pcm.byteLength));
+        const rv = decoder.processSamples(frame);
+
+        if (rv === 1) packet = decoder.getPacket();
+        if (rv === 2) packet = decoder.getDoublePacket();
+    }
+
+    return packet;
+}
+
+function mdcPttBytes(unitId) {
+    const lead = 0;
+    const tail = 0;
+    const samples = Mdc1200.encodePacket(0x01, 0x00, unitId, { sampleRate: 8000, preamble: 0 });
+    const pcm = new Uint8Array((lead + samples.length + tail) * 2);
+    let offset = lead * 2;
+
+    for (let i = 0; i < samples.length; i++) {
+        pcm[offset++] = samples[i] & 0xff;
+        pcm[offset++] = (samples[i] >> 8) & 0xff;
+    }
+
+    return pcm;
+}
+
 function assertPacket(packet, expected) {
     if (!packet) throw new Error('no packet decoded');
 
@@ -47,6 +77,13 @@ assertPacket(decoded[0], {
     unitID: 0x5678
 });
 
+assertPacket(decodeInByteFrames(mdcPttBytes(0x1234), 320), {
+    frameCount: 1,
+    op: 0x01,
+    arg: 0x00,
+    unitID: 0x1234
+});
+
 const doublePacket = Mdc1200.encodeDoublePacket(0x55, 0x34, 0x5678, 0x0a, 0x0b, 0x0c, 0x0d, { sampleRate: 16000 });
 const doublePcm = new Int16Array(doublePacket.length + 1600);
 doublePcm.set(doublePacket, 0);
@@ -71,4 +108,5 @@ assertPacket(doubleDecoded, {
 });
 
 console.log(`MDC1200 8000 PCM single ok (${single.length} samples)`);
+console.log('MDC1200 8000 PCM pre-id framed ok');
 console.log(`MDC1200 16000 PCM double ok (${doublePacket.length} samples)`);

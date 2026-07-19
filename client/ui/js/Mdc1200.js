@@ -17,7 +17,7 @@
 * Copyright (C) 2026 Caleb, K4PHP
 *
 * Based upon the c++ lib https://github.com/atmatthewat/mdc-encode-decode/
-*
+*0
 */
 
 function MdcEncoder(sampleRate) {
