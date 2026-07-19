@@ -85,7 +85,7 @@ class ScanManager {
                 return false;
             }
 
-            return channel.tgid.toString() === tgid.toString();
+            return channel.tgid != null && channel.tgid.toString() === tgid.toString();
         });
     }
 
@@ -104,7 +104,7 @@ class ScanManager {
         for (const entry of scanList.channels) {
             const zone = this.getZoneByName(entry.zone);
             if (zone) {
-                const channel = zone.channels.find(ch => ch.name === entry.channel && ch.tgid.toString() === tgid.toString());
+                const channel = zone.channels.find(ch => ch.name === entry.channel && ch.tgid != null && ch.tgid.toString() === tgid.toString());
                 if (channel) {
                     return {
                         zone: entry.zone,

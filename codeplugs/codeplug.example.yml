@@ -10,11 +10,18 @@ radioWide:
 
 systems:
   - name: "System 1"
+    mode: trunking
     # This address is the Public IP of your Whackerlink Server. If hosted in a VPS, it is your Public IP of the VPS.
     # If hosted locally, this is the Public IP of your Network.
     address: "localhost"
     authKey: "SuperSecretKey1"
     port: 3000
+    rid: null
+  - name: "Conventional"
+    mode: mdcconv
+    address: "localhost"
+    authKey: "SuperSecretKey1"
+    port: 3001
     rid: null
 
 qcList:
@@ -36,6 +43,9 @@ zones:
       - name: "Channel 3"
         system: "System 1"
         tgid: "15003"
+      - name: "Conv 1"
+        system: "Conventional"
+        frequency: "853.0125"
 
   - name: "Zone 2"
     channels:

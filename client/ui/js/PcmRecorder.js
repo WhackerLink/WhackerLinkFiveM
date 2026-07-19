@@ -134,6 +134,11 @@ class MicCapture {
             const inBuffer = event.inputBuffer.getChannelData(0);
             const downsampled = this.downsampleBuffer(inBuffer, event.inputBuffer.sampleRate, 8000);
             downsampled.forEach(sample => {
+                if (outputSamples >= samplesPerFrame) {
+                    outputSamples = 0;
+                    sum = 0.0;
+                }
+
                 const sample16 = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
                 view.setInt16(outputSamples * 2, sample16, true);
                 outputSamples++;
@@ -141,9 +146,10 @@ class MicCapture {
 
                 if (outputSamples >= samplesPerFrame) {
                     const rms = Math.sqrt(sum / samplesPerFrame) / 32767.0;
-                    this.onAudioFrameReadyCallback(new Uint8Array(frame), rms * 30.0);
+                    const outputFrame = frame.slice(0);
                     outputSamples = 0;
                     sum = 0.0;
+                    this.onAudioFrameReadyCallback(new Uint8Array(outputFrame), rms * 30.0);
                 }
             });
         };

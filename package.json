@@ -4,6 +4,9 @@
   "main": "server/server.js",
   "license": "GPL-3.0-only",
   "author": "Caleb, K4PHP (_php_)",
+  "scripts": {
+    "test:mdc": "node tests/mdc1200.test.js"
+  },
   "dependencies": {
     "js-yaml": "^4.1.0"
   }
