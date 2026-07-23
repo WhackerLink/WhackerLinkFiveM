@@ -1,0 +1,226 @@
+#radio-container {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    display: inline-block;
+}
+
+body {
+    overflow-y: hidden; 
+    overflow-x: hidden; 
+  }
+
+#radio-image {
+    display: block;
+    width: 200px;
+    height: auto;
+    position: relative;
+}
+
+#rssi-icon {
+    position: absolute;
+    top: 74.5%;
+    left: 25%;
+    display: block;
+}
+#scan-icon {
+    position: absolute;
+    top: 74.5%;
+    left: 45%;
+    display: none;
+    width: 12px;
+    height: auto;
+}
+
+#battery-icon {
+    position: absolute;
+    top: 74.5%;
+    left: 70.2%;
+    height: 3%;
+    width: auto;
+    display: none;
+}
+
+#zone-up,  #scan-btn {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 60%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#channel-up, #rssi-btn {
+    left: 37%;
+    background: white;
+    visibility: hidden;
+    display: none;
+}
+
+#zone-up {
+    left: 29%;
+}
+
+#scan-btn {
+    left: 72%;
+
+}
+
+#rssi-btn {
+    left: 50%;
+}
+
+#channel-knbu {
+    left: 47%;
+    top: 13%;
+}
+#channel-knbd {
+    left: 54%;
+    top: 13%;
+}
+#btn-emer {
+    left: 59%;
+}
+
+#power-btn {
+    left: 70%;
+    top: 13%;
+    width: 50px;
+}
+
+#btn-emer {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 45%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#channel-knbu, #channel-knbd, #power-btn {
+    position: absolute;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#line1, #line2, #line3 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    color: white;
+    font-size: 17px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+}
+
+#softText1, #softText2, #softText4 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    color: white;
+    font-size: 17px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+}
+
+#softText1 {
+    font-size: 12px;
+    top: 85.2%;
+    left: 36%;
+}
+
+#softText2 {
+    position: absolute;
+    left: 50%;
+    z-index: 1;
+    color: white;
+    font-size: 1px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+    visibility: hidden;
+}
+
+#softText3 {
+    position: absolute;
+    left: 50%;
+    z-index: 1;
+    color: white;
+    font-size: 1px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+    visibility: hidden;
+}
+#softText4 {
+    font-size: 12px;
+    top: 85.2%;
+    left: 63.5%;
+}
+
+
+#line1 {
+    top: 37%;
+}
+
+#line2 {
+    top: 44%;
+    font-size: 15px;
+}
+
+#line3 {
+    top: 49%;
+    font-size: 14px;
+    left: 49.5%;
+    width: 41%;
+}
+
+#startup-message {
+    background-color: transparent;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+#startup-message h1 {
+    margin: 0 0 10px;
+}
+
+#startup-message p {
+    margin: 5px 0;
+}
+#boot-image {
+    position: absolute;
+    top: 74.5%;
+    left: 24.7%;
+    height: 13%;
+    width: 50.3%;
+    display: none;
+}

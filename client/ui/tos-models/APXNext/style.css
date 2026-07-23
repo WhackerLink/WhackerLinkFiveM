@@ -1,0 +1,272 @@
+#radio-container {
+    position: absolute;
+    bottom: 5px;
+    display: inline-block;
+}
+
+body {
+    overflow-y: hidden; 
+    overflow-x: hidden; 
+  }
+
+
+#radio-image {
+    display: block;
+    width: 250px;
+    height: auto;
+    position: relative;
+}
+
+#rssi-icon {
+    position: absolute;
+    top: 56.5%;
+    left: 25.5%; /* Adjust this as needed */
+    height: 2%;
+    width: auto;
+    display: block;
+}
+#scan-icon {
+    position: absolute;
+    top: 56.5%;
+    left: 40%;
+    display: none;
+    width: 15px;
+    height: auto;
+}
+
+#battery-icon {
+    position: absolute;
+    top: 46.5%;
+    left: 70%;
+    height: 3%;
+    width: auto;
+    display: none;
+}
+
+#zone-up, #scan-btn {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 69%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+    color: transparent;
+    width: 45px;
+    border: none;
+    cursor: pointer;
+}
+
+#channel-up {
+    left: 37%;
+    visibility: hidden;
+    display: none;
+}
+
+#zone-up {
+    left: 32%;
+}
+
+
+#scan-btn {
+    left: 50%;
+
+}
+
+
+#rssi-btn {
+    display: none; /* Completely removes it from layout */
+}
+
+#channel-knbu {
+    left: 55%;
+    top: 18.5%;
+    height: 70px;
+}
+#channel-knbd {
+    left: 44%;
+    top: 18.5%;
+    height: 70px;
+}
+#btn-emer {
+    left: 30%;
+}
+
+#power-btn {
+    left: 86%;
+    top: 24%;
+    height: 50px;
+    width: 60px;
+    padding: 10px;
+}
+
+#btn-emer {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 28%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 10px;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#channel-knbu, #channel-knbd, #power-btn {
+    position: absolute;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 8px;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#line1, #line2, #line3 {
+    position: absolute;
+    left: 25.5%; /* Adjust this as needed */
+    transform: none; /* Remove centering */
+    z-index: 1;
+    color: black;
+    font-size: 13px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: left; /* Align text to the left */
+    width: 90%;
+}
+
+#softText1, #softText2, #softText4, #next-text {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    color: black;
+    font-size: 13px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+}
+
+#softText1 {
+    font-size: 8px;
+    top: 72.5%;
+    left: 30%; /* Position relative to other icons */
+}
+
+#softText2 {
+    font-size: 0px;
+    top: 0%;
+    left: 0%;
+    color: transparent;
+}
+
+#softText3 {
+    position: absolute;
+    left: 50%;
+    z-index: 1;
+    color: white;
+    font-size: 1px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+    visibility: hidden;
+}
+#softText4 {
+    font-size: 8px;
+    top: 72.5%;
+    left: 49.5%; /* Position relative to other icons */
+}
+#next-text {
+    font-size: 8px;
+    top: 72.5%;
+    left: 69%; /* Position relative to other icons */
+}
+
+
+#line1 {
+    top: 58.5%;
+    color:#868380;
+}
+
+#line2 {
+    top: 61%;
+    font-size: 10px;
+}
+
+#line3 {
+    top: 62.5%;
+    font-size: 8px;
+    left: 25.5%;
+    width: 41%;
+}
+
+#startup-message {
+    background-color: white;
+    padding: 20px;
+    left: 48.5%;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+#startup-message h1 {
+    margin: 0 0 10px;
+}
+
+#startup-message p {
+    margin: 5px 0;
+}
+
+#next-icon1, #next-icon2, #next-icon3 {
+    position: absolute;
+    display: none; /* Hidden by default until powered on */
+    width: 15px; /* Adjust as needed */
+    height: auto;
+}
+
+#next-icon1 {
+    top: 70%;
+    left: 26.5%; /* Position relative to other icons */
+}
+
+#next-icon2 {
+    top: 70%;
+    left: 46%; /* Position relative to other icons */
+}
+
+#next-icon3 {
+    top: 71%;
+    left: 65%; /* Position relative to other icons */
+}
+
+.tx-indicator, .rx-indicator {
+    position: absolute;
+    width: 8px; /* Adjust as needed */
+    height: 74px;
+    top: 56.41%; /* Adjust to fit your UI */
+    left: 22.5%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-weight: bold;
+    color: white;
+    display: none; /* Hidden by default */
+}
+
+.tx-indicator {
+    background-color:#ec1c24;
+}
+
+.rx-indicator {
+    background-color:#fcb400;
+}
+
+
