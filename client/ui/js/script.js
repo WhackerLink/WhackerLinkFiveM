@@ -1120,7 +1120,11 @@ function changeChannel(direction) {
     isReceivingParkedChannel = false;
     resetConvReceive();
 
-    //scanOff();
+    if (scanEnabled) {
+        scanOff();
+        scanOn();
+    }
+
 
     if (currentCodeplug.zones === null || currentCodeplug.zones === undefined) {
         displayError("Fail 01/82");
