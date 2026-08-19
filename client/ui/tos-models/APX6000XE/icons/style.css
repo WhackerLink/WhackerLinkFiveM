@@ -1,0 +1,188 @@
+#radio-container {
+    position: fixed;
+    bottom: 5px;
+    right: 100px;
+    display: inline-block;
+}
+
+#radio-image {
+    display: block;
+    width: 350px;
+    height: auto;
+    position: relative;
+}
+
+#rssi-icon {
+    position: absolute;
+    top: 69.5%;
+    left: 30%;
+    display: block;
+}
+
+#battery-icon {
+    position: absolute;
+    top: 69%;
+    left: 65.5%;
+    height: 3.5%;
+    width: auto;
+    display: none;
+}
+
+#channel-up, #zone-up, #rssi-btn {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 91%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#channel-up {
+    left: 63%;
+bottom: -4%;
+}
+
+#zone-up {
+bottom: -4%;
+    left: 37%;
+
+}
+
+#rssi-btn {
+bottom: -4%;
+    left: 50%;
+
+}
+
+#channel-knbu {
+    left: 52%;
+    top: 35%;
+    color: red;
+}
+#channel-knbd {
+    left: 44%;
+    top: 35%;
+    color: blue;
+
+
+}
+#btn-emer {
+   left 28%;
+   background-color: orange;
+}
+
+#power-btn {
+    left: 86%;
+    top: 41%;
+    width: 50px;
+   background-color:green;
+}
+
+#btn-emer {
+    position: absolute;
+    transform: translateX(-50%);
+    top: 45%;
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#channel-knbu, #channel-knbd, #power-btn {
+    position: absolute;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: block;
+    margin: 10px auto;
+    padding: 7px;
+    background-color: transparent;
+    color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#line1, #line2, #line3 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    color: black;
+    font-size: 17px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+}
+
+#softText1, #softText2, #softText3 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    color: white;
+    font-size: 17px;
+    font-family: Helvetica, serif;
+    font-weight: bold;
+    text-align: center;
+    width: 90%;
+}
+
+#softText1 {
+    font-size: 12px;
+    top: 87.2%;
+    left: 36%;
+}
+
+#softText2 {
+    font-size: 12px;
+    top: 87.2%;
+    left: 49.5%;
+}
+
+#softText3 {
+    font-size: 12px;
+    top: 87.2%;
+    left: 63.5%;
+}
+
+#line1 {
+    top: 73%;
+}
+
+#line2 {
+    top: 77%;
+    font-size: 15px;
+}
+
+#line3 {
+    top: 81.5%;
+    font-size: 14px;
+    left: 49.5%;
+    width: 41%;
+}
+
+#startup-message {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+#startup-message h1 {
+    margin: 0 0 10px;
+}
+
+#startup-message p {
+    margin: 5px 0;
+}
